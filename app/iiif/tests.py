@@ -36,5 +36,5 @@ class FileTestCase(TestCase):
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token()}
         response = self.c.get(self.url + "some_public_image.jpg", **header)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 401)
         self.assertEqual(response.content.decode("utf-8"), "DENIED")

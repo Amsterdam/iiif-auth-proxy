@@ -1,7 +1,6 @@
 import authorization_django
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import jwt
 
 from settings.settings import JWKS_TEST_KEY, EDEPOT_PUBLIC_SCOPE, EDEPOT_PRIVATE_SCOPE
 
@@ -15,5 +14,4 @@ def index(request, iiif_url):
         # TODO: Get metadata from stadsarchiefserver
         return HttpResponse("APPROVED IF IMAGE IS PUBLIC")
     else:
-        return HttpResponse("DENIED")
-        # return HttpResponse("DENIED", status_code=401)
+        return HttpResponse("DENIED", status=401)
