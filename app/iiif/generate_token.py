@@ -17,10 +17,14 @@ def load_jwks(jwks):
         _keyset.import_keyset(jwks)
     except JWException as e:
         raise Exception("Failed to import keyset from settings") from e
-    print('Loaded JWKS from JWKS setting.')
 
 
-def create_token():
+def create_token(scopes=None):
+    if scopes is None:
+        scopes = []
+    if type(scopes) not in (list, tuple, set):
+        scopes = [scopes]
+
     load_jwks(JWKS_TEST_KEY)
     key = next(iter(_keyset['keys']))
     now = int(time.time())
@@ -32,7 +36,7 @@ def create_token():
     claims = {
         'iat': now,
         'exp': now + 3600,
-        'scopes': [EDEPOT_PUBLIC_SCOPE, EDEPOT_PRIVATE_SCOPE],
+        'scopes': scopes,
         'sub': 'testgas@amsterdam.nl',
     }
     token = JWT(
@@ -40,5 +44,4 @@ def create_token():
         claims=claims
     )
     token.make_signed_token(key)
-    print(token.serialize())
     return token.serialize()
