@@ -1,6 +1,5 @@
 from django.test import TestCase, Client
 import logging
-import time
 from .generate_token import create_token
 import pytz
 from settings.settings import JWKS_TEST_KEY, EDEPOT_PUBLIC_SCOPE, EDEPOT_PRIVATE_SCOPE
@@ -12,7 +11,6 @@ timezone = pytz.timezone("UTC")
 class FileTestCase(TestCase):
     def setUp(self):
         self.url = '/iiif/'
-
         self.c = Client()
 
     def test_get_public_image_as_speciale_ambtenaar(self):
