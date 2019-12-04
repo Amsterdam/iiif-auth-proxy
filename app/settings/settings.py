@@ -52,8 +52,8 @@ DATAPUNT_AUTHZ = {
     # 'ALWAYS_OK': False,  # disable authz. tests will fail...
     'JWKS': os.getenv('PUB_JWKS', JWKS_TEST_KEY)
 }
-EDEPOT_PUBLIC_SCOPE = 'BD_O'  # BouwDossiers_Openbaar
-EDEPOT_PRIVATE_SCOPE = 'BD_A'  # BouwDossiers_Allemaal
+BOUWDOSSIER_OPENBAAR_SCOPE = 'BD_O'  # BouwDossiers_Openbaar
+BOUWDOSSIER_ALL_SCOPE = 'BD_A'  # BouwDossiers_Allemaal
 
 
 # Application definition

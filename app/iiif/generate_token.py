@@ -1,10 +1,8 @@
 import time
-
+from django.conf import settings
 from jwcrypto.jwt import JWT
 from jwcrypto.jwk import JWKSet
 from jwcrypto.common import JWException
-
-from settings.settings import JWKS_TEST_KEY, EDEPOT_PUBLIC_SCOPE, EDEPOT_PRIVATE_SCOPE
 
 
 _keyset = None
@@ -25,7 +23,7 @@ def create_token(scopes=None):
     if type(scopes) not in (list, tuple, set):
         scopes = [scopes]
 
-    load_jwks(JWKS_TEST_KEY)
+    load_jwks(settings.JWKS_TEST_KEY)
     key = next(iter(_keyset['keys']))
     now = int(time.time())
     header = {
