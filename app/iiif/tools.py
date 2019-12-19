@@ -12,3 +12,8 @@ def get_info_from_iiif_url(iiif_url):
         return stadsdeel, dossier, subdossier, image.split('.')[0]
     except Exception:
         raise InvalidIIIFUrlError(f"Invalid iiif url: {iiif_url}")
+
+
+def get_img_status_from_metadata(img_metadata):
+    # TODO: implement this
+    return "private"

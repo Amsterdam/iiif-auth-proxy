@@ -27,6 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+STADSARCHIEF_META_SERVER_URL = os.getenv('STADSARCHIEF_META_SERVER_URL', "https://metaserver.amsterdam.nl/")
+IIIF_URL = os.getenv('IIIF_URL', "https://iiif.amsterdam.nl/")
+
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
 # This is a test public/private key def and added for testing .
 JWKS_TEST_KEY = """
