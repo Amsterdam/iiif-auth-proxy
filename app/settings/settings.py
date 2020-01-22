@@ -27,8 +27,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-STADSARCHIEF_META_SERVER_URL = os.getenv('STADSARCHIEF_META_SERVER_URL', "https://metaserver.amsterdam.nl/")
-IIIF_URL = os.getenv('IIIF_URL', "https://iiif.amsterdam.nl/")
+STADSARCHIEF_META_SERVER_URL = os.getenv('STADSARCHIEF_META_SERVER_URL', "http://stadsarchief-api.service.consul")
+STADSARCHIEF_META_SERVER_PORT = os.getenv('STADSARCHIEF_META_SERVER_PORT', "8156")  # This port is static within the network
+ACCESS_PUBLIC = "PUBLIC"
+ACCESS_RESTRICTED = "RESTRICTED"
+BOUWDOSSIER_READ_SCOPE = 'BD/R'  # BouwDossiers_Read
+BOUWDOSSIER_EXTENDED_SCOPE = 'BD/X'  # BouwDossiers_eXtended
+IIIF_URL = os.getenv('IIIF_URL', "http://iiif.service.consul/")
+IIIF_PORT = os.getenv('IIIF_PORT', "8149")  # This port is static within the network
+IIIF_AUTH_USER = os.getenv('IIIF_AUTH_USER', 'user')
+IIIF_AUTH_PASS = os.getenv('IIIF_AUTH_PASS', 'pass')
+
 
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
 # This is a test public/private key def and added for testing .
@@ -55,8 +64,6 @@ DATAPUNT_AUTHZ = {
     # 'ALWAYS_OK': False,  # disable authz. tests will fail...
     'JWKS': os.getenv('PUB_JWKS', JWKS_TEST_KEY)
 }
-BOUWDOSSIER_OPENBAAR_SCOPE = 'BD_O'  # BouwDossiers_Openbaar
-BOUWDOSSIER_ALL_SCOPE = 'BD_A'  # BouwDossiers_Allemaal
 
 
 # Application definition

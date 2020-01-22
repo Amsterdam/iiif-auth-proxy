@@ -1,5 +1,6 @@
+from unittest.mock import patch
 from django.conf import settings
-from django.test import TestCase, Client
+from django.test import TestCase, Client,  override_settings
 import logging
 from .generate_token import create_token
 import pytz
@@ -8,50 +9,235 @@ from .tools import get_info_from_iiif_url, InvalidIIIFUrlError
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
 
+IMAGE_BINARY_DATA = "image binary data"
+IMAGE_URL = "2/edepot:ST$00015$ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
+
+class MockResponse:
+    def __init__(self, status_code, json_content=None, content=None):
+        self.status_code = status_code
+        self.json_content = json_content
+        self.content = content
+
+    def json(self):
+        return self.json_content
+
 
 class FileTestCase(TestCase):
     def setUp(self):
         self.url = '/iiif/'
         self.c = Client()
 
-    def test_get_public_image_as_speciale_ambtenaar(self):
-        """ Test getting a public image as a 'speciale ambtenaar' """
+    def test_get_image_with_wrongly_formatted_url(self):
+        """ Test getting an image with a wrongly formatted url' """
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(
-            [settings.BOUWDOSSIER_OPENBAAR_SCOPE, settings.BOUWDOSSIER_ALL_SCOPE])}
-        response = self.c.get(self.url + "some_public_image.jpg", **header)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), "APPROVED")
+            [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
+        response = self.c.get(self.url + "wrong_formatted_image_url.jpg", **header)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content.decode("utf-8"), "Invalid formatted url")
 
-    def test_get_public_image_as_normale_ambtenaar(self):
-        """ Test getting a public image as a 'normale ambtenaar' """
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_public_image_as_non_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
 
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_OPENBAAR_SCOPE)}
-        response = self.c.get(self.url + "some_public_image.jpg", **header)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), "APPROVED IF IMAGE IS PUBLIC")
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA
+        )
 
-    def test_get_public_image_as_non_ambtenaar(self):
-        """ Test getting a public image as not an ambtenaar """
-
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token()}
-        response = self.c.get(self.url + "some_public_image.jpg", **header)
+        response = self.c.get(self.url + IMAGE_URL)
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content.decode("utf-8"), "DENIED")
+        self.assertEqual(response.content.decode("utf-8"), "")
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_restricted_image_as_non_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_RESTRICTED,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}
+                ]
+            }
+        )
+
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA
+        )
+
+        response = self.c.get(self.url + IMAGE_URL)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.content.decode("utf-8"), "")
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_restricted_image_in_public_dossier_as_non_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}
+                ]
+            }
+        )
+
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA
+        )
+
+        response = self.c.get(self.url + IMAGE_URL)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.content.decode("utf-8"), "")
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_public_image_in_restricted_dossier_as_non_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_RESTRICTED,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
+
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA
+        )
+
+        response = self.c.get(self.url + IMAGE_URL)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.content.decode("utf-8"), "")
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_public_image_as_normale_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
+
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA
+        )
+
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
+        response = self.c.get(self.url + IMAGE_URL, **header)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_restricted_image_as_normale_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_RESTRICTED,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}
+                ]
+            }
+        )
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA
+        )
+
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
+        response = self.c.get(self.url + IMAGE_URL, **header)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.content.decode("utf-8"), "")
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_public_image_as_speciale_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
+
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA
+        )
+
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(
+            [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
+        response = self.c.get(self.url + IMAGE_URL, **header)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_restricted_image_as_speciale_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_RESTRICTED,
+                'documenten': [
+                    {'barcode': 'ST00000126',
+                     'access': settings.ACCESS_RESTRICTED
+                     }
+                ]
+            }
+        )
+
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA
+        )
+
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(
+            [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
+        response = self.c.get(self.url + IMAGE_URL, **header)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
 
 
 class ToolsTestCase(TestCase):
     def setUp(self):
-        self.iiif_url = \
-            "https://acc.images.data.amsterdam.nl/iiif/2/" \
-            "edepot:ST$00015$ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
+        self.iiif_url = "http://iiif.services.consul/iiif/" + IMAGE_URL
 
     def test_get_info_from_iiif_url_vanilla(self):
-        stadsdeel, dossier, subdossier, image = get_info_from_iiif_url(self.iiif_url)
+        stadsdeel, dossier, document, file = get_info_from_iiif_url(self.iiif_url)
         self.assertEqual(stadsdeel, "ST")
         self.assertEqual(dossier, "00015")
-        self.assertEqual(subdossier, "ST00000126")
-        self.assertEqual(image, "00001")
+        self.assertEqual(document, "ST00000126")
+        self.assertEqual(file, "00001")
 
     def test_get_info_from_iiif_url_wrong_formatted_url(self):
         self.assertRaises(InvalidIIIFUrlError, get_info_from_iiif_url, "https://acc.images.data.amsterdam.nl/iiif/")
