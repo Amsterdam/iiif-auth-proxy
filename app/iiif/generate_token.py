@@ -1,9 +1,9 @@
 import time
-from django.conf import settings
-from jwcrypto.jwt import JWT
-from jwcrypto.jwk import JWKSet
-from jwcrypto.common import JWException
 
+from django.conf import settings
+from jwcrypto.common import JWException
+from jwcrypto.jwk import JWKSet
+from jwcrypto.jwt import JWT
 
 _keyset = None
 

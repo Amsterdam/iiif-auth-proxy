@@ -1,16 +1,19 @@
-from unittest.mock import patch
-from django.conf import settings
-from django.test import TestCase, Client,  override_settings
 import logging
-from .generate_token import create_token
+from unittest.mock import patch
+
 import pytz
-from .tools import get_info_from_iiif_url, InvalidIIIFUrlError
+from django.conf import settings
+from django.test import Client, TestCase
+
+from .generate_token import create_token
+from .tools import InvalidIIIFUrlError, get_info_from_iiif_url
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
 
 IMAGE_BINARY_DATA = "image binary data"
 IMAGE_URL = "2/edepot:ST$00015$ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
+
 
 class MockResponse:
     def __init__(self, status_code, json_content=None, content=None):
@@ -49,7 +52,6 @@ class FileTestCase(TestCase):
                 ]
             }
         )
-
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
             content=IMAGE_BINARY_DATA
@@ -72,7 +74,6 @@ class FileTestCase(TestCase):
                 ]
             }
         )
-
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
             content=IMAGE_BINARY_DATA
@@ -95,7 +96,6 @@ class FileTestCase(TestCase):
                 ]
             }
         )
-
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
             content=IMAGE_BINARY_DATA
@@ -118,7 +118,6 @@ class FileTestCase(TestCase):
                 ]
             }
         )
-
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
             content=IMAGE_BINARY_DATA
@@ -141,7 +140,6 @@ class FileTestCase(TestCase):
                 ]
             }
         )
-
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
             content=IMAGE_BINARY_DATA
@@ -188,7 +186,6 @@ class FileTestCase(TestCase):
                 ]
             }
         )
-
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
             content=IMAGE_BINARY_DATA
@@ -215,7 +212,6 @@ class FileTestCase(TestCase):
                 ]
             }
         )
-
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
             content=IMAGE_BINARY_DATA
