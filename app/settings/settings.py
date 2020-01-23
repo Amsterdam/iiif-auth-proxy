@@ -35,8 +35,6 @@ BOUWDOSSIER_READ_SCOPE = 'BD/R'  # BouwDossiers_Read
 BOUWDOSSIER_EXTENDED_SCOPE = 'BD/X'  # BouwDossiers_eXtended
 IIIF_URL = os.getenv('IIIF_URL', "http://iiif.service.consul/")
 IIIF_PORT = os.getenv('IIIF_PORT', "8149")  # This port is static within the network
-IIIF_AUTH_USER = os.getenv('IIIF_AUTH_USER', 'user')
-IIIF_AUTH_PASS = os.getenv('IIIF_AUTH_PASS', 'pass')
 
 
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256

@@ -11,14 +11,12 @@ def get_meta_data(dossier):
 
 
 def get_image_from_iiif_server(stadsdeel, dossier, document_barcode, file):
-    return requests.get(
-        f"{settings.IIIF_URL}{stadsdeel}/{dossier}/{document_barcode}/{file}:{settings.IIIF_PORT}",
-        auth=('user', 'pass')
-    )
+    return requests.get(f"{settings.IIIF_URL}{stadsdeel}/{dossier}/{document_barcode}/{file}:{settings.IIIF_PORT}")
 
 
 def get_info_from_iiif_url(iiif_url):
-    # iiif_url = "https://acc.images.data.amsterdam.nl/iiif/2/edepot:ST$00015$ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
+    # iiif_url = \
+    # "https://acc.images.data.amsterdam.nl/iiif/2/edepot:ST$00015$ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
     # ST=stadsdeel  00015=dossier  ST00000126=document  00001=file/bestand
 
     try:
