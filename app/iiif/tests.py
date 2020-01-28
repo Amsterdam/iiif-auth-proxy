@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytz
 from django.conf import settings
-from django.test import Client, TestCase
+from django.test import Client, SimpleTestCase
 
 from .generate_token import create_token
 from .tools import InvalidIIIFUrlError, get_info_from_iiif_url
@@ -25,7 +25,7 @@ class MockResponse:
         return self.json_content
 
 
-class FileTestCase(TestCase):
+class FileTestCase(SimpleTestCase):
     def setUp(self):
         self.url = '/iiif/'
         self.c = Client()
@@ -224,7 +224,7 @@ class FileTestCase(TestCase):
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
 
 
-class ToolsTestCase(TestCase):
+class ToolsTestCase(SimpleTestCase):
     def setUp(self):
         self.iiif_url = "http://iiif.services.consul/iiif/" + IMAGE_URL
 
