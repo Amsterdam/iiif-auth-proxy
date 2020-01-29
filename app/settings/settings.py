@@ -23,7 +23,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 STADSARCHIEF_META_SERVER_URL = os.getenv('STADSARCHIEF_META_SERVER_URL', "http://stadsarchief-api.service.consul")
 STADSARCHIEF_META_SERVER_PORT = os.getenv('STADSARCHIEF_META_SERVER_PORT', "8156")  # This port is static within the network
