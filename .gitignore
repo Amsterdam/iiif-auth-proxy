@@ -3,6 +3,7 @@ venv/
 .idea/
 .mypy*
 .vscode
+.env
 
 # Python ephemerals:
 *.pyc

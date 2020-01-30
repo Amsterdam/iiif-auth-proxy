@@ -1,0 +1,19 @@
+version: "3.3"
+services:
+  app:
+    build: .
+    volumes:
+      - ./app:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=insecure
+      - UWSGI_HTTP=0.0.0.0:8000
+      - UWSGI_MODULE=settings.wsgi:application
+      - UWSGI_CALLABLE=application
+      - UWSGI_OFFLOAD_THREADS=1
+      - UWSGI_MASTER=1
+      - UWSGI_VACUUM=1
+      - UWSGI_HARAKIRI=15
+      - UWSGI_DIE_ON_TERM=1
+      - UWSGI_PY_AUTORELOAD=1
