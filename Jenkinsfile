@@ -3,7 +3,7 @@
 // Project Settings for Deployment
 String PROJECT_DISPLAY = "iiif-auth-proxy"
 String PROJECT_NAME = "iiif-auth-proxy"
-String CONTAINER_DIR = "./app"
+String CONTAINER_DIR = "."
 String PRODUCTION_BRANCH = "master"
 String ACCEPTANCE_BRANCH = "development"
 String INFRASTRUCTURE = 'thanos'
