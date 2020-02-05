@@ -28,13 +28,13 @@ DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 
 ALLOWED_HOSTS = ['*']
 
-STADSARCHIEF_META_SERVER_URL = os.getenv('STADSARCHIEF_META_SERVER_URL', "http://stadsarchief-api.service.consul")
+STADSARCHIEF_META_SERVER_BASE_URL = os.getenv('STADSARCHIEF_META_SERVER_BASE_URL', "http://stadsarchief-api.service.consul")
 STADSARCHIEF_META_SERVER_PORT = os.getenv('STADSARCHIEF_META_SERVER_PORT', "8156")  # This port is static within the network
 ACCESS_PUBLIC = "PUBLIC"
 ACCESS_RESTRICTED = "RESTRICTED"
 BOUWDOSSIER_READ_SCOPE = 'BD/R'  # BouwDossiers_Read
 BOUWDOSSIER_EXTENDED_SCOPE = 'BD/X'  # BouwDossiers_eXtended
-IIIF_URL = os.getenv('IIIF_URL', "http://iiif.service.consul/")
+IIIF_BASE_URL = os.getenv('IIIF_BASE_URL', "http://iiif.service.consul")
 IIIF_PORT = os.getenv('IIIF_PORT', "8149")  # This port is static within the network
 
 
