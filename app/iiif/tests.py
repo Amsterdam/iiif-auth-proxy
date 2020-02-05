@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
 
 IMAGE_BINARY_DATA = "image binary data"
-IMAGE_URL = "2/edepot:ST$00015$ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
+IMAGE_URL = "2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
 
 
 class MockResponse:
