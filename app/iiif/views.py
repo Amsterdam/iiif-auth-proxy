@@ -11,13 +11,17 @@ log = logging.getLogger(__name__)
 
 @csrf_exempt
 def index(request, iiif_url):
+    if not request.META.get('HTTP_AUTHORIZATION', None):
+        return HttpResponse("No token supplied", status=401)
+    token = request.META['HTTP_AUTHORIZATION']
+
     try:
         stadsdeel, dossier, document_barcode, file = tools.get_info_from_iiif_url(iiif_url)
     except tools.InvalidIIIFUrlError:
         return HttpResponse("Invalid formatted url", status=400)
 
     # Get image meta data
-    meta_response = tools.get_meta_data(dossier)
+    meta_response = tools.get_meta_data(dossier, token)
     if meta_response.status_code == 404:
         return HttpResponse("No metadata could be found for this image", status=404)
     elif meta_response.status_code != 200:
@@ -32,7 +36,7 @@ def index(request, iiif_url):
     metadata = meta_response.json()
 
     # Get the image itself
-    img_response = tools.get_image_from_iiif_server(stadsdeel, dossier, document_barcode, file)
+    img_response = tools.get_image_from_iiif_server(iiif_url)
     if img_response.status_code == 404:
         return HttpResponse("No image could be found", status=404)
     elif img_response.status_code != 200:

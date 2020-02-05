@@ -6,9 +6,9 @@ class InvalidIIIFUrlError(Exception):
     pass
 
 
-def get_meta_data(dossier):
+def get_meta_data(dossier, token):
     metadata_url = f"{settings.STADSARCHIEF_META_SERVER_BASE_URL}:{settings.STADSARCHIEF_META_SERVER_PORT}/{dossier}/"
-    return requests.get(metadata_url)
+    return requests.get(metadata_url, headers={'Authorization', token})
 
 
 def get_image_from_iiif_server(iiif_url):
