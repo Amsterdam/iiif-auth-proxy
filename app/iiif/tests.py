@@ -7,6 +7,7 @@ from django.test import Client, SimpleTestCase
 
 from .generate_token import create_token
 from .tools import InvalidIIIFUrlError, get_info_from_iiif_url
+from .views import RESPONSE_CONTENT_NO_TOKEN
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
@@ -59,7 +60,7 @@ class FileTestCase(SimpleTestCase):
 
         response = self.c.get(self.url + IMAGE_URL)
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content.decode("utf-8"), "")
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_TOKEN)
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
@@ -81,7 +82,7 @@ class FileTestCase(SimpleTestCase):
 
         response = self.c.get(self.url + IMAGE_URL)
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content.decode("utf-8"), "")
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_TOKEN)
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
@@ -103,7 +104,7 @@ class FileTestCase(SimpleTestCase):
 
         response = self.c.get(self.url + IMAGE_URL)
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content.decode("utf-8"), "")
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_TOKEN)
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
@@ -125,7 +126,7 @@ class FileTestCase(SimpleTestCase):
 
         response = self.c.get(self.url + IMAGE_URL)
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content.decode("utf-8"), "")
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_TOKEN)
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
