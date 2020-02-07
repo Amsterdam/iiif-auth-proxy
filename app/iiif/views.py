@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from sentry_sdk import capture_message
 
 from . import tools
 
@@ -12,6 +13,9 @@ RESPONSE_CONTENT_NO_TOKEN = "No token supplied"
 
 @csrf_exempt
 def index(request, iiif_url):
+    log.info("IN THE INDEX VIEW log")
+    capture_message("IN THE INDEX VIEW sentry")
+
     if not request.META.get('HTTP_AUTHORIZATION', None):
         return HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
     token = request.META['HTTP_AUTHORIZATION']
