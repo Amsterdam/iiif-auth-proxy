@@ -7,12 +7,13 @@ class InvalidIIIFUrlError(Exception):
 
 
 def get_meta_data(dossier, token):
-    metadata_url = f"{settings.STADSARCHIEF_META_SERVER_BASE_URL}:{settings.STADSARCHIEF_META_SERVER_PORT}/{dossier}/"
-    return requests.get(metadata_url, headers={'Authorization', token})
+    metadata_url = f"{settings.STADSARCHIEF_META_SERVER_BASE_URL}:" \
+                   f"{settings.STADSARCHIEF_META_SERVER_PORT}/stadsarchief/bouwdossier/{dossier}/"
+    return requests.get(metadata_url, headers={'Authorization': token})
 
 
 def get_image_from_iiif_server(iiif_url):
-    iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/{iiif_url}/"
+    iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
     return requests.get(iiif_image_url)
 
 

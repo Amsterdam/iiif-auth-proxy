@@ -17,10 +17,11 @@ IMAGE_URL = "2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,1000/0/default.jpg
 
 
 class MockResponse:
-    def __init__(self, status_code, json_content=None, content=None):
+    def __init__(self, status_code, json_content=None, content=None, headers=None):
         self.status_code = status_code
         self.json_content = json_content
         self.content = content
+        self.headers = headers
 
     def json(self):
         return self.json_content
@@ -143,7 +144,8 @@ class FileTestCase(SimpleTestCase):
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
-            content=IMAGE_BINARY_DATA
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
@@ -166,7 +168,8 @@ class FileTestCase(SimpleTestCase):
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
-            content=IMAGE_BINARY_DATA
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
@@ -189,7 +192,8 @@ class FileTestCase(SimpleTestCase):
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
-            content=IMAGE_BINARY_DATA
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(
@@ -215,7 +219,8 @@ class FileTestCase(SimpleTestCase):
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
-            content=IMAGE_BINARY_DATA
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(

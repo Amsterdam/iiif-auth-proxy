@@ -3,7 +3,6 @@ import logging
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from sentry_sdk import capture_message
 
 from . import tools
 
@@ -11,11 +10,9 @@ log = logging.getLogger(__name__)
 
 RESPONSE_CONTENT_NO_TOKEN = "No token supplied"
 
+
 @csrf_exempt
 def index(request, iiif_url):
-    log.info("IN THE INDEX VIEW log")
-    capture_message("IN THE INDEX VIEW sentry")
-
     if not request.META.get('HTTP_AUTHORIZATION', None):
         return HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
     token = request.META['HTTP_AUTHORIZATION']
@@ -57,10 +54,10 @@ def index(request, iiif_url):
     # Decide whether the user can view the image
     if request.is_authorized_for(settings.BOUWDOSSIER_EXTENDED_SCOPE):
         # The user has an extended scope, meaning (s)he can view anything. So we'll return the image.
-        return HttpResponse(img_response.content)
+        return HttpResponse(img_response.content, content_type=img_response.headers.get('Content-Type', ''))
 
     elif request.is_authorized_for(settings.BOUWDOSSIER_READ_SCOPE) and tools.img_is_public(metadata, document_barcode):
         # The user has a read scope, meaning (s)he can view only public images. This image is public, so we'll serve it.
-        return HttpResponse(img_response.content)
+        return HttpResponse(img_response.content, content_type=img_response.headers.get('Content-Type', ''))
 
     return HttpResponse("", status=401)
