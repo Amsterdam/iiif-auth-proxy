@@ -27,6 +27,7 @@ class MockResponse:
         return self.json_content
 
 
+# We're using SimpleTestCase because the normal TestCase fails because it checks for a DB connection (which is not used)
 class FileTestCase(SimpleTestCase):
     def setUp(self):
         self.url = '/iiif/'
