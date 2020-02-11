@@ -7,24 +7,27 @@ from django.test import Client, SimpleTestCase
 
 from .generate_token import create_token
 from .tools import InvalidIIIFUrlError, get_info_from_iiif_url
+from .views import RESPONSE_CONTENT_NO_TOKEN
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
 
 IMAGE_BINARY_DATA = "image binary data"
-IMAGE_URL = "2/edepot:ST$00015$ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
+IMAGE_URL = "2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
 
 
 class MockResponse:
-    def __init__(self, status_code, json_content=None, content=None):
+    def __init__(self, status_code, json_content=None, content=None, headers=None):
         self.status_code = status_code
         self.json_content = json_content
         self.content = content
+        self.headers = headers
 
     def json(self):
         return self.json_content
 
 
+# We're using SimpleTestCase because the normal TestCase fails because it checks for a DB connection (which is not used)
 class FileTestCase(SimpleTestCase):
     def setUp(self):
         self.url = '/iiif/'
@@ -59,7 +62,7 @@ class FileTestCase(SimpleTestCase):
 
         response = self.c.get(self.url + IMAGE_URL)
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content.decode("utf-8"), "")
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_TOKEN)
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
@@ -81,7 +84,7 @@ class FileTestCase(SimpleTestCase):
 
         response = self.c.get(self.url + IMAGE_URL)
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content.decode("utf-8"), "")
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_TOKEN)
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
@@ -103,7 +106,7 @@ class FileTestCase(SimpleTestCase):
 
         response = self.c.get(self.url + IMAGE_URL)
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content.decode("utf-8"), "")
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_TOKEN)
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
@@ -125,7 +128,7 @@ class FileTestCase(SimpleTestCase):
 
         response = self.c.get(self.url + IMAGE_URL)
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content.decode("utf-8"), "")
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_TOKEN)
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
@@ -142,7 +145,8 @@ class FileTestCase(SimpleTestCase):
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
-            content=IMAGE_BINARY_DATA
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
@@ -165,7 +169,8 @@ class FileTestCase(SimpleTestCase):
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
-            content=IMAGE_BINARY_DATA
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
@@ -188,7 +193,8 @@ class FileTestCase(SimpleTestCase):
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
-            content=IMAGE_BINARY_DATA
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(
@@ -214,7 +220,8 @@ class FileTestCase(SimpleTestCase):
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
             200,
-            content=IMAGE_BINARY_DATA
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(

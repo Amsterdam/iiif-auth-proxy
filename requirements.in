@@ -3,3 +3,4 @@
 
 django
 datapunt-authorization-django
+sentry-sdk

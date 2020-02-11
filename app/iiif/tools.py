@@ -6,22 +6,25 @@ class InvalidIIIFUrlError(Exception):
     pass
 
 
-def get_meta_data(dossier):
-    return requests.get(f"{settings.STADSARCHIEF_META_SERVER_URL}{dossier}/:{settings.STADSARCHIEF_META_SERVER_PORT}")
+def get_meta_data(dossier, token):
+    metadata_url = f"{settings.STADSARCHIEF_META_SERVER_BASE_URL}:" \
+                   f"{settings.STADSARCHIEF_META_SERVER_PORT}/stadsarchief/bouwdossier/{dossier}/"
+    return requests.get(metadata_url, headers={'Authorization': token})
 
 
-def get_image_from_iiif_server(stadsdeel, dossier, document_barcode, file):
-    return requests.get(f"{settings.IIIF_URL}{stadsdeel}/{dossier}/{document_barcode}/{file}:{settings.IIIF_PORT}")
+def get_image_from_iiif_server(iiif_url):
+    iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
+    return requests.get(iiif_image_url)
 
 
 def get_info_from_iiif_url(iiif_url):
     # iiif_url = \
-    # "https://acc.images.data.amsterdam.nl/iiif/2/edepot:ST$00015$ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
+    # "https://acc.images.data.amsterdam.nl/iiif/2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
     # ST=stadsdeel  00015=dossier  ST00000126=document  00001=file/bestand
 
     try:
         relevant_url_part = iiif_url.split('edepot:')[1].split('/')[0]
-        stadsdeel, dossier, document_and_file = relevant_url_part.split('$')
+        stadsdeel, dossier, document_and_file = relevant_url_part.split('-')
         document, file = document_and_file.split('_')
         return stadsdeel, dossier, document, file.split('.')[0]
     except Exception:
