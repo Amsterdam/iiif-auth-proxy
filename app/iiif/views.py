@@ -9,6 +9,7 @@ from . import tools
 log = logging.getLogger(__name__)
 
 RESPONSE_CONTENT_NO_TOKEN = "No token supplied"
+RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA = "Document not found in metadata"
 
 
 @csrf_exempt
@@ -25,7 +26,7 @@ def index(request, iiif_url):
     # Get image meta data
     meta_response = tools.get_meta_data(dossier, token)
     if meta_response.status_code == 404:
-        return HttpResponse("No metadata could be found for this image", status=404)
+        return HttpResponse("No metadata could be found for this file", status=404)
     elif meta_response.status_code != 200:
         log.info(
             f"Got response code {meta_response.status_code} while retrieving "
@@ -51,13 +52,20 @@ def index(request, iiif_url):
             status=400
         )
 
+    # Check whether the image exists in the metadata and whether it is public
+    try:
+        is_public = tools.img_is_public(metadata, document_barcode)
+    except tools.DocumentNotFoundInMetadataError:
+        return HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404)
+
     # Decide whether the user can view the image
     if request.is_authorized_for(settings.BOUWDOSSIER_EXTENDED_SCOPE):
         # The user has an extended scope, meaning (s)he can view anything. So we'll return the image.
         return HttpResponse(img_response.content, content_type=img_response.headers.get('Content-Type', ''))
 
-    elif request.is_authorized_for(settings.BOUWDOSSIER_READ_SCOPE) and tools.img_is_public(metadata, document_barcode):
-        # The user has a read scope, meaning (s)he can view only public images. This image is public, so we'll serve it.
+    elif request.is_authorized_for(settings.BOUWDOSSIER_READ_SCOPE) and is_public:
+        # The user has a read scope, meaning (s)he can view only public images. 
+        # This image is public, so we'll serve it.
         return HttpResponse(img_response.content, content_type=img_response.headers.get('Content-Type', ''))
 
     return HttpResponse("", status=401)

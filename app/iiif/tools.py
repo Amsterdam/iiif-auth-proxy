@@ -6,6 +6,10 @@ class InvalidIIIFUrlError(Exception):
     pass
 
 
+class DocumentNotFoundInMetadataError(Exception):
+    pass
+
+
 def get_meta_data(dossier, token):
     metadata_url = f"{settings.STADSARCHIEF_META_SERVER_BASE_URL}:" \
                    f"{settings.STADSARCHIEF_META_SERVER_PORT}/stadsarchief/bouwdossier/{dossier}/"
@@ -32,10 +36,12 @@ def get_info_from_iiif_url(iiif_url):
 
 
 def img_is_public(metadata, document_barcode):
-    if metadata['access'] == settings.ACCESS_PUBLIC:
-        for meta_document in metadata['documenten']:
-            if meta_document['barcode'] == document_barcode:
-                if meta_document['access'] == settings.ACCESS_PUBLIC:
-                    return True
-                break
-    return False
+    if metadata['access'] != settings.ACCESS_PUBLIC:
+        return False
+
+    for meta_document in metadata['documenten']:
+        if meta_document['barcode'] == document_barcode:
+            if meta_document['access'] == settings.ACCESS_PUBLIC:
+                return True
+            break
+    raise DocumentNotFoundInMetadataError()
