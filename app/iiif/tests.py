@@ -58,7 +58,8 @@ class FileTestCase(SimpleTestCase):
             content=IMAGE_BINARY_DATA
         )
 
-        response = self.c.get(self.url + IMAGE_URL)
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
+        response = self.c.get(self.url + IMAGE_URL, **header)
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA)
 
