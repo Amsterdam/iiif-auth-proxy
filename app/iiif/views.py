@@ -39,7 +39,11 @@ def index(request, iiif_url):
     metadata = meta_response.json()
 
     # Get the image itself
-    img_response = tools.get_image_from_iiif_server(iiif_url)
+    headers = {}
+    if 'HTTP_X_FORWARDED_PROTO' in request.META and 'HTTP_X_FORWARDED_HOST' in request.META :
+        headers['X-Forwarded-Proto'] = request.META['HTTP_X_FORWARDED_PROTO']
+        headers['X-Forwarded-Host'] = request.META['HTTP_X_FORWARDED_HOST']
+    img_response = tools.get_image_from_iiif_server(iiif_url, headers)
     if img_response.status_code == 404:
         return HttpResponse("No image could be found", status=404)
     elif img_response.status_code != 200:
