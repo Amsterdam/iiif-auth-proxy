@@ -16,9 +16,9 @@ def get_meta_data(dossier, token):
     return requests.get(metadata_url, headers={'Authorization': token})
 
 
-def get_image_from_iiif_server(iiif_url):
+def get_image_from_iiif_server(iiif_url, headers):
     iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
-    return requests.get(iiif_image_url)
+    return requests.get(iiif_image_url, headers=headers)
 
 
 def get_info_from_iiif_url(iiif_url):
