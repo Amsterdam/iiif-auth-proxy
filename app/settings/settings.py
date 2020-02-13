@@ -25,8 +25,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 
-
 ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_ALLOW_ALL = True
 
 STADSARCHIEF_META_SERVER_BASE_URL = os.getenv('STADSARCHIEF_META_SERVER_BASE_URL', "http://stadsarchief-api.service.consul")
 STADSARCHIEF_META_SERVER_PORT = os.getenv('STADSARCHIEF_META_SERVER_PORT', "8156")  # This port is static within the network
@@ -76,9 +76,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'iiif',
     'health',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
