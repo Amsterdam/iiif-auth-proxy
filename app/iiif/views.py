@@ -24,7 +24,7 @@ def index(request, iiif_url):
         return HttpResponse("Invalid formatted url", status=400)
 
     # Get image meta data
-    meta_response = tools.get_meta_data(dossier, token)
+    meta_response = tools.get_meta_data(stadsdeel, dossier, token)
     if meta_response.status_code == 404:
         return HttpResponse("No metadata could be found for this file", status=404)
     elif meta_response.status_code != 200:
@@ -68,7 +68,7 @@ def index(request, iiif_url):
         return HttpResponse(img_response.content, content_type=img_response.headers.get('Content-Type', ''))
 
     elif request.is_authorized_for(settings.BOUWDOSSIER_READ_SCOPE) and is_public:
-        # The user has a read scope, meaning (s)he can view only public images. 
+        # The user has a read scope, meaning (s)he can view only public images.
         # This image is public, so we'll serve it.
         return HttpResponse(img_response.content, content_type=img_response.headers.get('Content-Type', ''))
 

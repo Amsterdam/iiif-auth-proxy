@@ -258,7 +258,7 @@ class ToolsTestCase(SimpleTestCase):
 
     def test_get_info_from_iiif_url_vanilla(self):
         stadsdeel, dossier, document, file = get_info_from_iiif_url(self.iiif_url)
-        self.assertEqual(stadsdeel, "ST")
+        self.assertEqual(stadsdeel, "T")  # Stadsdeel should not contain the S that is prepended to the value
         self.assertEqual(dossier, "00015")
         self.assertEqual(document, "ST00000126")
         self.assertEqual(file, "00001")
