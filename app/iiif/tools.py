@@ -29,7 +29,6 @@ def get_info_from_iiif_url(iiif_url):
     try:
         relevant_url_part = iiif_url.split('edepot:')[1].split('/')[0]
         stadsdeel, dossier, document_and_file = relevant_url_part.split('-')
-        stadsdeel = stadsdeel[1]  # remove the S that prepends the stadsdeel value
         document, file = document_and_file.split('_')
         return stadsdeel, dossier, document, file.split('.')[0]
     except Exception:
