@@ -252,6 +252,58 @@ class FileTestCase(SimpleTestCase):
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
 
 
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_public_image_with_only_bd_x_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
+        )
+
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])}
+        response = self.c.get(self.url + IMAGE_URL, **header)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_restricted_image_with_only_bd_x_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_RESTRICTED,
+                'documenten': [
+                    {'barcode': 'ST00000126',
+                     'access': settings.ACCESS_RESTRICTED
+                     }
+                ]
+            }
+        )
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
+        )
+
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])}
+        response = self.c.get(self.url + IMAGE_URL, **header)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+
+
 class ToolsTestCase(SimpleTestCase):
     def setUp(self):
         self.iiif_url = "http://iiif.services.consul/iiif/" + IMAGE_URL
