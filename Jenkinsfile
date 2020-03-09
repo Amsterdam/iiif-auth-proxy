@@ -39,7 +39,7 @@ node {
 
     stage('Test') {
         tryStep "Test", {
-            sh "app/deploy/test/jenkins-script.sh"
+            sh "src/deploy/test/jenkins-script.sh"
         }
     }
 

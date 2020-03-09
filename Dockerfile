@@ -9,16 +9,16 @@ ENV CONSUL_PORT=${CONSUL_PORT:-8500}
 
 RUN adduser --system datapunt
 
-RUN mkdir -p /app && chown datapunt /app
+RUN mkdir -p /src && chown datapunt /src
 RUN mkdir -p /deploy && chown datapunt /deploy
 RUN mkdir -p /var/log/uwsgi && chown datapunt /var/log/uwsgi
 
-WORKDIR /app
-COPY requirements.txt /app/
+WORKDIR /src
+COPY requirements.txt /src/
 RUN pip install --no-cache-dir -r requirements.txt
 USER datapunt
 
-COPY app /app/
-COPY app/deploy /deploy/
+COPY src /src/
+COPY src/deploy /deploy/
 
 CMD ["/deploy/docker-run.sh"]
