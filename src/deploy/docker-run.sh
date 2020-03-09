@@ -4,6 +4,6 @@ set -u  # crash on missing env variables
 set -e  # stop on any error
 set -x  # print what we are doing
 
-cd /app
-
-python manage.py test
+# run uwsgi
+cd /src
+exec uwsgi

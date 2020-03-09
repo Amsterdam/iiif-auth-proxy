@@ -3,11 +3,8 @@ services:
   tests:
     build: ../../..
     volumes:
-#      - ./app:/app
-      - ./test-run.sh:/app/test-run.sh
-#    ports:
-#      - "8000:8000"
+      - ./test-run.sh:/src/test-run.sh
     environment:
       - SECRET_KEY=insecure
       - DEBUG=True
-    command: /app/test-run.sh
+    command: /src/test-run.sh
