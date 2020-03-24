@@ -43,5 +43,7 @@ def img_is_public(metadata, document_barcode):
         if meta_document['barcode'] == document_barcode:
             if meta_document['access'] == settings.ACCESS_PUBLIC:
                 return True
+            elif meta_document['access'] == settings.ACCESS_RESTRICTED:
+                return False
             break
     raise DocumentNotFoundInMetadataError()
