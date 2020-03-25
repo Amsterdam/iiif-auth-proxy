@@ -4,3 +4,4 @@
 django
 datapunt-authorization-django
 sentry-sdk
+django-cors-headers

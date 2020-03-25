@@ -6,17 +6,18 @@
 #
 asgiref==3.2.3            # via django
 certifi==2019.11.28       # via requests, sentry-sdk
-cffi==1.13.2              # via cryptography
+cffi==1.14.0              # via cryptography
 chardet==3.0.4            # via requests
 cryptography==2.8         # via jwcrypto
-datapunt-authorization-django==0.3.1
-django==3.0.3
-idna==2.8                 # via requests
-jwcrypto==0.6.0           # via datapunt-authorization-django
-pycparser==2.19           # via cffi
+datapunt-authorization-django==1.0.0
+django-cors-headers==3.2.1
+django==3.0.4
+idna==2.9                 # via requests
+jwcrypto==0.7             # via datapunt-authorization-django
+pycparser==2.20           # via cffi
 pytz==2019.3              # via django
-requests==2.22.0          # via datapunt-authorization-django
-sentry-sdk==0.14.1
+requests==2.23.0          # via datapunt-authorization-django
+sentry-sdk==0.14.2
 six==1.14.0               # via cryptography
-sqlparse==0.3.0           # via django
+sqlparse==0.3.1           # via django
 urllib3==1.25.8           # via requests, sentry-sdk

@@ -3,7 +3,7 @@ services:
   app:
     build: .
     volumes:
-      - ./app:/app
+      - ./src:/src
     ports:
       - "8000:8000"
     environment:

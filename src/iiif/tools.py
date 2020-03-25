@@ -6,15 +6,19 @@ class InvalidIIIFUrlError(Exception):
     pass
 
 
-def get_meta_data(dossier, token):
+class DocumentNotFoundInMetadataError(Exception):
+    pass
+
+
+def get_meta_data(stadsdeel, dossier, token):
     metadata_url = f"{settings.STADSARCHIEF_META_SERVER_BASE_URL}:" \
-                   f"{settings.STADSARCHIEF_META_SERVER_PORT}/stadsarchief/bouwdossier/{dossier}/"
+                   f"{settings.STADSARCHIEF_META_SERVER_PORT}/stadsarchief/bouwdossier/{stadsdeel}{dossier}/"
     return requests.get(metadata_url, headers={'Authorization': token})
 
 
-def get_image_from_iiif_server(iiif_url):
+def get_image_from_iiif_server(iiif_url, headers):
     iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
-    return requests.get(iiif_image_url)
+    return requests.get(iiif_image_url, headers=headers)
 
 
 def get_info_from_iiif_url(iiif_url):
@@ -32,10 +36,14 @@ def get_info_from_iiif_url(iiif_url):
 
 
 def img_is_public(metadata, document_barcode):
-    if metadata['access'] == settings.ACCESS_PUBLIC:
-        for meta_document in metadata['documenten']:
-            if meta_document['barcode'] == document_barcode:
-                if meta_document['access'] == settings.ACCESS_PUBLIC:
-                    return True
-                break
-    return False
+    if metadata['access'] != settings.ACCESS_PUBLIC:
+        return False
+
+    for meta_document in metadata['documenten']:
+        if meta_document['barcode'] == document_barcode:
+            if meta_document['access'] == settings.ACCESS_PUBLIC:
+                return True
+            elif meta_document['access'] == settings.ACCESS_RESTRICTED:
+                return False
+            break
+    raise DocumentNotFoundInMetadataError()
