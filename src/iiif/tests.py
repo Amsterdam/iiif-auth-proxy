@@ -333,15 +333,12 @@ class FileTestCase(SimpleTestCase):
 
 
 class ToolsTestCase(SimpleTestCase):
-    def setUp(self):
-        self.iiif_url = "http://iiif.services.consul/iiif/" + IMAGE_URL
-
     def test_get_info_from_iiif_url_vanilla(self):
-        stadsdeel, dossier, document, file = get_info_from_iiif_url(self.iiif_url)
+        stadsdeel, dossier, document, file = get_info_from_iiif_url(IMAGE_URL)
         self.assertEqual(stadsdeel, "ST")
         self.assertEqual(dossier, "00015")
         self.assertEqual(document, "ST00000126")
         self.assertEqual(file, "00001")
 
     def test_get_info_from_iiif_url_wrong_formatted_url(self):
-        self.assertRaises(InvalidIIIFUrlError, get_info_from_iiif_url, "https://acc.images.data.amsterdam.nl/iiif/")
+        self.assertRaises(InvalidIIIFUrlError, get_info_from_iiif_url, "2/")
