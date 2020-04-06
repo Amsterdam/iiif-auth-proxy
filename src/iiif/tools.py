@@ -27,7 +27,7 @@ def get_info_from_iiif_url(iiif_url):
     # ST=stadsdeel  00015=dossier  ST00000126=document  00001=file/bestand
 
     try:
-        relevant_url_part = iiif_url.split('edepot:')[1].split('/')[0]
+        relevant_url_part = iiif_url.split(':')[1].split('/')[0]
         stadsdeel, dossier, document_and_file = relevant_url_part.split('-')
         document, file = document_and_file.split('_')
         return stadsdeel, dossier, document, file.split('.')[0]
