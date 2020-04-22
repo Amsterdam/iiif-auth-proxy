@@ -40,7 +40,10 @@ def index(request, iiif_url):
 
     # Get the image itself
     headers = {}
-    if 'HTTP_X_FORWARDED_PROTO' in request.META and 'HTTP_X_FORWARDED_HOST' in request.META :
+    if 'HTTP_X_FORWARDED_PROTO' in request.META and 'HTTP_X_FORWARDED_HOST' in request.META:
+        # Make sure the iiif-image-server gets the protocol and the host of the initial request so that
+        # any other info urls in the response have the correct public url, instead of the
+        # local .service.consul url.
         headers['X-Forwarded-Proto'] = request.META['HTTP_X_FORWARDED_PROTO']
         headers['X-Forwarded-Host'] = request.META['HTTP_X_FORWARDED_HOST']
     img_response = tools.get_image_from_iiif_server(iiif_url, headers)
