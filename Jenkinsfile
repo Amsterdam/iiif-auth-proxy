@@ -9,7 +9,7 @@ String ACCEPTANCE_BRANCH = "development"
 String INFRASTRUCTURE = 'thanos'
 String PLAYBOOK = 'deploy-iiif-auth-proxy.yml'
 
-String IMAGE_NAME = "repo.data.amsterdam.nl/datapunt/${PROJECT_NAME}:${env.BUILD_NUMBER}"
+String IMAGE_NAME = "docker-registry.data.amsterdam.nl/datapunt/${PROJECT_NAME}:${env.BUILD_NUMBER}"
 String BRANCH = "${env.BRANCH_NAME}"
 
 image = 'initial value'
