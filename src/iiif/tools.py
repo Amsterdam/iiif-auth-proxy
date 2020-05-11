@@ -11,14 +11,14 @@ class DocumentNotFoundInMetadataError(Exception):
 
 
 def get_meta_data(stadsdeel, dossier, token):
+    # Test with:
+    # curl -i -H "Accept: application/json" http://iiif-metadata-server.service.consul:8183/iiif-metadata/bouwdossier/SA85385/
     metadata_url = f"{settings.STADSARCHIEF_META_SERVER_BASE_URL}:" \
-                   f"{settings.STADSARCHIEF_META_SERVER_PORT}/stadsarchief/bouwdossier/{stadsdeel}{dossier}/"
+                   f"{settings.STADSARCHIEF_META_SERVER_PORT}/iiif-metadata/bouwdossier/{stadsdeel}{dossier}/"
     return requests.get(metadata_url, headers={'Authorization': token})
 
 
 def get_image_from_iiif_server(iiif_url, headers):
-    # Test with:
-    # curl -i -H "Accept: application/json" http://stadsarchief-api.service.consul:8156/stadsarchief/bouwdossier/SA85385/
     iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
     return requests.get(iiif_image_url, headers=headers)
 
