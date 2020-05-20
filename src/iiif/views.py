@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from requests.exceptions import RequestException
 
 from . import tools
 
@@ -10,7 +11,8 @@ log = logging.getLogger(__name__)
 
 RESPONSE_CONTENT_NO_TOKEN = "No token supplied"
 RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA = "Document not found in metadata"
-
+RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER = "The iiif-metadata-server cannot be reached"
+RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = "The iiif-image-server cannot be reached"
 
 @csrf_exempt
 def index(request, iiif_url):
@@ -24,7 +26,15 @@ def index(request, iiif_url):
         return HttpResponse("Invalid formatted url", status=400)
 
     # Get image meta data
-    meta_response = tools.get_meta_data(stadsdeel, dossier, token)
+    try:
+        meta_response = tools.get_meta_data(stadsdeel, dossier, token)
+    except RequestException as e:
+        log.error(
+            f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER} "
+            f"because of this error {e}"
+        )
+        return HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER, status=502)
+
     if meta_response.status_code == 404:
         return HttpResponse("No metadata could be found for this file", status=404)
     elif meta_response.status_code != 200:
@@ -46,7 +56,14 @@ def index(request, iiif_url):
         # local .service.consul url.
         headers['X-Forwarded-Proto'] = request.META['HTTP_X_FORWARDED_PROTO']
         headers['X-Forwarded-Host'] = request.META['HTTP_X_FORWARDED_HOST']
-    img_response = tools.get_image_from_iiif_server(iiif_url, headers)
+    try:
+        img_response = tools.get_image_from_iiif_server(iiif_url, headers)
+    except RequestException as e:
+        log.error(
+            f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE} "
+            f"because of this error {e}"
+        )
+        return HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE, status=502)
     if img_response.status_code == 404:
         return HttpResponse("No image could be found", status=404)
     elif img_response.status_code != 200:
