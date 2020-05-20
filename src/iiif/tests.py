@@ -7,7 +7,10 @@ from django.test import Client, SimpleTestCase
 
 from .generate_token import create_token
 from .tools import InvalidIIIFUrlError, get_info_from_iiif_url
-from .views import RESPONSE_CONTENT_NO_TOKEN, RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA
+from .views import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
+                    RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER,
+                    RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
+                    RESPONSE_CONTENT_NO_TOKEN)
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
@@ -63,6 +66,29 @@ class FileTestCase(SimpleTestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA)
 
+    def test_get_image_when_metadata_server_is_not_available(self):
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
+        response = self.c.get(self.url + IMAGE_URL, **header)
+        self.assertEqual(response.status_code, 502)
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER)
+
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_image_when_cantaloupe_server_is_not_available(self, mock_get_meta_data):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}]
+            }
+        )
+
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
+        response = self.c.get(self.url + IMAGE_URL, **header)
+        self.assertEqual(response.status_code, 502)
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE)
+
+
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
     def test_get_public_image_as_non_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
@@ -71,9 +97,7 @@ class FileTestCase(SimpleTestCase):
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
-                'documenten': [
-                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}
-                ]
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}]
             }
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
@@ -93,9 +117,7 @@ class FileTestCase(SimpleTestCase):
             200,
             json_content={
                 'access': settings.ACCESS_RESTRICTED,
-                'documenten': [
-                    {'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}
-                ]
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}]
             }
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
@@ -115,9 +137,7 @@ class FileTestCase(SimpleTestCase):
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
-                'documenten': [
-                    {'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}
-                ]
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}]
             }
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
@@ -137,9 +157,7 @@ class FileTestCase(SimpleTestCase):
             200,
             json_content={
                 'access': settings.ACCESS_RESTRICTED,
-                'documenten': [
-                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}
-                ]
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}]
             }
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
@@ -159,9 +177,7 @@ class FileTestCase(SimpleTestCase):
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
-                'documenten': [
-                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}
-                ]
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}]
             }
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
@@ -183,9 +199,7 @@ class FileTestCase(SimpleTestCase):
             200,
             json_content={
                 'access': settings.ACCESS_RESTRICTED,
-                'documenten': [
-                    {'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}
-                ]
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}]
             }
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
@@ -207,9 +221,7 @@ class FileTestCase(SimpleTestCase):
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
-                'documenten': [
-                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}
-                ]
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}]
             }
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
@@ -232,11 +244,7 @@ class FileTestCase(SimpleTestCase):
             200,
             json_content={
                 'access': settings.ACCESS_RESTRICTED,
-                'documenten': [
-                    {'barcode': 'ST00000126',
-                     'access': settings.ACCESS_RESTRICTED
-                     }
-                ]
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}]
             }
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
@@ -261,11 +269,7 @@ class FileTestCase(SimpleTestCase):
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
-                'documenten': [
-                    {'barcode': 'ST00000126',
-                     'access': settings.ACCESS_RESTRICTED
-                     }
-                ]
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}]
             }
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
@@ -289,9 +293,7 @@ class FileTestCase(SimpleTestCase):
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
-                'documenten': [
-                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}
-                ]
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}]
             }
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
@@ -313,11 +315,7 @@ class FileTestCase(SimpleTestCase):
             200,
             json_content={
                 'access': settings.ACCESS_RESTRICTED,
-                'documenten': [
-                    {'barcode': 'ST00000126',
-                     'access': settings.ACCESS_RESTRICTED
-                     }
-                ]
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}]
             }
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
