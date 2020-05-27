@@ -14,6 +14,7 @@ RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA = "Document not found in metadata"
 RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER = "The iiif-metadata-server cannot be reached"
 RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = "The iiif-image-server cannot be reached"
 
+
 @csrf_exempt
 def index(request, iiif_url):
     if not request.META.get('HTTP_AUTHORIZATION', None):

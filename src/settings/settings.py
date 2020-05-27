@@ -61,11 +61,10 @@ JWKS_TEST_KEY = """
 
 DATAPUNT_AUTHZ = {
     # 'ALWAYS_OK': False,  # disable authz. tests will fail...
-    'JWKS': os.getenv('PUB_JWKS', JWKS_TEST_KEY)
+    'JWKS': os.getenv('PUB_JWKS', JWKS_TEST_KEY),
+    'FORCED_ANONYMOUS_ROUTES': ['/status/health']
 }
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.auth',
