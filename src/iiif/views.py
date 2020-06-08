@@ -74,8 +74,9 @@ def index(request, iiif_url):
             f"Got response code {img_response.status_code} while retrieving "
             f"the image {iiif_url} from the iiif-image-server."
         )
+        iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
         return HttpResponse(
-            f"We had a problem retrieving the image. We got status code {img_response.status_code}",
+            f"We had a problem retrieving the image. We got status code {img_response.status_code} for internal url {iiif_image_url}",
             status=400
         )
 
