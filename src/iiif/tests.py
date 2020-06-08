@@ -360,7 +360,7 @@ class ToolsTestCase(SimpleTestCase):
             'documenten': [
                 {
                     'barcode': '628547',
-                    'bestanden': [{"filename": "/SDZ/UIT/COH/628547.PDF"}]
+                    'bestanden': [{"filename": "SDZ/UIT/COH/628547.PDF"}]
                 }
             ]
         }
