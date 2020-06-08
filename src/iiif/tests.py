@@ -366,4 +366,4 @@ class ToolsTestCase(SimpleTestCase):
         }
 
         wabo_url = create_wabo_url(metadata=metadata, url_info=url_info)
-        self.assertEqual(wabo_url, '2/wabo:/SDZ/UIT/COH/628547.PDF/full/1000,1000/0/default.jpg')
+        self.assertEqual(wabo_url, '2/wabo:SDZ-UIT-COH-628547.PDF/full/1000,1000/0/default.jpg')

@@ -69,7 +69,7 @@ def index(request, iiif_url):
         )
         return HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE, status=502)
     if img_response.status_code == 404:
-        return HttpResponse(f"No file could be found for internal url {iiif_image_url}", status=404)
+        return HttpResponse(f"No source file could be found for internal url {iiif_image_url}", status=404)
     elif img_response.status_code != 200:
         log.info(
             f"Got response code {img_response.status_code} while retrieving "

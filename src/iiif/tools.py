@@ -21,7 +21,8 @@ def get_meta_data(url_info, token):
 def create_wabo_url(url_info, metadata):
     for document in metadata['documenten']:
         if document['barcode'] == url_info['document_barcode']:
-            return f"2/{url_info['source']}:{document['bestanden'][0]['filename']}/{url_info['formatting']}"
+            filename = document['bestanden'][0]['filename'].replace('/', '', 1).replace('/', '-')
+            return f"2/{url_info['source']}:{filename}/{url_info['formatting']}"
 
     # TODO: raise something in the unlikely event that nothing is found
 
