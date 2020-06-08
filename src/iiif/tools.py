@@ -27,6 +27,22 @@ def create_wabo_url(url_info, metadata):
     # TODO: raise something in the unlikely event that nothing is found
 
 
+def create_cantaloupe_url_and_headers(request_meta, url_info, iiif_url, metadata):
+    headers = {}
+    if 'HTTP_X_FORWARDED_PROTO' in request_meta and 'HTTP_X_FORWARDED_HOST' in request_meta:
+        # Make sure the iiif-image-server gets the protocol and the host of the initial request so that
+        # any other info urls in the response have the correct public url, instead of the
+        # local .service.consul url.
+        headers['X-Forwarded-Proto'] = request_meta['HTTP_X_FORWARDED_PROTO']
+        headers['X-Forwarded-Host'] = request_meta['HTTP_X_FORWARDED_HOST']
+
+    if url_info['source'] == 'edepot':
+        return iiif_url, headers
+    elif url_info['source'] == 'wabo':
+        headers['X-Forwarded-ID'] = iiif_url.split('/')[1]  # The
+        return create_wabo_url(url_info, metadata), headers
+
+
 def get_image_from_iiif_server(iiif_url, headers):
     iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
     return requests.get(iiif_image_url, headers=headers)
@@ -44,7 +60,7 @@ def get_info_from_iiif_url(iiif_url):
     # SDZ=stadsdeel  38657=dossier  4900487=olo_liaan_nummer  628547=document_barcode
 
     try:
-        source = iiif_url.split(':')[0].split('/')[1]
+        source = iiif_url.split(':')[0].split('/')[1]  # "edepot" or "wabo"
         relevant_url_part = iiif_url.split(':')[1].split('/')[0]
         formatting = iiif_url.split(':')[1].split('/', 1)[1] if '/' in iiif_url.split(':')[1] else ''
 
