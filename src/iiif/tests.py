@@ -6,7 +6,8 @@ from django.conf import settings
 from django.test import Client, SimpleTestCase
 
 from .generate_token import create_token
-from .tools import InvalidIIIFUrlError, get_info_from_iiif_url, create_wabo_url
+from .tools import (InvalidIIIFUrlError, create_cantaloupe_url_and_headers,
+                    create_wabo_url, get_info_from_iiif_url)
 from .views import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
                     RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER,
                     RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
@@ -367,3 +368,85 @@ class ToolsTestCase(SimpleTestCase):
 
         wabo_url = create_wabo_url(metadata=metadata, url_info=url_info)
         self.assertEqual(wabo_url, '2/wabo:SDZ-UIT-COH-628547.PDF/full/1000,1000/0/default.jpg')
+
+    def test_create_cantaloupe_url_and_headers(self):
+        metadata = {
+            'documenten': [
+                {
+                    'barcode': '628547',
+                    'bestanden': [{"filename": "SDZ/UIT/COH/628547.PDF"}]
+                }
+            ]
+        }
+
+        # pre-wabo with no headers
+        url, headers = create_cantaloupe_url_and_headers(
+            {},
+            {'source': 'edepot'},
+            PRE_WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, PRE_WABO_IMG_URL)
+        self.assertEqual(headers, {})
+
+        # pre-wabo with one header (which we expect to not be used)
+        url, headers = create_cantaloupe_url_and_headers(
+            {'HTTP_X_FORWARDED_PROTO': 'a'},
+            {'source': 'edepot'},
+            PRE_WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, PRE_WABO_IMG_URL)
+        self.assertEqual(headers, {})
+
+        # pre-wabo with one header (which we expect to not be used)
+        url, headers = create_cantaloupe_url_and_headers(
+            {'HTTP_X_FORWARDED_HOST': 'a'},
+            {'source': 'edepot'},
+            PRE_WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, PRE_WABO_IMG_URL)
+        self.assertEqual(headers, {})
+
+        # pre-wabo with both forwarded headers (which we both expect to be used)
+        url, headers = create_cantaloupe_url_and_headers(
+            {'HTTP_X_FORWARDED_PROTO': 'proto', 'HTTP_X_FORWARDED_HOST': 'host'},
+            {'source': 'edepot'},
+            PRE_WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, PRE_WABO_IMG_URL)
+        self.assertEqual(headers['X-Forwarded-Proto'], 'proto')
+        self.assertEqual(headers['X-Forwarded-Host'], 'host')
+
+        # wabo with adjusted url and X-Forwarded-ID
+        url, headers = create_cantaloupe_url_and_headers(
+            {},
+            {
+                'source': 'wabo',
+                'document_barcode': '628547',
+                'formatting': 'full/1000,1000/0/default.jpg'
+            },
+            WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, '2/wabo:SDZ-UIT-COH-628547.PDF/full/1000,1000/0/default.jpg')
+        self.assertEqual(headers['X-Forwarded-ID'], 'wabo:SDZ-38657-4900487_628547')
+
+        # wabo with adjusted url and X-Forwarded-ID and both forwarded headers
+        url, headers = create_cantaloupe_url_and_headers(
+            {'HTTP_X_FORWARDED_PROTO': 'proto', 'HTTP_X_FORWARDED_HOST': 'host'},
+            {
+                'source': 'wabo',
+                'document_barcode': '628547',
+                'formatting': 'full/1000,1000/0/default.jpg'
+            },
+            WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, '2/wabo:SDZ-UIT-COH-628547.PDF/full/1000,1000/0/default.jpg')
+        self.assertEqual(len(headers), 3)
+        self.assertEqual(headers['X-Forwarded-ID'], 'wabo:SDZ-38657-4900487_628547')
+        self.assertEqual(headers['X-Forwarded-Proto'], 'proto')
+        self.assertEqual(headers['X-Forwarded-Host'], 'host')

@@ -50,18 +50,9 @@ def index(request, iiif_url):
     metadata = meta_response.json()
 
     # Get the image itself
-    if url_info['source'] == 'wabo':
-        iiif_url = tools.create_wabo_url(url_info, metadata)
-    iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
-    headers = {}
-    if 'HTTP_X_FORWARDED_PROTO' in request.META and 'HTTP_X_FORWARDED_HOST' in request.META:
-        # Make sure the iiif-image-server gets the protocol and the host of the initial request so that
-        # any other info urls in the response have the correct public url, instead of the
-        # local .service.consul url.
-        headers['X-Forwarded-Proto'] = request.META['HTTP_X_FORWARDED_PROTO']
-        headers['X-Forwarded-Host'] = request.META['HTTP_X_FORWARDED_HOST']
+    cantaloupe_url, headers = tools.create_cantaloupe_url_and_headers(request.META, url_info, iiif_url, metadata)
     try:
-        img_response = tools.get_image_from_iiif_server(iiif_url, headers)
+        img_response = tools.get_image_from_iiif_server(cantaloupe_url, headers)
     except RequestException as e:
         log.error(
             f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE} "
@@ -69,14 +60,15 @@ def index(request, iiif_url):
         )
         return HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE, status=502)
     if img_response.status_code == 404:
-        return HttpResponse(f"No source file could be found for internal url {iiif_image_url}", status=404)
+        return HttpResponse(f"No source file could be found for internal url {cantaloupe_url}", status=404)
     elif img_response.status_code != 200:
         log.info(
             f"Got response code {img_response.status_code} while retrieving "
-            f"the image {iiif_url} from the iiif-image-server."
+            f"the image {cantaloupe_url} from the iiif-image-server."
         )
         return HttpResponse(
-            f"We had a problem retrieving the image. We got status code {img_response.status_code} for internal url {iiif_image_url}",
+            f"We had a problem retrieving the image. We got status code {img_response.status_code} for "
+            f"internal url {cantaloupe_url}",
             status=400
         )
 
