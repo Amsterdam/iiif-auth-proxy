@@ -52,6 +52,7 @@ def index(request, iiif_url):
     # Get the image itself
     if url_info['source'] == 'wabo':
         iiif_url = tools.create_wabo_url(url_info, metadata)
+    iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
     headers = {}
     if 'HTTP_X_FORWARDED_PROTO' in request.META and 'HTTP_X_FORWARDED_HOST' in request.META:
         # Make sure the iiif-image-server gets the protocol and the host of the initial request so that
@@ -68,13 +69,12 @@ def index(request, iiif_url):
         )
         return HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE, status=502)
     if img_response.status_code == 404:
-        return HttpResponse("No image could be found", status=404)
+        return HttpResponse(f"No file could be found for internal url {iiif_image_url}", status=404)
     elif img_response.status_code != 200:
         log.info(
             f"Got response code {img_response.status_code} while retrieving "
             f"the image {iiif_url} from the iiif-image-server."
         )
-        iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
         return HttpResponse(
             f"We had a problem retrieving the image. We got status code {img_response.status_code} for internal url {iiif_image_url}",
             status=400
