@@ -22,13 +22,13 @@ def index(request, iiif_url):
     token = request.META['HTTP_AUTHORIZATION']
 
     try:
-        stadsdeel, dossier, document_barcode, file = tools.get_info_from_iiif_url(iiif_url)
+        url_info = tools.get_info_from_iiif_url(iiif_url)
     except tools.InvalidIIIFUrlError:
         return HttpResponse("Invalid formatted url", status=400)
 
     # Get image meta data
     try:
-        meta_response = tools.get_meta_data(stadsdeel, dossier, token)
+        meta_response = tools.get_meta_data(url_info, token)
     except RequestException as e:
         log.error(
             f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER} "
@@ -50,6 +50,8 @@ def index(request, iiif_url):
     metadata = meta_response.json()
 
     # Get the image itself
+    if url_info['source'] == 'wabo':
+        iiif_url = tools.create_wabo_url(url_info, metadata)
     headers = {}
     if 'HTTP_X_FORWARDED_PROTO' in request.META and 'HTTP_X_FORWARDED_HOST' in request.META:
         # Make sure the iiif-image-server gets the protocol and the host of the initial request so that
@@ -79,7 +81,7 @@ def index(request, iiif_url):
 
     # Check whether the image exists in the metadata and whether it is public
     try:
-        is_public = tools.img_is_public(metadata, document_barcode)
+        is_public = tools.img_is_public(metadata, url_info['document_barcode'])
     except tools.DocumentNotFoundInMetadataError:
         return HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404)
 
