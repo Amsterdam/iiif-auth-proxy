@@ -18,16 +18,21 @@ def get_meta_data(url_info, token):
     return requests.get(metadata_url, headers={'Authorization': token})
 
 
-def create_wabo_url(url_info, metadata):
+def create_wabo_url(url_info, metadata, source_url=False):
     for document in metadata['documenten']:
         if document['barcode'] == url_info['document_barcode']:
-            filename = document['bestanden'][0]['filename'].replace('/', '-')
-            return f"2/{url_info['source']}:{filename}/{url_info['formatting']}"
-
+            filename = document['bestanden'][0]['filename']
+            if source_url:
+                # This means that in order to avoid any file conversions we're bypassing cantaloupe
+                # and going directly to the source server to get the raw file and serve that
+                return f"{filename}"
+            else:
+                return f"2/{url_info['source']}:{filename.replace('/', '-')}/{url_info['formatting']}"
     # TODO: raise something in the unlikely event that nothing is found
 
 
-def create_cantaloupe_url_and_headers(request_meta, url_info, iiif_url, metadata):
+# TODO: split into two functions, one for url and one for headers
+def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
     headers = {}
     if 'HTTP_X_FORWARDED_PROTO' in request_meta and 'HTTP_X_FORWARDED_HOST' in request_meta:
         # Make sure the iiif-image-server gets the protocol and the host of the initial request so that
@@ -37,15 +42,25 @@ def create_cantaloupe_url_and_headers(request_meta, url_info, iiif_url, metadata
         headers['X-Forwarded-Host'] = request_meta['HTTP_X_FORWARDED_HOST']
 
     if url_info['source'] == 'edepot':
-        return iiif_url, headers
+        iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
+        return iiif_image_url, headers
     elif url_info['source'] == 'wabo':
-        headers['X-Forwarded-ID'] = iiif_url.split('/')[1]  # The
-        return create_wabo_url(url_info, metadata), headers
+        if url_info['source_file'] == True:
+            # This means that in order to avoid any file conversions we're bypassing cantaloupe
+            # and going directly to the source server to get the raw file and serve that
+            headers["Host"] = "conversiestraatwabo.amsterdam.nl"
+            wabo_url = create_wabo_url(url_info, metadata, source_url=True)
+            iiif_image_url = f"{settings.WABO_BASE_URL}{wabo_url}"
+            return iiif_image_url, headers
+        else:
+            headers['X-Forwarded-ID'] = iiif_url.split('/')[1]
+            wabo_url = create_wabo_url(url_info, metadata)
+            iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{wabo_url}"
+            return iiif_image_url, headers
 
 
-def get_image_from_iiif_server(iiif_url, headers):
-    iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
-    return requests.get(iiif_image_url, headers=headers)
+def get_image_from_iiif_server(file_url, headers):
+    return requests.get(file_url, headers=headers)
 
 
 def get_info_from_iiif_url(iiif_url):
@@ -56,13 +71,17 @@ def get_info_from_iiif_url(iiif_url):
 
     ## WABO
     # iiif_url = \
-    # "https://acc.images.data.amsterdam.nl/iiif/2/wabo:SDZ-38657-4900487_628547"
+    # "https://acc.images.data.amsterdam.nl/iiif/2/wabo:SDZ-38657-4900487_628547/full/full/0/default.jpg""
     # SDZ=stadsdeel  38657=dossier  4900487=olo_liaan_nummer  628547=document_barcode
+
+    # At the end of the url, this can be appended '?source_file=true', which means we'll bypass 
+    # cantaloupe and go directly for the source file
 
     try:
         source = iiif_url.split(':')[0].split('/')[1]  # "edepot" or "wabo"
         relevant_url_part = iiif_url.split(':')[1].split('/')[0]
-        formatting = iiif_url.split(':')[1].split('/', 1)[1] if '/' in iiif_url.split(':')[1] else ''
+        formatting = iiif_url.split(':')[1].split('/', 1)[1].split('?')[0] if '/' in iiif_url.split(':')[1] else ''
+        source_file = 'source_file=true' in iiif_url
 
         if source == 'edepot':  # == pre-wabo
             stadsdeel, dossier, document_and_file = relevant_url_part.split('-')
@@ -73,7 +92,8 @@ def get_info_from_iiif_url(iiif_url):
                 'dossier': dossier,
                 'document_barcode': document_barcode,
                 'file': file.split('.')[0],
-                'formatting': formatting
+                'formatting': formatting,
+                'source_file': source_file,
             }
 
         elif source == 'wabo':  # = pre-wabo
@@ -85,7 +105,8 @@ def get_info_from_iiif_url(iiif_url):
                 'dossier': dossier,
                 'olo': olo,
                 'document_barcode': document_barcode,
-                'formatting': formatting
+                'formatting': formatting,
+                'source_file': source_file,
             }
 
         raise InvalidIIIFUrlError(f"Invalid iiif url (no valid source): {iiif_url}")
