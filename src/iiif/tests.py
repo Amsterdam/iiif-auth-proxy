@@ -506,4 +506,4 @@ class ToolsTestCase(SimpleTestCase):
             metadata
         )
         self.assertEqual(url, f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF")
-        self.assertEqual(cert, ('/tmp/sw444v1912.pem',))
+        self.assertEqual(cert, '/tmp/sw444v1912.pem')

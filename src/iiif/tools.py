@@ -50,7 +50,7 @@ def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
             # and going directly to the source server to get the raw file and serve that
             wabo_url = create_wabo_url(url_info, metadata)
             iiif_image_url = f"{settings.WABO_BASE_URL}{wabo_url}"
-            cert = ('/tmp/sw444v1912.pem',)
+            cert = '/tmp/sw444v1912.pem'
             return iiif_image_url, headers, cert
         else:
             headers['X-Forwarded-ID'] = iiif_url.split('/')[1]
