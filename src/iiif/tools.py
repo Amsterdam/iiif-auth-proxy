@@ -43,24 +43,24 @@ def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
 
     if url_info['source'] == 'edepot':
         iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
-        return iiif_image_url, headers
+        return iiif_image_url, headers, ()
     elif url_info['source'] == 'wabo':
         if url_info['source_file'] == True:
             # This means that in order to avoid any file conversions we're bypassing cantaloupe
             # and going directly to the source server to get the raw file and serve that
-            headers["Host"] = "conversiestraatwabo.amsterdam.nl"
             wabo_url = create_wabo_url(url_info, metadata, source_url=True)
             iiif_image_url = f"{settings.WABO_BASE_URL}{wabo_url}"
-            return iiif_image_url, headers
+            cert = ('/tmp/sw444v1912.pem',)
+            return iiif_image_url, headers, cert
         else:
             headers['X-Forwarded-ID'] = iiif_url.split('/')[1]
             wabo_url = create_wabo_url(url_info, metadata)
             iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{wabo_url}"
-            return iiif_image_url, headers
+            return iiif_image_url, headers, ()
 
 
-def get_image_from_iiif_server(file_url, headers):
-    return requests.get(file_url, headers=headers)
+def get_image_from_iiif_server(file_url, headers, cert):
+    return requests.get(file_url, headers=headers, cert=cert)
 
 
 def get_info_from_iiif_url(iiif_url):
