@@ -49,26 +49,26 @@ def index(request, iiif_url):
         )
     metadata = meta_response.json()
 
-    # Get the image itself
-    cantaloupe_url, headers = tools.create_cantaloupe_url_and_headers(request.META, url_info, iiif_url, metadata)
+    # Get the file itself
+    file_url, headers = tools.create_file_url_and_headers(request.META, url_info, iiif_url, metadata)
     try:
-        img_response = tools.get_image_from_iiif_server(cantaloupe_url, headers)
+        file_response = tools.get_image_from_iiif_server(file_url, headers)
     except RequestException as e:
         log.error(
             f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE} "
             f"because of this error {e}"
         )
         return HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE, status=502)
-    if img_response.status_code == 404:
-        return HttpResponse(f"No source file could be found for internal url {cantaloupe_url}", status=404)
-    elif img_response.status_code != 200:
+    if file_response.status_code == 404:
+        return HttpResponse(f"No source file could be found for internal url {file_url}", status=404)
+    elif file_response.status_code != 200:
         log.info(
-            f"Got response code {img_response.status_code} while retrieving "
-            f"the image {cantaloupe_url} from the iiif-image-server."
+            f"Got response code {file_response.status_code} while retrieving "
+            f"the image {file_url} from the iiif-image-server."
         )
         return HttpResponse(
-            f"We had a problem retrieving the image. We got status code {img_response.status_code} for "
-            f"internal url {cantaloupe_url}",
+            f"We had a problem retrieving the image. We got status code {file_response.status_code} for "
+            f"internal url {file_url}",
             status=400
         )
 
@@ -81,11 +81,11 @@ def index(request, iiif_url):
     # Decide whether the user can view the image
     if request.is_authorized_for(settings.BOUWDOSSIER_EXTENDED_SCOPE):
         # The user has an extended scope, meaning (s)he can view anything. So we'll return the image.
-        return HttpResponse(img_response.content, content_type=img_response.headers.get('Content-Type', ''))
+        return HttpResponse(file_response.content, content_type=file_response.headers.get('Content-Type', ''))
 
     elif request.is_authorized_for(settings.BOUWDOSSIER_READ_SCOPE) and is_public:
         # The user has a read scope, meaning (s)he can view only public images.
         # This image is public, so we'll serve it.
-        return HttpResponse(img_response.content, content_type=img_response.headers.get('Content-Type', ''))
+        return HttpResponse(file_response.content, content_type=file_response.headers.get('Content-Type', ''))
 
     return HttpResponse("", status=401)
