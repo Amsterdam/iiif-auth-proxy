@@ -18,11 +18,11 @@ def get_meta_data(url_info, token):
     return requests.get(metadata_url, headers={'Authorization': token})
 
 
-def create_wabo_url(url_info, metadata, source_url=False):
+def create_wabo_url(url_info, metadata):
     for document in metadata['documenten']:
         if document['barcode'] == url_info['document_barcode']:
             filename = document['bestanden'][0]['filename']
-            if source_url:
+            if url_info['source_file']:
                 # This means that in order to avoid any file conversions we're bypassing cantaloupe
                 # and going directly to the source server to get the raw file and serve that
                 return f"{filename}"
@@ -48,7 +48,7 @@ def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
         if url_info['source_file'] == True:
             # This means that in order to avoid any file conversions we're bypassing cantaloupe
             # and going directly to the source server to get the raw file and serve that
-            wabo_url = create_wabo_url(url_info, metadata, source_url=True)
+            wabo_url = create_wabo_url(url_info, metadata)
             iiif_image_url = f"{settings.WABO_BASE_URL}{wabo_url}"
             cert = ('/tmp/sw444v1912.pem',)
             return iiif_image_url, headers, cert
