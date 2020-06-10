@@ -50,9 +50,9 @@ def index(request, iiif_url):
     metadata = meta_response.json()
 
     # Get the file itself
-    file_url, headers = tools.create_file_url_and_headers(request.META, url_info, iiif_url, metadata)
+    file_url, headers, cert = tools.create_file_url_and_headers(request.META, url_info, iiif_url, metadata)
     try:
-        file_response = tools.get_image_from_iiif_server(file_url, headers)
+        file_response = tools.get_image_from_iiif_server(file_url, headers, cert)
     except RequestException as e:
         log.error(
             f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE} "

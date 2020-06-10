@@ -3,15 +3,15 @@ MAINTAINER datapunt@amsterdam.nl
 
 EXPOSE 8000
 
-# stunnel4 is for adding the client side certificate to the wabo requests
-RUN apt update -y && \
-    apt install -y --no-install-recommends stunnel4 && \
-    rm -rf /var/lib/apt/lists/*
-
-
 ENV PYTHONUNBUFFERED 1
 ENV CONSUL_HOST=${CONSUL_HOST:-notset}
 ENV CONSUL_PORT=${CONSUL_PORT:-8500}
+
+# Edit the openssl.cnf file to allow a lower security level.
+# This is needed to directly call the wabo data
+# TODO: remove this when we get a more secure cert for the wabo server
+RUN sed -i "s|MinProtocol = TLSv1.2|MinProtocol = None|g" /etc/ssl/openssl.cnf
+RUN sed -i "s|CipherString = DEFAULT@SECLEVEL=2|CipherString = DEFAULT|g" /etc/ssl/openssl.cnf
 
 RUN adduser --system datapunt
 

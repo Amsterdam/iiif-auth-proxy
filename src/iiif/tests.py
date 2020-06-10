@@ -400,7 +400,7 @@ class ToolsTestCase(SimpleTestCase):
         }
 
         # pre-wabo with no headers
-        url, headers = create_file_url_and_headers(
+        url, headers, cert = create_file_url_and_headers(
             {},
             {'source': 'edepot'},
             PRE_WABO_IMG_URL,
@@ -408,9 +408,10 @@ class ToolsTestCase(SimpleTestCase):
         )
         self.assertEqual(url, f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL}")
         self.assertEqual(headers, {})
+        self.assertEqual(cert, ())
 
         # pre-wabo with one header (which we expect to not be used)
-        url, headers = create_file_url_and_headers(
+        url, headers, cert = create_file_url_and_headers(
             {'HTTP_X_FORWARDED_PROTO': 'a'},
             {'source': 'edepot'},
             PRE_WABO_IMG_URL,
@@ -418,9 +419,10 @@ class ToolsTestCase(SimpleTestCase):
         )
         self.assertEqual(url, f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL}")
         self.assertEqual(headers, {})
+        self.assertEqual(cert, ())
 
         # pre-wabo with one header (which we expect to not be used)
-        url, headers = create_file_url_and_headers(
+        url, headers, cert = create_file_url_and_headers(
             {'HTTP_X_FORWARDED_HOST': 'a'},
             {'source': 'edepot'},
             PRE_WABO_IMG_URL,
@@ -428,9 +430,10 @@ class ToolsTestCase(SimpleTestCase):
         )
         self.assertEqual(url, f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL}")
         self.assertEqual(headers, {})
+        self.assertEqual(cert, ())
 
         # pre-wabo with both forwarded headers (which we both expect to be used)
-        url, headers = create_file_url_and_headers(
+        url, headers, cert = create_file_url_and_headers(
             {'HTTP_X_FORWARDED_PROTO': 'proto', 'HTTP_X_FORWARDED_HOST': 'host'},
             {'source': 'edepot'},
             PRE_WABO_IMG_URL,
@@ -439,9 +442,10 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(url, f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL}")
         self.assertEqual(headers['X-Forwarded-Proto'], 'proto')
         self.assertEqual(headers['X-Forwarded-Host'], 'host')
+        self.assertEqual(cert, ())
 
         # wabo with adjusted url and X-Forwarded-ID
-        url, headers = create_file_url_and_headers(
+        url, headers, cert = create_file_url_and_headers(
             {},
             {
                 'source': 'wabo',
@@ -454,9 +458,10 @@ class ToolsTestCase(SimpleTestCase):
         )
         self.assertEqual(url, f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/2/wabo:SDZ-UIT-COH-628547.PDF/full/1000,1000/0/default.jpg")
         self.assertEqual(headers['X-Forwarded-ID'], 'wabo:SDZ-38657-4900487_628547')
+        self.assertEqual(cert, ())
 
         # wabo with adjusted url and X-Forwarded-ID and both forwarded headers
-        url, headers = create_file_url_and_headers(
+        url, headers, cert = create_file_url_and_headers(
             {'HTTP_X_FORWARDED_PROTO': 'proto', 'HTTP_X_FORWARDED_HOST': 'host'},
             {
                 'source': 'wabo',
@@ -472,9 +477,10 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(headers['X-Forwarded-ID'], 'wabo:SDZ-38657-4900487_628547')
         self.assertEqual(headers['X-Forwarded-Proto'], 'proto')
         self.assertEqual(headers['X-Forwarded-Host'], 'host')
+        self.assertEqual(cert, ())
 
         # wabo with source_file
-        url, headers = create_file_url_and_headers(
+        url, headers, cert = create_file_url_and_headers(
             {},
             {
                 'source': 'wabo',
@@ -486,4 +492,4 @@ class ToolsTestCase(SimpleTestCase):
             metadata
         )
         self.assertEqual(url, f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF")
-        self.assertEqual(headers['Host'], 'conversiestraatwabo.amsterdam.nl')
+        self.assertEqual(cert, ('/tmp/sw444v1912.pem',))
