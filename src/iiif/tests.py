@@ -334,7 +334,7 @@ class FileTestCase(SimpleTestCase):
 
 class ToolsTestCase(SimpleTestCase):
     def test_get_info_from_pre_wabo_url_vanilla(self):
-        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL)
+        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL, False)
         self.assertEqual(url_info['source'], "edepot")
         self.assertEqual(url_info['stadsdeel'], "ST")
         self.assertEqual(url_info['dossier'], "00015")
@@ -343,7 +343,7 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(url_info['source_file'], False)
 
     def test_get_info_from_pre_wabo_url_with_source_file(self):
-        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL + '?source_file=true')
+        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL, True)
         self.assertEqual(url_info['source'], "edepot")
         self.assertEqual(url_info['stadsdeel'], "ST")
         self.assertEqual(url_info['dossier'], "00015")
@@ -352,10 +352,10 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(url_info['source_file'], True)
 
     def test_get_info_from_pre_wabo_url_wrong_formatted_url(self):
-        self.assertRaises(InvalidIIIFUrlError, get_info_from_iiif_url, "2/")
+        self.assertRaises(InvalidIIIFUrlError, get_info_from_iiif_url, "2/", False)
 
     def test_get_info_from_wabo_url_vanilla(self):
-        url_info = get_info_from_iiif_url(WABO_IMG_URL)
+        url_info = get_info_from_iiif_url(WABO_IMG_URL, False)
         self.assertEqual(url_info['source'], "wabo")
         self.assertEqual(url_info['stadsdeel'], "SDZ")
         self.assertEqual(url_info['dossier'], "38657")
@@ -364,7 +364,7 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(url_info['source_file'], False)
 
     def test_get_info_from_wabo_url_with_source_file(self):
-        url_info = get_info_from_iiif_url(WABO_IMG_URL + '?source_file=true')
+        url_info = get_info_from_iiif_url(WABO_IMG_URL, True)
         self.assertEqual(url_info['source'], "wabo")
         self.assertEqual(url_info['stadsdeel'], "SDZ")
         self.assertEqual(url_info['dossier'], "38657")
@@ -373,10 +373,10 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(url_info['source_file'], True)
 
     def test_get_info_from_wabo_url_wrong_formatted_url(self):
-        self.assertRaises(InvalidIIIFUrlError, get_info_from_iiif_url, "2/")
+        self.assertRaises(InvalidIIIFUrlError, get_info_from_iiif_url, "2/", False)
 
     def test_create_wabo_url(self):
-        url_info = get_info_from_iiif_url(WABO_IMG_URL)
+        url_info = get_info_from_iiif_url(WABO_IMG_URL, False)
         metadata = {
             'documenten': [
                 {
@@ -390,7 +390,7 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(wabo_url, '2/wabo:SDZ-UIT-COH-628547.PDF/full/1000,1000/0/default.jpg')
 
     def test_create_wabo_url_source_file(self):
-        url_info = get_info_from_iiif_url(WABO_IMG_URL + '?source_file=true')
+        url_info = get_info_from_iiif_url(WABO_IMG_URL, True)
         metadata = {
             'documenten': [
                 {

@@ -63,7 +63,7 @@ def get_image_from_iiif_server(file_url, headers, cert):
     return requests.get(file_url, headers=headers, cert=cert)
 
 
-def get_info_from_iiif_url(iiif_url):
+def get_info_from_iiif_url(iiif_url, source_file):
     ## PRE-WABO
     # iiif_url = \
     # "https://acc.images.data.amsterdam.nl/iiif/2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
@@ -81,7 +81,6 @@ def get_info_from_iiif_url(iiif_url):
         source = iiif_url.split(':')[0].split('/')[1]  # "edepot" or "wabo"
         relevant_url_part = iiif_url.split(':')[1].split('/')[0]
         formatting = iiif_url.split(':')[1].split('/', 1)[1].split('?')[0] if '/' in iiif_url.split(':')[1] else ''
-        source_file = 'source_file=true' in iiif_url
 
         if source == 'edepot':  # == pre-wabo
             stadsdeel, dossier, document_and_file = relevant_url_part.split('-')
