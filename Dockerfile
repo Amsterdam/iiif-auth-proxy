@@ -7,6 +7,12 @@ ENV PYTHONUNBUFFERED 1
 ENV CONSUL_HOST=${CONSUL_HOST:-notset}
 ENV CONSUL_PORT=${CONSUL_PORT:-8500}
 
+# Edit the openssl.cnf file to allow a lower security level.
+# This is needed to directly call the wabo data
+# TODO: remove this when we get a more secure cert for the wabo server
+RUN sed -i "s|MinProtocol = TLSv1.2|MinProtocol = None|g" /etc/ssl/openssl.cnf
+RUN sed -i "s|CipherString = DEFAULT@SECLEVEL=2|CipherString = DEFAULT|g" /etc/ssl/openssl.cnf
+
 RUN adduser --system datapunt
 
 RUN mkdir -p /src && chown datapunt /src

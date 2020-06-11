@@ -17,3 +17,5 @@ services:
       - UWSGI_HARAKIRI=15
       - UWSGI_DIE_ON_TERM=1
       - UWSGI_PY_AUTORELOAD=1
+      - START_STUNNEL=false
+      - IIIF_IMAGE_SERVER_WABO_CERT=dGhlIGNvbnRlbnRzIG9mIHRoZSBjZXJ0IGZpbGU=  # This says "the contents of the cert file"

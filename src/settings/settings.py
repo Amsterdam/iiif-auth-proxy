@@ -28,7 +28,7 @@ DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
-STADSARCHIEF_META_SERVER_BASE_URL = os.getenv('STADSARCHIEF_META_SERVER_BASE_URL', "http://iiif-metadata-server.service.consul")
+STADSARCHIEF_META_SERVER_BASE_URL = os.getenv('STADSARCHIEF_META_SERVER_BASE_URL', "http://iiif-metadata-server-api.service.consul")
 STADSARCHIEF_META_SERVER_PORT = os.getenv('STADSARCHIEF_META_SERVER_PORT', "8183")  # This port is static within the network
 ACCESS_PUBLIC = "PUBLIC"
 ACCESS_RESTRICTED = "RESTRICTED"
@@ -36,6 +36,7 @@ BOUWDOSSIER_READ_SCOPE = 'BD/R'  # BouwDossiers_Read
 BOUWDOSSIER_EXTENDED_SCOPE = 'BD/X'  # BouwDossiers_eXtended
 IIIF_BASE_URL = os.getenv('IIIF_BASE_URL', "http://iiif.service.consul")
 IIIF_PORT = os.getenv('IIIF_PORT', "8149")  # This port is static within the network
+WABO_BASE_URL = os.getenv('WABO_BASE_URL', "https://conversiestraatwabo.amsterdam.nl/webDAV/")
 
 
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
@@ -61,11 +62,10 @@ JWKS_TEST_KEY = """
 
 DATAPUNT_AUTHZ = {
     # 'ALWAYS_OK': False,  # disable authz. tests will fail...
-    'JWKS': os.getenv('PUB_JWKS', JWKS_TEST_KEY)
+    'JWKS': os.getenv('PUB_JWKS', JWKS_TEST_KEY),
+    'FORCED_ANONYMOUS_ROUTES': ['/status/health']
 }
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.auth',

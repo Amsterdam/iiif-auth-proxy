@@ -6,7 +6,8 @@ from django.conf import settings
 from django.test import Client, SimpleTestCase
 
 from .generate_token import create_token
-from .tools import InvalidIIIFUrlError, get_info_from_iiif_url
+from .tools import (InvalidIIIFUrlError, create_file_url_and_headers,
+                    create_wabo_url, get_info_from_iiif_url)
 from .views import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
                     RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER,
                     RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
@@ -16,7 +17,8 @@ log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
 
 IMAGE_BINARY_DATA = "image binary data"
-IMAGE_URL = "2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
+PRE_WABO_IMG_URL = "2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
+WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547/full/1000,1000/0/default.jpg"
 
 
 class MockResponse:
@@ -62,13 +64,13 @@ class FileTestCase(SimpleTestCase):
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
-        response = self.c.get(self.url + IMAGE_URL, **header)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA)
 
     def test_get_image_when_metadata_server_is_not_available(self):
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
-        response = self.c.get(self.url + IMAGE_URL, **header)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 502)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER)
 
@@ -84,7 +86,7 @@ class FileTestCase(SimpleTestCase):
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
-        response = self.c.get(self.url + IMAGE_URL, **header)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 502)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE)
 
@@ -105,7 +107,7 @@ class FileTestCase(SimpleTestCase):
             content=IMAGE_BINARY_DATA
         )
 
-        response = self.c.get(self.url + IMAGE_URL)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_TOKEN)
 
@@ -125,7 +127,7 @@ class FileTestCase(SimpleTestCase):
             content=IMAGE_BINARY_DATA
         )
 
-        response = self.c.get(self.url + IMAGE_URL)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_TOKEN)
 
@@ -145,7 +147,7 @@ class FileTestCase(SimpleTestCase):
             content=IMAGE_BINARY_DATA
         )
 
-        response = self.c.get(self.url + IMAGE_URL)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_TOKEN)
 
@@ -165,7 +167,7 @@ class FileTestCase(SimpleTestCase):
             content=IMAGE_BINARY_DATA
         )
 
-        response = self.c.get(self.url + IMAGE_URL)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_TOKEN)
 
@@ -187,7 +189,7 @@ class FileTestCase(SimpleTestCase):
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
-        response = self.c.get(self.url + IMAGE_URL, **header)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
 
@@ -209,7 +211,7 @@ class FileTestCase(SimpleTestCase):
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
-        response = self.c.get(self.url + IMAGE_URL, **header)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.content.decode("utf-8"), "")
 
@@ -232,7 +234,7 @@ class FileTestCase(SimpleTestCase):
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
-        response = self.c.get(self.url + IMAGE_URL, **header)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
 
@@ -255,7 +257,7 @@ class FileTestCase(SimpleTestCase):
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
-        response = self.c.get(self.url + IMAGE_URL, **header)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
 
@@ -280,7 +282,7 @@ class FileTestCase(SimpleTestCase):
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
-        response = self.c.get(self.url + IMAGE_URL, **header)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
 
@@ -303,7 +305,7 @@ class FileTestCase(SimpleTestCase):
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])}
-        response = self.c.get(self.url + IMAGE_URL, **header)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
 
@@ -325,18 +327,183 @@ class FileTestCase(SimpleTestCase):
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])}
-        response = self.c.get(self.url + IMAGE_URL, **header)
+        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
 
 
 class ToolsTestCase(SimpleTestCase):
-    def test_get_info_from_iiif_url_vanilla(self):
-        stadsdeel, dossier, document, file = get_info_from_iiif_url(IMAGE_URL)
-        self.assertEqual(stadsdeel, "ST")
-        self.assertEqual(dossier, "00015")
-        self.assertEqual(document, "ST00000126")
-        self.assertEqual(file, "00001")
+    def test_get_info_from_pre_wabo_url_vanilla(self):
+        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL, False)
+        self.assertEqual(url_info['source'], "edepot")
+        self.assertEqual(url_info['stadsdeel'], "ST")
+        self.assertEqual(url_info['dossier'], "00015")
+        self.assertEqual(url_info['document_barcode'], "ST00000126")
+        self.assertEqual(url_info['file'], "00001")
+        self.assertEqual(url_info['source_file'], False)
 
-    def test_get_info_from_iiif_url_wrong_formatted_url(self):
-        self.assertRaises(InvalidIIIFUrlError, get_info_from_iiif_url, "2/")
+    def test_get_info_from_pre_wabo_url_with_source_file(self):
+        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL, True)
+        self.assertEqual(url_info['source'], "edepot")
+        self.assertEqual(url_info['stadsdeel'], "ST")
+        self.assertEqual(url_info['dossier'], "00015")
+        self.assertEqual(url_info['document_barcode'], "ST00000126")
+        self.assertEqual(url_info['file'], "00001")
+        self.assertEqual(url_info['source_file'], True)
+
+    def test_get_info_from_pre_wabo_url_wrong_formatted_url(self):
+        self.assertRaises(InvalidIIIFUrlError, get_info_from_iiif_url, "2/", False)
+
+    def test_get_info_from_wabo_url_vanilla(self):
+        url_info = get_info_from_iiif_url(WABO_IMG_URL, False)
+        self.assertEqual(url_info['source'], "wabo")
+        self.assertEqual(url_info['stadsdeel'], "SDZ")
+        self.assertEqual(url_info['dossier'], "38657")
+        self.assertEqual(url_info['olo'], "4900487")
+        self.assertEqual(url_info['document_barcode'], "628547")
+        self.assertEqual(url_info['source_file'], False)
+
+    def test_get_info_from_wabo_url_with_source_file(self):
+        url_info = get_info_from_iiif_url(WABO_IMG_URL, True)
+        self.assertEqual(url_info['source'], "wabo")
+        self.assertEqual(url_info['stadsdeel'], "SDZ")
+        self.assertEqual(url_info['dossier'], "38657")
+        self.assertEqual(url_info['olo'], "4900487")
+        self.assertEqual(url_info['document_barcode'], "628547")
+        self.assertEqual(url_info['source_file'], True)
+
+    def test_get_info_from_wabo_url_wrong_formatted_url(self):
+        self.assertRaises(InvalidIIIFUrlError, get_info_from_iiif_url, "2/", False)
+
+    def test_create_wabo_url(self):
+        url_info = get_info_from_iiif_url(WABO_IMG_URL, False)
+        metadata = {
+            'documenten': [
+                {
+                    'barcode': '628547',
+                    'bestanden': [{"filename": "SDZ/UIT/COH/628547.PDF"}]
+                }
+            ]
+        }
+
+        wabo_url = create_wabo_url(metadata=metadata, url_info=url_info)
+        self.assertEqual(wabo_url, '2/wabo:SDZ-UIT-COH-628547.PDF/full/1000,1000/0/default.jpg')
+
+    def test_create_wabo_url_source_file(self):
+        url_info = get_info_from_iiif_url(WABO_IMG_URL, True)
+        metadata = {
+            'documenten': [
+                {
+                    'barcode': '628547',
+                    'bestanden': [{"filename": "SDZ/UIT/COH/628547.PDF"}]
+                }
+            ]
+        }
+
+        wabo_url = create_wabo_url(metadata=metadata, url_info=url_info)
+        self.assertEqual(wabo_url, 'SDZ/UIT/COH/628547.PDF')
+
+    def test_create_file_url_and_headers(self):
+        metadata = {
+            'documenten': [
+                {
+                    'barcode': '628547',
+                    'bestanden': [{"filename": "SDZ/UIT/COH/628547.PDF"}]
+                }
+            ]
+        }
+
+        # pre-wabo with no headers
+        url, headers, cert = create_file_url_and_headers(
+            {},
+            {'source': 'edepot'},
+            PRE_WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL}")
+        self.assertEqual(headers, {})
+        self.assertEqual(cert, ())
+
+        # pre-wabo with one header (which we expect to not be used)
+        url, headers, cert = create_file_url_and_headers(
+            {'HTTP_X_FORWARDED_PROTO': 'a'},
+            {'source': 'edepot'},
+            PRE_WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL}")
+        self.assertEqual(headers, {})
+        self.assertEqual(cert, ())
+
+        # pre-wabo with one header (which we expect to not be used)
+        url, headers, cert = create_file_url_and_headers(
+            {'HTTP_X_FORWARDED_HOST': 'a'},
+            {'source': 'edepot'},
+            PRE_WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL}")
+        self.assertEqual(headers, {})
+        self.assertEqual(cert, ())
+
+        # pre-wabo with both forwarded headers (which we both expect to be used)
+        url, headers, cert = create_file_url_and_headers(
+            {'HTTP_X_FORWARDED_PROTO': 'proto', 'HTTP_X_FORWARDED_HOST': 'host'},
+            {'source': 'edepot'},
+            PRE_WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL}")
+        self.assertEqual(headers['X-Forwarded-Proto'], 'proto')
+        self.assertEqual(headers['X-Forwarded-Host'], 'host')
+        self.assertEqual(cert, ())
+
+        # wabo with adjusted url and X-Forwarded-ID
+        url, headers, cert = create_file_url_and_headers(
+            {},
+            {
+                'source': 'wabo',
+                'document_barcode': '628547',
+                'formatting': 'full/1000,1000/0/default.jpg',
+                'source_file': False
+            },
+            WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/2/wabo:SDZ-UIT-COH-628547.PDF/full/1000,1000/0/default.jpg")
+        self.assertEqual(headers['X-Forwarded-ID'], 'wabo:SDZ-38657-4900487_628547')
+        self.assertEqual(cert, ())
+
+        # wabo with adjusted url and X-Forwarded-ID and both forwarded headers
+        url, headers, cert = create_file_url_and_headers(
+            {'HTTP_X_FORWARDED_PROTO': 'proto', 'HTTP_X_FORWARDED_HOST': 'host'},
+            {
+                'source': 'wabo',
+                'document_barcode': '628547',
+                'formatting': 'full/1000,1000/0/default.jpg',
+                'source_file': False
+            },
+            WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/2/wabo:SDZ-UIT-COH-628547.PDF/full/1000,1000/0/default.jpg")
+        self.assertEqual(len(headers), 3)
+        self.assertEqual(headers['X-Forwarded-ID'], 'wabo:SDZ-38657-4900487_628547')
+        self.assertEqual(headers['X-Forwarded-Proto'], 'proto')
+        self.assertEqual(headers['X-Forwarded-Host'], 'host')
+        self.assertEqual(cert, ())
+
+        # wabo with source_file
+        url, headers, cert = create_file_url_and_headers(
+            {},
+            {
+                'source': 'wabo',
+                'document_barcode': '628547',
+                'formatting': 'full/1000,1000/0/default.jpg',
+                'source_file': True
+            },
+            WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF")
+        self.assertEqual(cert, '/tmp/sw444v1912.pem')
