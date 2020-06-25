@@ -7,7 +7,7 @@ String CONTAINER_DIR = "."
 String PRODUCTION_BRANCH = "master"
 String ACCEPTANCE_BRANCH = "development"
 String INFRASTRUCTURE = 'thanos'
-String PLAYBOOK = 'deploy-iiif-auth-proxy.yml'
+String PLAYBOOK = 'deploy.yml'
 
 String IMAGE_NAME = "docker-registry.data.amsterdam.nl/datapunt/${PROJECT_NAME}:${env.BUILD_NUMBER}"
 String BRANCH = "${env.BRANCH_NAME}"
@@ -62,7 +62,8 @@ if (BRANCH == "${ACCEPTANCE_BRANCH}") {
                 parameters: [
                         [$class: 'StringParameterValue', name: 'INFRASTRUCTURE', value: "${INFRASTRUCTURE}"],
                         [$class: 'StringParameterValue', name: 'INVENTORY', value: 'acceptance'],
-                        [$class: 'StringParameterValue', name: 'PLAYBOOK', value: "${PLAYBOOK}"]
+                        [$class: 'StringParameterValue', name: 'PLAYBOOK', value: "${PLAYBOOK}"],
+                        [$class: 'StringParameterValue', name: 'PLAYBOOKPARAMS', value: "-e cmdb_id=app_iiif-auth-proxy"]
                 ]
             }
         }
@@ -85,7 +86,8 @@ if (BRANCH == "${PRODUCTION_BRANCH}") {
                 parameters: [
                         [$class: 'StringParameterValue', name: 'INFRASTRUCTURE', value: "${INFRASTRUCTURE}"],
                         [$class: 'StringParameterValue', name: 'INVENTORY', value: 'production'],
-                        [$class: 'StringParameterValue', name: 'PLAYBOOK', value: "${PLAYBOOK}"]
+                        [$class: 'StringParameterValue', name: 'PLAYBOOK', value: "${PLAYBOOK}"],
+                        [$class: 'StringParameterValue', name: 'PLAYBOOKPARAMS', value: "-e cmdb_id=app_iiif-auth-proxy"]
                 ]
             }
         }
