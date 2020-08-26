@@ -60,6 +60,7 @@ def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
 
 
 def get_image_from_iiif_server(file_url, headers, cert):
+    # curl http://iiif.service.consul:8149/iiif/2/edepot:SA-63538-SA00423873_00044.jpg
     return requests.get(file_url, headers=headers, cert=cert)
 
 
@@ -97,7 +98,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
 
         elif source == 'wabo':  # = pre-wabo
             stadsdeel, dossier, olo_and_document = relevant_url_part.split('-')
-            olo, document_barcode = olo_and_document.split('_')
+            olo, document_barcode = olo_and_document.split('_', 1)
             return {
                 'source': source,
                 'stadsdeel': stadsdeel,
