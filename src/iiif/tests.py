@@ -372,6 +372,15 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(url_info['document_barcode'], "628547")
         self.assertEqual(url_info['source_file'], True)
 
+    def test_get_info_from_wabo_url_with_underscores_in_barcode(self):
+        url_info = get_info_from_iiif_url("2/wabo:SDO-10316333-3304_ECS0000004420_000_000/info.json", False)
+        self.assertEqual(url_info['source'], "wabo")
+        self.assertEqual(url_info['stadsdeel'], "SDO")
+        self.assertEqual(url_info['dossier'], "10316333")
+        self.assertEqual(url_info['olo'], "3304")
+        self.assertEqual(url_info['document_barcode'], "ECS0000004420_000_000")
+        self.assertEqual(url_info['source_file'], False)
+
     def test_get_info_from_wabo_url_wrong_formatted_url(self):
         self.assertRaises(InvalidIIIFUrlError, get_info_from_iiif_url, "2/", False)
 
