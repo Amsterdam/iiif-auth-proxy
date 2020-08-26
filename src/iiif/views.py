@@ -24,7 +24,7 @@ def index(request, iiif_url):
     try:
         url_info = tools.get_info_from_iiif_url(iiif_url, request.GET.get('source_file') == 'true')
     except tools.InvalidIIIFUrlError:
-        return HttpResponse(f"Invalid formatted url: {iiif_url}", status=400)
+        return HttpResponse("Invalid formatted url", status=400)
 
     # Get image meta data
     try:
