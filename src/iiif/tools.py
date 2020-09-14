@@ -12,7 +12,7 @@ class DocumentNotFoundInMetadataError(Exception):
 
 def get_meta_data(url_info, token):
     # Test with:
-    # curl -i -H "Accept: application/json" http://iiif-metadata-server.service.consul:8183/iiif-metadata/bouwdossier/SA85385/
+    # curl -i -H "Accept: application/json" http://iiif-metadata-server-api.service.consul:8183/iiif-metadata/bouwdossier/SA85385/
     metadata_url = f"{settings.STADSARCHIEF_META_SERVER_BASE_URL}:" \
                    f"{settings.STADSARCHIEF_META_SERVER_PORT}/iiif-metadata/bouwdossier/{url_info['stadsdeel']}{url_info['dossier']}/"
     return requests.get(metadata_url, headers={'Authorization': token})
@@ -97,7 +97,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
             }
 
         elif source == 'wabo':  # = pre-wabo
-            stadsdeel, dossier, olo_and_document = relevant_url_part.split('-')
+            stadsdeel, dossier, olo_and_document = relevant_url_part.split('-', 2)
             olo, document_barcode = olo_and_document.split('_', 1)
             return {
                 'source': source,
