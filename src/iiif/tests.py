@@ -372,6 +372,7 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(url_info['document_barcode'], "628547")
         self.assertEqual(url_info['source_file'], True)
 
+
     def test_get_info_from_wabo_url_with_underscores_in_barcode(self):
         url_info = get_info_from_iiif_url("2/wabo:SDO-10316333-3304_ECS0000004420_000_000/info.json", False)
         self.assertEqual(url_info['source'], "wabo")

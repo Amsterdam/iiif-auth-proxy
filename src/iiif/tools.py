@@ -60,7 +60,6 @@ def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
 
 
 def get_image_from_iiif_server(file_url, headers, cert):
-    # curl http://iiif.service.consul:8149/iiif/2/edepot:SA-63538-SA00423873_00044.jpg
     return requests.get(file_url, headers=headers, cert=cert)
 
 
