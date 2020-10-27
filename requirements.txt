@@ -8,7 +8,7 @@ asgiref==3.2.7            # via django
 certifi==2020.4.5.2       # via requests, sentry-sdk
 cffi==1.14.0              # via cryptography
 chardet==3.0.4            # via requests
-cryptography==2.9.2       # via jwcrypto
+cryptography==3.2         # via jwcrypto
 datapunt-authorization-django==1.0.0  # via -r requirements.in
 django-cors-headers==3.3.0  # via -r requirements.in
 django==3.0.7             # via -r requirements.in, datapunt-authorization-django, django-cors-headers
