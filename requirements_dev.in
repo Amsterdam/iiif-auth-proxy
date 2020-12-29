@@ -8,3 +8,6 @@
 pip-tools
 
 # Useful extra developer packages:
+pytest
+pytest-cov
+pytest-django

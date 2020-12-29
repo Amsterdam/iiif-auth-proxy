@@ -4,20 +4,20 @@
 #
 #    pip-compile --output-file=requirements.txt requirements.in
 #
-asgiref==3.2.7            # via django
-certifi==2020.4.5.2       # via requests, sentry-sdk
-cffi==1.14.0              # via cryptography
-chardet==3.0.4            # via requests
-cryptography==2.9.2       # via jwcrypto
-datapunt-authorization-django==1.0.0  # via -r requirements.in
-django-cors-headers==3.3.0  # via -r requirements.in
-django==3.0.7             # via -r requirements.in, datapunt-authorization-django, django-cors-headers
-idna==2.9                 # via requests
-jwcrypto==0.7             # via datapunt-authorization-django
+asgiref==3.3.1            # via django
+certifi==2020.12.5        # via requests, sentry-sdk
+cffi==1.14.4              # via cryptography
+chardet==4.0.0            # via requests
+cryptography==3.3.1       # via jwcrypto
+datapunt-authorization-django==1.3.0  # via -r requirements.in
+django-cors-headers==3.6.0  # via -r requirements.in
+django==3.1.4             # via -r requirements.in, datapunt-authorization-django, django-cors-headers
+idna==2.10                # via requests
+jwcrypto==0.8             # via datapunt-authorization-django
 pycparser==2.20           # via cffi
-pytz==2020.1              # via django
-requests==2.23.0          # via datapunt-authorization-django
-sentry-sdk==0.14.4        # via -r requirements.in
+pytz==2020.5              # via django
+requests==2.25.1          # via datapunt-authorization-django
+sentry-sdk==0.19.5        # via -r requirements.in
 six==1.15.0               # via cryptography
-sqlparse==0.3.1           # via django
-urllib3==1.25.9           # via requests, sentry-sdk
+sqlparse==0.4.1           # via django
+urllib3==1.26.2           # via requests, sentry-sdk
