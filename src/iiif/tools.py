@@ -1,3 +1,4 @@
+import re
 import requests
 from django.conf import settings
 
@@ -33,6 +34,7 @@ def create_wabo_url(url_info, metadata):
 
 # TODO: split into two functions, one for url and one for headers
 def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
+    iiif_url = iiif_url.replace(' ', '%20')
     headers = {}
     if 'HTTP_X_FORWARDED_PROTO' in request_meta and 'HTTP_X_FORWARDED_HOST' in request_meta:
         # Make sure the iiif-image-server gets the protocol and the host of the initial request so that
@@ -42,6 +44,9 @@ def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
         headers['X-Forwarded-Host'] = request_meta['HTTP_X_FORWARDED_HOST']
 
     if url_info['source'] == 'edepot':
+        # If the iiif url contains a reference to dossier like SQ1421 without - then
+        # this was added to ad reference to stadsdeel and dossiernumber and it should be removed
+        iiif_url = re.sub(r":[A-Z]+\d+-", ":", iiif_url)
         iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url}"
         return iiif_image_url, headers, ()
     elif url_info['source'] == 'wabo':
@@ -74,7 +79,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
     # "https://acc.images.data.amsterdam.nl/iiif/2/wabo:SDZ-38657-4900487_628547/full/full/0/default.jpg""
     # SDZ=stadsdeel  38657=dossier  4900487=olo_liaan_nummer  628547=document_barcode
 
-    # At the end of the url, this can be appended '?source_file=true', which means we'll bypass 
+    # At the end of the url, this can be appended '?source_file=true', which means we'll bypass
     # cantaloupe and go directly for the source file
 
     try:
@@ -83,7 +88,12 @@ def get_info_from_iiif_url(iiif_url, source_file):
         formatting = iiif_url.split(':')[1].split('/', 1)[1].split('?')[0] if '/' in iiif_url.split(':')[1] else ''
 
         if source == 'edepot':  # == pre-wabo
-            stadsdeel, dossier, document_and_file = relevant_url_part.split('-')
+            m = re.match(r"^([A-Z]+)-?(\d+)-(.+)$", relevant_url_part)
+            if not m:
+                raise InvalidIIIFUrlError(f"Invalid iiif url (no valid source): {iiif_url}")
+            stadsdeel = m.group(1)
+            dossier = m.group(2)
+            document_and_file = m.group(3).split('-')[-1]
             document_barcode, file = document_and_file.split('_')
             return {
                 'source': source,
@@ -110,7 +120,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
 
         raise InvalidIIIFUrlError(f"Invalid iiif url (no valid source): {iiif_url}")
 
-    except Exception:
+    except Exception as e:
         raise InvalidIIIFUrlError(f"Invalid iiif url: {iiif_url}")
 
 

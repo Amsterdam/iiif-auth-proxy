@@ -18,6 +18,7 @@ timezone = pytz.timezone("UTC")
 
 IMAGE_BINARY_DATA = "image binary data"
 PRE_WABO_IMG_URL = "2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
+PRE_WABO_IMG_URL_X = "2/edepot:SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg/full/1000,1000/0/default.jpg"
 WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547/full/1000,1000/0/default.jpg"
 
 
