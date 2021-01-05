@@ -1,95 +1,108 @@
 #!groovy
 
-// Project Settings for Deployment
-String PROJECT_DISPLAY = "iiif-auth-proxy"
-String PROJECT_NAME = "iiif-auth-proxy"
-String CONTAINER_DIR = "."
-String PRODUCTION_BRANCH = "master"
-String ACCEPTANCE_BRANCH = "development"
-String INFRASTRUCTURE = 'thanos'
-String PLAYBOOK = 'deploy.yml'
+def PROJECT_NAME = "iiif-auth-proxy"
+def PLAYBOOK = 'deploy.yml'
+def SLACK_CHANNEL = '#waarnemingen-deployments'  # TODO: Change to a more generic deployment channel
+def SLACK_MESSAGE = [
+    "title_link": BUILD_URL,
+    "fields": [
+        ["title": "Project","value": PROJECT_NAME],
+        ["title":"Branch", "value": BRANCH_NAME, "short":true],
+        ["title":"Build number", "value": BUILD_NUMBER, "short":true]
+    ]
+]
 
-String IMAGE_NAME = "docker-registry.data.amsterdam.nl/datapunt/${PROJECT_NAME}:${env.BUILD_NUMBER}"
-String BRANCH = "${env.BRANCH_NAME}"
 
-image = 'initial value'
+pipeline {
+    agent any
 
-def tryStep(String message, Closure block, Closure tearDown = null) {
-    try {
-        block();
-    }
-    catch (Throwable t) {
-        if (BRANCH == "${PRODUCTION_BRANCH}") {
-            slackSend message: "${env.JOB_NAME}: ${message} failure ${env.BUILD_URL}", channel: '#ci-channel', color: 'danger'
-        }
-        throw t;
-    }
-    finally {
-        if (tearDown) {
-            tearDown();
-        }
-    }
-}
-
-node {
-    // Get a copy of the code
-    stage("Checkout") {
-        checkout scm
+    options {
+        timeout(time: 1, unit: 'HOURS')
     }
 
-    stage('Test') {
-        tryStep "Test", {
-            sh "src/deploy/test/jenkins-script.sh"
-        }
+    environment {
+        SHORT_UUID = sh( script: "uuidgen | cut -d '-' -f1", returnStdout: true).trim()
+        COMPOSE_PROJECT_NAME = "${PROJECT_NAME}-${env.SHORT_UUID}"
+        VERSION = env.BRANCH_NAME.replace('/', '-').toLowerCase().replace(
+            'master', 'latest'
+        )
     }
 
-    // Build the Dockerfile in the $CONTAINER_DIR and push it to Nexus
-    stage("Build develop image") {
-        tryStep "build", {
-            image = docker.build("${IMAGE_NAME}","${CONTAINER_DIR}")
-            image.push()
-        }
-    }
-}
-
-// Acceptance branch, fetch the container, label with acceptance and deploy to acceptance.
-if (BRANCH == "${ACCEPTANCE_BRANCH}") {
-    node {
-        stage("Deploy to ACC") {
-            tryStep "deployment", {
-                image.push("acceptance")
-                build job: 'Subtask_Openstack_Playbook',
-                parameters: [
-                        [$class: 'StringParameterValue', name: 'INFRASTRUCTURE', value: "${INFRASTRUCTURE}"],
-                        [$class: 'StringParameterValue', name: 'INVENTORY', value: 'acceptance'],
-                        [$class: 'StringParameterValue', name: 'PLAYBOOK', value: "${PLAYBOOK}"],
-                        [$class: 'StringParameterValue', name: 'PLAYBOOKPARAMS', value: "-e cmdb_id=app_iiif-auth-proxy"]
-                ]
+    stages {
+        stage('Test') {
+            steps {
+                sh 'make test'
             }
         }
-  }
-}
 
-// On master branch, fetch the container, tag with production and latest and deploy to production
-if (BRANCH == "${PRODUCTION_BRANCH}") {
-    stage('Waiting for approval') {
-        slackSend channel: '#ci-channel', color: 'warning', message: "${PROJECT_DISPLAY} is waiting for Production Release - please confirm"
-        input "Deploy to Production?"
-    }
-
-    node {
-        stage("Deploy to PROD") {
-            tryStep "deployment", {
-                image.push("production")
-                image.push("latest")
-                build job: 'Subtask_Openstack_Playbook',
-                parameters: [
-                        [$class: 'StringParameterValue', name: 'INFRASTRUCTURE', value: "${INFRASTRUCTURE}"],
-                        [$class: 'StringParameterValue', name: 'INVENTORY', value: 'production'],
-                        [$class: 'StringParameterValue', name: 'PLAYBOOK', value: "${PLAYBOOK}"],
-                        [$class: 'StringParameterValue', name: 'PLAYBOOKPARAMS', value: "-e cmdb_id=app_iiif-auth-proxy"]
-                ]
+        stage('Build') {
+            steps {
+                sh 'make build'
             }
+        }
+
+        stage('Push and deploy') {
+            when {
+                anyOf {
+                    branch 'master'
+                    buildingTag()
+                }
+            }
+            stages {
+                stage('Push') {
+                    steps {
+                        retry(3) {
+                            sh 'make push'
+                        }
+                    }
+                }
+
+                stage('Deploy to acceptance') {
+                    when {
+                        branch 'master'
+                    }
+                    steps {
+                        sh 'VERSION=acceptance make push'
+                        build job: 'Subtask_Openstack_Playbook', parameters: [
+                            string(name: 'PLAYBOOK', value: PLAYBOOK),
+                            string(name: 'INVENTORY', value: "acceptance"),
+                            string(
+                                name: 'PLAYBOOKPARAMS',
+                                value: "-e 'deployversion=${VERSION} cmdb_id=app_iiif-auth-proxy'"
+                            )
+                        ], wait: true
+                    }
+                }
+
+                stage('Deploy to production') {
+                    when { buildingTag() }
+                    steps {
+                        sh 'VERSION=production make push'
+                        build job: 'Subtask_Openstack_Playbook', parameters: [
+                            string(name: 'PLAYBOOK', value: PLAYBOOK),
+                            string(name: 'INVENTORY', value: "production"),
+                            string(
+                                name: 'PLAYBOOKPARAMS',
+                                value: "-e 'deployversion=${VERSION} cmdb_id=app_iiif-auth-proxy'"
+                            )
+                        ], wait: true
+                    }
+                }
+            }
+        }
+
+    }
+    post {
+        always {
+            sh 'make clean'
+        }
+        failure {
+            slackSend(channel: SLACK_CHANNEL, attachments: [SLACK_MESSAGE <<
+                [
+                    "color": "#D53030",
+                    "title": "Build failed :fire:",
+                ]
+            ])
         }
     }
 }

@@ -5,13 +5,13 @@ import pytz
 from django.conf import settings
 from django.test import Client, SimpleTestCase
 
-from .generate_token import create_token
-from .tools import (InvalidIIIFUrlError, create_file_url_and_headers,
-                    create_wabo_url, get_info_from_iiif_url)
-from .views import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
-                    RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER,
-                    RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
-                    RESPONSE_CONTENT_NO_TOKEN)
+from iiif.generate_token import create_token
+from iiif.tools import (InvalidIIIFUrlError, create_file_url_and_headers,
+                        create_wabo_url, get_info_from_iiif_url)
+from iiif.views import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
+                        RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER,
+                        RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
+                        RESPONSE_CONTENT_NO_TOKEN)
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
