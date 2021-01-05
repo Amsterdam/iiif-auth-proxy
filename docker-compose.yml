@@ -1,21 +1,40 @@
-version: "3.3"
+version: "3.4"
 services:
-  app:
-    build: .
+  x-app: &base-app
+    build:
+      context: .
+      target: app
     volumes:
       - ./src:/src
+      - ./tests:/tests
+      - ./deploy:/deploy
     ports:
       - "8000:8000"
+    environment: &base-app-env
+      SECRET_KEY: 'insecure'
+      START_STUNNEL: 'false'
+      IIIF_IMAGE_SERVER_WABO_CERT: dGhlIGNvbnRlbnRzIG9mIHRoZSBjZXJ0IGZpbGU=  # This says "the contents of the cert file"
+
+  dev:
+    <<: *base-app
+    build:
+      context: .
+      target: dev
+    command: python manage.py runserver 0.0.0.0:8000
+
+  app:
+    <<: *base-app
+    build:
+      context: .
+      target: app
+    image: docker-registry.data.amsterdam.nl/datapunt/iiif-auth-proxy:${VERSION:-latest}
+    command: /deploy/docker-run.sh
+
+  test:
+    <<: *base-app
+    build:
+      context: .
+      target: tests
     environment:
-      - SECRET_KEY=insecure
-      - UWSGI_HTTP=0.0.0.0:8000
-      - UWSGI_MODULE=settings.wsgi:application
-      - UWSGI_CALLABLE=application
-      - UWSGI_OFFLOAD_THREADS=1
-      - UWSGI_MASTER=1
-      - UWSGI_VACUUM=1
-      - UWSGI_HARAKIRI=15
-      - UWSGI_DIE_ON_TERM=1
-      - UWSGI_PY_AUTORELOAD=1
-      - START_STUNNEL=false
-      - IIIF_IMAGE_SERVER_WABO_CERT=dGhlIGNvbnRlbnRzIG9mIHRoZSBjZXJ0IGZpbGU=  # This says "the contents of the cert file"
+      <<: *base-app-env
+      DJANGO_SETTINGS_MODULE: "main.settings"

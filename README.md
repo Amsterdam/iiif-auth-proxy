@@ -30,4 +30,4 @@ The server can be run using `docker-compose up`
 The [metadata server](https://github.com/Amsterdam/stadsarchief) and the 
 [iiif-image-server](https://github.com/Amsterdam/iiif-image-server) are called using consul urls over http. For 
 example, the iiif-image-server is called using `http://iiif.service.consul:8149`. These settings can be overwritten 
-using `SERVER_URL` and `SERVER_PORT` env variables in [settings.py](src/settings/settings.py). 
+using `SERVER_URL` and `SERVER_PORT` env variables in [settings.py](src/main/settings.py). 
