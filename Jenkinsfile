@@ -26,7 +26,6 @@ pipeline {
         VERSION = env.BRANCH_NAME.replace('/', '-').toLowerCase().replace(
             'master', 'latest'
         )
-        IS_RELEASE = "${env.BRANCH_NAME ==~ "release/.*"}"
     }
 
     stages {
@@ -47,7 +46,6 @@ pipeline {
                 anyOf {
                     branch 'master'
                     buildingTag()
-                    environment name: 'IS_RELEASE', value: 'true'
                 }
             }
             stages {
@@ -61,10 +59,7 @@ pipeline {
 
                 stage('Deploy to acceptance') {
                     when {
-                        anyOf {
-                            environment name: 'IS_RELEASE', value: 'true'
-                            branch 'master'
-                        }
+                        branch 'master'
                     }
                     steps {
                         sh 'VERSION=acceptance make push'
