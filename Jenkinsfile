@@ -2,7 +2,7 @@
 
 def PROJECT_NAME = "iiif-auth-proxy"
 def PLAYBOOK = 'deploy.yml'
-def SLACK_CHANNEL = '#waarnemingen-deployments'  # TODO: Change to a more generic deployment channel
+def SLACK_CHANNEL = '#waarnemingen-deployments'  // TODO: Change to a more generic deployment channel
 def SLACK_MESSAGE = [
     "title_link": BUILD_URL,
     "fields": [
