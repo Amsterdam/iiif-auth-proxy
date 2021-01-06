@@ -17,9 +17,12 @@ RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = "The iiif-image-server cannot 
 
 @csrf_exempt
 def index(request, iiif_url):
-    if not request.META.get('HTTP_AUTHORIZATION', None):
-        return HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
-    token = request.META['HTTP_AUTHORIZATION']
+    if not settings.DATAPUNT_AUTHZ['ALWAYS_OK']:
+        if not request.META.get('HTTP_AUTHORIZATION', None):
+            return HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
+        token = request.META['HTTP_AUTHORIZATION']
+    else:
+        token = 'NOT_SET'
 
     try:
         url_info = tools.get_info_from_iiif_url(iiif_url, request.GET.get('source_file') == 'true')
@@ -49,6 +52,16 @@ def index(request, iiif_url):
         )
     metadata = meta_response.json()
 
+    # Check whether the image exists in the metadata and whether it is public
+    try:
+        is_public = tools.img_is_public(metadata, url_info['document_barcode'])
+    except tools.DocumentNotFoundInMetadataError:
+        return HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404)
+
+    if not request.is_authorized_for(settings.BOUWDOSSIER_EXTENDED_SCOPE) and not (
+            is_public and request.is_authorized_for(settings.BOUWDOSSIER_READ_SCOPE)):
+        return HttpResponse("", status=401)
+
     # Get the file itself
     file_url, headers, cert = tools.create_file_url_and_headers(request.META, url_info, iiif_url, metadata)
     try:
@@ -71,21 +84,4 @@ def index(request, iiif_url):
             f"internal url {file_url}",
             status=400
         )
-
-    # Check whether the image exists in the metadata and whether it is public
-    try:
-        is_public = tools.img_is_public(metadata, url_info['document_barcode'])
-    except tools.DocumentNotFoundInMetadataError:
-        return HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404)
-
-    # Decide whether the user can view the image
-    if request.is_authorized_for(settings.BOUWDOSSIER_EXTENDED_SCOPE):
-        # The user has an extended scope, meaning (s)he can view anything. So we'll return the image.
-        return HttpResponse(file_response.content, content_type=file_response.headers.get('Content-Type', ''))
-
-    elif request.is_authorized_for(settings.BOUWDOSSIER_READ_SCOPE) and is_public:
-        # The user has a read scope, meaning (s)he can view only public images.
-        # This image is public, so we'll serve it.
-        return HttpResponse(file_response.content, content_type=file_response.headers.get('Content-Type', ''))
-
-    return HttpResponse("", status=401)
+    return HttpResponse(file_response.content, content_type=file_response.headers.get('Content-Type', ''))

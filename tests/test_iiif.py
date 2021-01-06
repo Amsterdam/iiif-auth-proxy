@@ -18,6 +18,8 @@ timezone = pytz.timezone("UTC")
 
 IMAGE_BINARY_DATA = "image binary data"
 PRE_WABO_IMG_URL = "2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
+PRE_WABO_IMG_URL_X1 = "2/edepot:SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg/full/1000,1000/0/default.jpg"
+PRE_WABO_IMG_URL_X2 = "2/edepot:SQ11426-SQ-file5BAIoi-SQ10092307_00001.jpg/info.json"
 WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547/full/1000,1000/0/default.jpg"
 
 
@@ -179,7 +181,11 @@ class FileTestCase(SimpleTestCase):
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
-                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}]
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10092307', 'access': settings.ACCESS_PUBLIC}
+                ]
             }
         )
         mock_get_image_from_iiif_server.return_value = MockResponse(
@@ -192,6 +198,15 @@ class FileTestCase(SimpleTestCase):
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+
+        response = self.c.get(self.url + PRE_WABO_IMG_URL_X1, **header)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+
+        response = self.c.get(self.url + PRE_WABO_IMG_URL_X2, **header)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
@@ -476,6 +491,27 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(headers['X-Forwarded-Proto'], 'proto')
         self.assertEqual(headers['X-Forwarded-Host'], 'host')
         self.assertEqual(cert, ())
+
+        # pre-wabo with other structure 1
+        url, headers, cert = create_file_url_and_headers(
+            {},
+            {'source': 'edepot'},
+            PRE_WABO_IMG_URL_X1,
+            metadata
+        )
+
+        self.assertEqual(url, f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL_X1.replace('SQ1452-','')}")
+
+        # pre-wabo with other structure 2
+        url, headers, cert = create_file_url_and_headers(
+            {},
+            {'source': 'edepot'},
+            PRE_WABO_IMG_URL_X2,
+            metadata
+        )
+
+        self.assertEqual(url,
+                         f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL_X2.replace('SQ11426-', '')}")
 
         # wabo with adjusted url and X-Forwarded-ID
         url, headers, cert = create_file_url_and_headers(
