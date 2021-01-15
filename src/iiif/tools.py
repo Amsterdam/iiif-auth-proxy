@@ -1,4 +1,8 @@
+import calendar
 import re
+from datetime import datetime, timedelta
+
+import jwt
 import requests
 from django.conf import settings
 
@@ -11,12 +15,12 @@ class DocumentNotFoundInMetadataError(Exception):
     pass
 
 
-def get_meta_data(url_info, token):
+def get_meta_data(url_info):
     # Test with:
     # curl -i -H "Accept: application/json" http://iiif-metadata-server-api.service.consul:8183/iiif-metadata/bouwdossier/SA85385/
     metadata_url = f"{settings.STADSARCHIEF_META_SERVER_BASE_URL}:" \
                    f"{settings.STADSARCHIEF_META_SERVER_PORT}/iiif-metadata/bouwdossier/{url_info['stadsdeel']}{url_info['dossier']}/"
-    return requests.get(metadata_url, headers={'Authorization': token})
+    return requests.get(metadata_url)
 
 
 def create_wabo_url(url_info, metadata):
@@ -146,3 +150,8 @@ def img_is_public(metadata, document_barcode):
                 return False
             break
     raise DocumentNotFoundInMetadataError()
+
+
+def get_authentication_jwt(expiry_hours=24, key=settings.SECRET_KEY):
+    exp = calendar.timegm((datetime.now() + timedelta(hours=expiry_hours)).timetuple())
+    return jwt.encode({"exp": exp, "scope": 'BD/R'}, key, algorithm="HS256")

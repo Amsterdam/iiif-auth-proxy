@@ -1,13 +1,17 @@
 import logging
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
+import jwt
 import pytz
+import time_machine
 from django.conf import settings
 from django.test import Client, SimpleTestCase
 
-from iiif.generate_token import create_token
+from iiif.generate_token import create_authz_token
 from iiif.tools import (InvalidIIIFUrlError, create_file_url_and_headers,
-                        create_wabo_url, get_info_from_iiif_url)
+                        create_wabo_url, get_authentication_jwt,
+                        get_info_from_iiif_url)
 from iiif.views import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
                         RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER,
                         RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
@@ -35,7 +39,7 @@ class MockResponse:
 
 
 # We're using SimpleTestCase because the normal TestCase fails because it checks for a DB connection (which is not used)
-class FileTestCase(SimpleTestCase):
+class FileTestCaseWithAuthz(SimpleTestCase):
     def setUp(self):
         self.url = '/iiif/'
         self.c = Client()
@@ -43,7 +47,7 @@ class FileTestCase(SimpleTestCase):
     def test_get_image_with_wrongly_formatted_url(self):
         """ Test getting an image with a wrongly formatted url' """
 
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
         response = self.c.get(self.url + "wrong_formatted_image_url.jpg", **header)
         self.assertEqual(response.status_code, 400)
@@ -65,13 +69,13 @@ class FileTestCase(SimpleTestCase):
             content=IMAGE_BINARY_DATA
         )
 
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA)
 
     def test_get_image_when_metadata_server_is_not_available(self):
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 502)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER)
@@ -87,7 +91,7 @@ class FileTestCase(SimpleTestCase):
             }
         )
 
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 502)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE)
@@ -95,7 +99,7 @@ class FileTestCase(SimpleTestCase):
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
-    def test_get_public_image_as_non_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_public_image_without_token(self, mock_get_meta_data, mock_get_image_from_iiif_server):
         # Setting up mocks
         mock_get_meta_data.return_value = MockResponse(
             200,
@@ -115,7 +119,7 @@ class FileTestCase(SimpleTestCase):
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
-    def test_get_restricted_image_as_non_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_without_token(self, mock_get_meta_data, mock_get_image_from_iiif_server):
         # Setting up mocks
         mock_get_meta_data.return_value = MockResponse(
             200,
@@ -135,7 +139,7 @@ class FileTestCase(SimpleTestCase):
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
-    def test_get_restricted_image_in_public_dossier_as_non_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_in_public_dossier_without_token(self, mock_get_meta_data, mock_get_image_from_iiif_server):
         # Setting up mocks
         mock_get_meta_data.return_value = MockResponse(
             200,
@@ -155,7 +159,7 @@ class FileTestCase(SimpleTestCase):
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
-    def test_get_public_image_in_restricted_dossier_as_non_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_public_image_in_restricted_dossier_without_token(self, mock_get_meta_data, mock_get_image_from_iiif_server):
         # Setting up mocks
         mock_get_meta_data.return_value = MockResponse(
             200,
@@ -175,7 +179,7 @@ class FileTestCase(SimpleTestCase):
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
-    def test_get_public_image_as_normale_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_read_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
         # Setting up mocks
         mock_get_meta_data.return_value = MockResponse(
             200,
@@ -194,7 +198,7 @@ class FileTestCase(SimpleTestCase):
             headers={'Content-Type': 'image/png'}
         )
 
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
@@ -210,7 +214,7 @@ class FileTestCase(SimpleTestCase):
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
-    def test_get_restricted_image_as_normale_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_with_read_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
         # Setting up mocks
         mock_get_meta_data.return_value = MockResponse(
             200,
@@ -225,14 +229,14 @@ class FileTestCase(SimpleTestCase):
             headers={'Content-Type': 'image/png'}
         )
 
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(settings.BOUWDOSSIER_READ_SCOPE)}
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.content.decode("utf-8"), "")
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
-    def test_get_public_image_as_speciale_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_extended_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
         # Setting up mocks
         mock_get_meta_data.return_value = MockResponse(
             200,
@@ -247,7 +251,7 @@ class FileTestCase(SimpleTestCase):
             headers={'Content-Type': 'image/png'}
         )
 
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
@@ -255,7 +259,7 @@ class FileTestCase(SimpleTestCase):
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
-    def test_get_restricted_image_as_speciale_ambtenaar(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_with_extended_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
         # Setting up mocks
         mock_get_meta_data.return_value = MockResponse(
             200,
@@ -270,7 +274,7 @@ class FileTestCase(SimpleTestCase):
             headers={'Content-Type': 'image/png'}
         )
 
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
@@ -278,7 +282,7 @@ class FileTestCase(SimpleTestCase):
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
-    def test_get_public_dossier_and_restricted_image_as_speciale_ambtenaar(
+    def test_get_public_dossier_and_restricted_image_with_extended_scope(
             self, mock_get_meta_data, mock_get_image_from_iiif_server
     ):
         # Setting up mocks
@@ -295,7 +299,7 @@ class FileTestCase(SimpleTestCase):
             headers={'Content-Type': 'image/png'}
         )
 
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token(
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
@@ -304,7 +308,8 @@ class FileTestCase(SimpleTestCase):
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
-    def test_get_public_image_with_only_bd_x_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_only_extended_scope_and_no_read_scope(
+            self, mock_get_meta_data, mock_get_image_from_iiif_server):
         # Setting up mocks
         mock_get_meta_data.return_value = MockResponse(
             200,
@@ -319,14 +324,15 @@ class FileTestCase(SimpleTestCase):
             headers={'Content-Type': 'image/png'}
         )
 
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])}
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
-    def test_get_restricted_image_with_only_bd_x_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_with_only_extended_scope_and_no_read_scope(
+            self, mock_get_meta_data, mock_get_image_from_iiif_server):
         # Setting up mocks
         mock_get_meta_data.return_value = MockResponse(
             200,
@@ -341,10 +347,123 @@ class FileTestCase(SimpleTestCase):
             headers={'Content-Type': 'image/png'}
         )
 
-        header = {'HTTP_AUTHORIZATION': "Bearer " + create_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])}
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+
+
+class FileTestCaseWithJWT(SimpleTestCase):
+    def setUp(self):
+        self.url = '/iiif/'
+        self.c = Client()
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_public_image_with_read_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10092307', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
+        )
+
+
+        response = self.c.get(self.url + PRE_WABO_IMG_URL + '?auth=' + get_authentication_jwt())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+
+        response = self.c.get(self.url + PRE_WABO_IMG_URL_X1 + '?auth=' + get_authentication_jwt())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+
+        response = self.c.get(self.url + PRE_WABO_IMG_URL_X2 + '?auth=' + get_authentication_jwt())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_restricted_image_with_read_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_RESTRICTED,
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}]
+            }
+        )
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
+        )
+
+        response = self.c.get(self.url + PRE_WABO_IMG_URL + '?auth=' + get_authentication_jwt())
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.content.decode("utf-8"), "")
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_public_image_with_expired_token(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10092307', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
+        )
+
+        # Time travel to two days ago so that the jwt token will be invalid
+        with time_machine.travel(datetime.now() - timedelta(days=2)):
+            jwt_token = get_authentication_jwt()
+
+        response = self.c.get(self.url + PRE_WABO_IMG_URL + '?auth=' + jwt_token)
+        self.assertEqual(response.status_code, 401)
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_public_image_with_invalid_token(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10092307', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
+        )
+
+        response = self.c.get(self.url + PRE_WABO_IMG_URL + '?auth=' + get_authentication_jwt(key='invalid'))
+        self.assertEqual(response.status_code, 401)
 
 
 class ToolsTestCase(SimpleTestCase):
@@ -562,3 +681,11 @@ class ToolsTestCase(SimpleTestCase):
         )
         self.assertEqual(url, f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF")
         self.assertEqual(cert, '/tmp/sw444v1912.pem')
+
+    def test_get_authentication_jwt(self):
+        token = get_authentication_jwt()
+        decoded = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        self.assertEqual(len(decoded.keys()), 2)
+        self.assertIn('exp', decoded.keys())
+        self.assertIn('scope', decoded.keys())
+        self.assertEqual(decoded['scope'], 'BD/R')

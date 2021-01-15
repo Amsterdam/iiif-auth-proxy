@@ -1,15 +1,19 @@
 import logging
+from datetime import datetime
 
+import jwt
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from jwt.exceptions import ExpiredSignatureError, InvalidSignatureError
 from requests.exceptions import RequestException
 
-from . import tools
+from iiif import tools
 
 log = logging.getLogger(__name__)
 
 RESPONSE_CONTENT_NO_TOKEN = "No token supplied"
+RESPONSE_CONTENT_JWT_TOKEN_EXPIRED = "Your token has expired. Request a new token."
 RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA = "Document not found in metadata"
 RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER = "The iiif-metadata-server cannot be reached"
 RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = "The iiif-image-server cannot be reached"
@@ -17,12 +21,30 @@ RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = "The iiif-image-server cannot 
 
 @csrf_exempt
 def index(request, iiif_url):
-    if not settings.DATAPUNT_AUTHZ['ALWAYS_OK']:
-        if not request.META.get('HTTP_AUTHORIZATION', None):
-            return HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
-        token = request.META['HTTP_AUTHORIZATION']
+    if not request.META.get('HTTP_AUTHORIZATION') and not request.GET.get('auth'):
+        return HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
+
+    # Check the jwt token if necessary
+    jwt_token = {}
+    if not request.META.get('HTTP_AUTHORIZATION'):
+        # Check signature
+        try:
+            jwt_token = jwt.decode(request.GET.get('auth'), settings.SECRET_KEY, algorithms=["HS256"])
+        except ExpiredSignatureError:
+            return HttpResponse("Expired JWT token signature", status=401)
+        except InvalidSignatureError:
+            return HttpResponse("Invalid JWT token signature", status=401)
+
+        # Check scope
+        if jwt_token.get('scope') not in (settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE):
+            return HttpResponse("Invalid scope", status=401)
+
+    if request.is_authorized_for(settings.BOUWDOSSIER_EXTENDED_SCOPE) or jwt_token.get('scope') == settings.BOUWDOSSIER_EXTENDED_SCOPE:
+        scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
+    elif request.is_authorized_for(settings.BOUWDOSSIER_READ_SCOPE) or jwt_token.get('scope') == settings.BOUWDOSSIER_READ_SCOPE:
+        scope = settings.BOUWDOSSIER_READ_SCOPE
     else:
-        token = 'NOT_SET'
+        return HttpResponse("Invalid scope", status=401)
 
     try:
         url_info = tools.get_info_from_iiif_url(iiif_url, request.GET.get('source_file') == 'true')
@@ -31,7 +53,7 @@ def index(request, iiif_url):
 
     # Get image meta data
     try:
-        meta_response = tools.get_meta_data(url_info, token)
+        meta_response = tools.get_meta_data(url_info)
     except RequestException as e:
         log.error(
             f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER} "
@@ -58,8 +80,7 @@ def index(request, iiif_url):
     except tools.DocumentNotFoundInMetadataError:
         return HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404)
 
-    if not request.is_authorized_for(settings.BOUWDOSSIER_EXTENDED_SCOPE) and not (
-            is_public and request.is_authorized_for(settings.BOUWDOSSIER_READ_SCOPE)):
+    if not scope == settings.BOUWDOSSIER_EXTENDED_SCOPE and not (is_public and scope == settings.BOUWDOSSIER_READ_SCOPE):
         return HttpResponse("", status=401)
 
     # Get the file itself
