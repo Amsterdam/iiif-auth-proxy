@@ -1,10 +1,23 @@
+import logging
+from requests.exceptions import RequestException
+from jwt.exceptions import ExpiredSignatureError, InvalidSignatureError
 import calendar
 import re
 from datetime import datetime, timedelta
-
+from django.http import HttpResponse
 import jwt
 import requests
 from django.conf import settings
+
+log = logging.getLogger(__name__)
+
+
+RESPONSE_CONTENT_NO_TOKEN = "No token supplied"
+RESPONSE_CONTENT_JWT_TOKEN_EXPIRED = "Your token has expired. Request a new token."
+RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA = "Document not found in metadata"
+RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER = "The iiif-metadata-server cannot be reached"
+RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = "The iiif-image-server cannot be reached"
+
 
 
 class InvalidIIIFUrlError(Exception):
@@ -155,3 +168,129 @@ def img_is_public(metadata, document_barcode):
 def get_authentication_jwt(expiry_hours=24, key=settings.SECRET_KEY):
     exp = calendar.timegm((datetime.now() + timedelta(hours=expiry_hours)).timetuple())
     return jwt.encode({"exp": exp, "scope": 'BD/R'}, key, algorithm="HS256")
+
+
+def check_auth_availability(request):
+    if not request.META.get('HTTP_AUTHORIZATION') and not request.GET.get('auth'):
+        return HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
+
+
+def read_out_jwt_token(request):
+    jwt_token = {}
+    response = None
+    if not request.META.get('HTTP_AUTHORIZATION'):
+        try:
+            jwt_token = jwt.decode(request.GET.get('auth'), settings.SECRET_KEY, algorithms=["HS256"])
+            # Check scope
+            if jwt_token.get('scope') not in (settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE):
+                response = HttpResponse("Invalid scope", status=401)
+        except ExpiredSignatureError:
+            response = HttpResponse("Expired JWT token signature", status=401)
+        except InvalidSignatureError:
+            response = HttpResponse("Invalid JWT token signature", status=401)
+
+    return jwt_token, response
+
+
+def define_scope(request, jwt_token):
+    scope = response =None
+    if request.is_authorized_for(settings.BOUWDOSSIER_EXTENDED_SCOPE) \
+            or jwt_token.get('scope') == settings.BOUWDOSSIER_EXTENDED_SCOPE:
+        scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
+    elif request.is_authorized_for(settings.BOUWDOSSIER_READ_SCOPE) \
+            or jwt_token.get('scope') == settings.BOUWDOSSIER_READ_SCOPE:
+        scope = settings.BOUWDOSSIER_READ_SCOPE
+    else:
+        response = HttpResponse("Invalid scope", status=401)
+
+    return scope, response
+
+
+def get_url_info(request, iiif_url):
+    url_info = response = None
+    try:
+        url_info = get_info_from_iiif_url(iiif_url, request.GET.get('source_file') == 'true')
+    except InvalidIIIFUrlError:
+        response = HttpResponse("Invalid formatted url", status=400)
+    return url_info, response
+
+
+def get_metadata(url_info, iiif_url):
+    response = meta_response = metadata = None
+
+    # Get the image metadata from the metadata server
+    try:
+        meta_response = get_meta_data(url_info)
+    except RequestException as e:
+        log.error(
+            f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER} "
+            f"because of this error {e}"
+        )
+        response = HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER, status=502)
+
+    if meta_response:
+        if meta_response.status_code == 404:
+            response = HttpResponse("No metadata could be found for this file", status=404)
+        elif meta_response.status_code != 200:
+            log.info(
+                f"Got response code {meta_response.status_code} while retrieving "
+                f"the metadata for {iiif_url} from the stadsarchief metadata server."
+            )
+            response = HttpResponse(
+                f"We had a problem retrieving the metadata. We got status code {meta_response.status_code}",
+                status=400
+            )
+        metadata = meta_response.json()
+
+    return metadata, response
+
+
+def check_file_in_metadata(metadata, url_info, scope):
+    response = None
+
+    # Check whether the image exists in the metadata
+    try:
+        is_public = img_is_public(metadata, url_info['document_barcode'])
+        # Check whether the file is public
+        if not scope == settings.BOUWDOSSIER_EXTENDED_SCOPE \
+                and not (is_public and scope == settings.BOUWDOSSIER_READ_SCOPE):
+            response = HttpResponse("", status=401)
+    except DocumentNotFoundInMetadataError:
+        response = HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404)
+
+    return response
+
+
+def get_file(request, url_info, iiif_url, metadata):
+    response = None
+    file_response = None
+
+    # Get the file itself
+    file_url, headers, cert = create_file_url_and_headers(request.META, url_info, iiif_url, metadata)
+    try:
+        file_response = get_image_from_iiif_server(file_url, headers, cert)
+    except RequestException as e:
+        log.error(
+            f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE} "
+            f"because of this error {e}"
+        )
+        response = HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE, status=502)
+
+    return file_response, file_url, response
+
+
+def handle_file_response_errors(file_response, file_url):
+    response = None
+    if file_response.status_code == 404:
+        response = HttpResponse(f"No source file could be found for internal url {file_url}", status=404)
+    elif file_response.status_code != 200:
+        log.info(
+            f"Got response code {file_response.status_code} while retrieving "
+            f"the image {file_url} from the iiif-image-server."
+        )
+        response = HttpResponse(
+            f"We had a problem retrieving the image. We got status "
+            f"code {file_response.status_code} for internal url {file_url}",
+            status=400
+        )
+    return response

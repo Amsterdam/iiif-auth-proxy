@@ -12,7 +12,7 @@ from iiif.generate_token import create_authz_token
 from iiif.tools import (InvalidIIIFUrlError, create_file_url_and_headers,
                         create_wabo_url, get_authentication_jwt,
                         get_info_from_iiif_url)
-from iiif.views import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
+from iiif.tools import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
                         RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER,
                         RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
                         RESPONSE_CONTENT_NO_TOKEN)
