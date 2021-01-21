@@ -37,7 +37,7 @@ BOUWDOSSIER_EXTENDED_SCOPE = 'BD/X'  # BouwDossiers_eXtended
 IIIF_BASE_URL = os.getenv('IIIF_BASE_URL', "http://iiif.service.consul")
 IIIF_PORT = os.getenv('IIIF_PORT', "8149")  # This port is static within the network
 WABO_BASE_URL = os.getenv('WABO_BASE_URL', "https://conversiestraatwabo.amsterdam.nl/webDAV/")
-
+ALGORITHM = "HS256"
 
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
 # This is a test public/private key def and added for testing .

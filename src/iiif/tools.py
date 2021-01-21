@@ -1,13 +1,13 @@
 import logging
-from requests.exceptions import RequestException
-from jwt.exceptions import ExpiredSignatureError, InvalidSignatureError
-import calendar
 import re
 from datetime import datetime, timedelta
-from django.http import HttpResponse
+
 import jwt
 import requests
 from django.conf import settings
+from django.http import HttpResponse
+from jwt.exceptions import ExpiredSignatureError, InvalidSignatureError
+from requests.exceptions import RequestException
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +17,6 @@ RESPONSE_CONTENT_JWT_TOKEN_EXPIRED = "Your token has expired. Request a new toke
 RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA = "Document not found in metadata"
 RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER = "The iiif-metadata-server cannot be reached"
 RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = "The iiif-image-server cannot be reached"
-
 
 
 class InvalidIIIFUrlError(Exception):
@@ -166,8 +165,8 @@ def img_is_public(metadata, document_barcode):
 
 
 def get_authentication_jwt(expiry_hours=24, key=settings.SECRET_KEY):
-    exp = calendar.timegm((datetime.now() + timedelta(hours=expiry_hours)).timetuple())
-    return jwt.encode({"exp": exp, "scope": 'BD/R'}, key, algorithm="HS256")
+    exp = int((datetime.utcnow() + timedelta(hours=expiry_hours)).timestamp())
+    return jwt.encode({"exp": exp, "scope": settings.BOUWDOSSIER_READ_SCOPE}, key, algorithm=settings.ALGORITHM)
 
 
 def check_auth_availability(request):
@@ -180,7 +179,7 @@ def read_out_jwt_token(request):
     response = None
     if not request.META.get('HTTP_AUTHORIZATION'):
         try:
-            jwt_token = jwt.decode(request.GET.get('auth'), settings.SECRET_KEY, algorithms=["HS256"])
+            jwt_token = jwt.decode(request.GET.get('auth'), settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
             # Check scope
             if jwt_token.get('scope') not in (settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE):
                 response = HttpResponse("Invalid scope", status=401)
@@ -252,7 +251,7 @@ def check_file_in_metadata(metadata, url_info, scope):
     try:
         is_public = img_is_public(metadata, url_info['document_barcode'])
         # Check whether the file is public
-        if not scope == settings.BOUWDOSSIER_EXTENDED_SCOPE \
+        if scope != settings.BOUWDOSSIER_EXTENDED_SCOPE \
                 and not (is_public and scope == settings.BOUWDOSSIER_READ_SCOPE):
             response = HttpResponse("", status=401)
     except DocumentNotFoundInMetadataError:
