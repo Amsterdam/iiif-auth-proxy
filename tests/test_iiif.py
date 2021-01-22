@@ -684,8 +684,9 @@ class ToolsTestCase(SimpleTestCase):
 
     def test_get_authentication_jwt(self):
         token = get_authentication_jwt()
-        decoded = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        decoded = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         self.assertEqual(len(decoded.keys()), 2)
         self.assertIn('exp', decoded.keys())
-        self.assertIn('scope', decoded.keys())
-        self.assertEqual(decoded['scope'], 'BD/R')
+        self.assertIn('scopes', decoded.keys())
+        self.assertEqual(len(decoded['scopes']), 1)
+        self.assertEqual(decoded['scopes'][0], settings.BOUWDOSSIER_READ_SCOPE)

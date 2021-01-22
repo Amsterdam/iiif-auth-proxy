@@ -18,7 +18,7 @@ def index(request, iiif_url):
     if response:
         return response
 
-    scope, response = tools.define_scope(request, jwt_token)
+    scope, response = tools.get_max_scope(request, jwt_token)
     if response:
         return response
 

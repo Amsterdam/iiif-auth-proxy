@@ -166,7 +166,7 @@ def img_is_public(metadata, document_barcode):
 
 def get_authentication_jwt(expiry_hours=24, key=settings.SECRET_KEY):
     exp = int((datetime.utcnow() + timedelta(hours=expiry_hours)).timestamp())
-    return jwt.encode({"exp": exp, "scope": settings.BOUWDOSSIER_READ_SCOPE}, key, algorithm=settings.ALGORITHM)
+    return jwt.encode({"exp": exp, "scopes": [settings.BOUWDOSSIER_READ_SCOPE]}, key, algorithm=settings.JWT_ALGORITHM)
 
 
 def check_auth_availability(request):
@@ -179,10 +179,12 @@ def read_out_jwt_token(request):
     response = None
     if not request.META.get('HTTP_AUTHORIZATION'):
         try:
-            jwt_token = jwt.decode(request.GET.get('auth'), settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-            # Check scope
-            if jwt_token.get('scope') not in (settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE):
-                response = HttpResponse("Invalid scope", status=401)
+            jwt_token = jwt.decode(request.GET.get('auth'), settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+            # Check scopes
+            for scope in jwt_token.get('scopes'):
+                if scope not in (settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE):
+                    response = HttpResponse("Invalid scope", status=401)
+                    break
         except ExpiredSignatureError:
             response = HttpResponse("Expired JWT token signature", status=401)
         except InvalidSignatureError:
@@ -191,13 +193,11 @@ def read_out_jwt_token(request):
     return jwt_token, response
 
 
-def define_scope(request, jwt_token):
+def get_max_scope(request, jwt_token):
     scope = response =None
-    if request.is_authorized_for(settings.BOUWDOSSIER_EXTENDED_SCOPE) \
-            or jwt_token.get('scope') == settings.BOUWDOSSIER_EXTENDED_SCOPE:
+    if settings.BOUWDOSSIER_EXTENDED_SCOPE in request.get_token_scopes + jwt_token.get('scopes', []):
         scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
-    elif request.is_authorized_for(settings.BOUWDOSSIER_READ_SCOPE) \
-            or jwt_token.get('scope') == settings.BOUWDOSSIER_READ_SCOPE:
+    elif settings.BOUWDOSSIER_READ_SCOPE in request.get_token_scopes + jwt_token.get('scopes', []):
         scope = settings.BOUWDOSSIER_READ_SCOPE
     else:
         response = HttpResponse("Invalid scope", status=401)
