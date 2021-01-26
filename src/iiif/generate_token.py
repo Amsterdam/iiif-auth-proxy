@@ -35,7 +35,7 @@ def create_authz_token(scopes=None):
         'iat': now,
         'exp': now + 3600,
         'scopes': scopes,
-        'sub': 'testgas@amsterdam.nl',
+        'sub': 'authztest@amsterdam.nl',
     }
     token = JWT(
         header=header,

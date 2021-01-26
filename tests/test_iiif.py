@@ -15,7 +15,9 @@ from iiif.tools import (InvalidIIIFUrlError, create_file_url_and_headers,
 from iiif.tools import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
                         RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER,
                         RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
-                        RESPONSE_CONTENT_NO_TOKEN)
+                        RESPONSE_CONTENT_NO_TOKEN, InvalidIIIFUrlError,
+                        create_file_url_and_headers, create_wabo_url,
+                        get_authentication_jwt, get_info_from_iiif_url)
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
@@ -505,7 +507,6 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(url_info['olo'], "4900487")
         self.assertEqual(url_info['document_barcode'], "628547")
         self.assertEqual(url_info['source_file'], True)
-
 
     def test_get_info_from_wabo_url_with_underscores_in_barcode(self):
         url_info = get_info_from_iiif_url("2/wabo:SDO-10316333-3304_ECS0000004420_000_000/info.json", False)

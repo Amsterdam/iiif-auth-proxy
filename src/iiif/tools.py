@@ -27,6 +27,21 @@ class DocumentNotFoundInMetadataError(Exception):
     pass
 
 
+class ImmediateHttpResponse(Exception):
+    """
+    This exception is used to interrupt the flow of processing to immediately
+    return a custom HttpResponse.
+    """
+    _response = HttpResponse("Nothing provided.")
+
+    def __init__(self, response):
+        self._response = response
+
+    @property
+    def response(self):
+        return self._response
+
+
 def get_meta_data(url_info):
     # Test with:
     # curl -i -H "Accept: application/json" http://iiif-metadata-server-api.service.consul:8183/iiif-metadata/bouwdossier/SA85385/
@@ -176,47 +191,46 @@ def check_auth_availability(request):
 
 def read_out_jwt_token(request):
     jwt_token = {}
-    response = None
     if not request.META.get('HTTP_AUTHORIZATION'):
+        if not request.GET.get('auth'):
+            raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401))
         try:
             jwt_token = jwt.decode(request.GET.get('auth'), settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
             # Check scopes
             for scope in jwt_token.get('scopes'):
                 if scope not in (settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE):
-                    response = HttpResponse("Invalid scope", status=401)
-                    break
+                    raise ImmediateHttpResponse(response=HttpResponse("Invalid scope", status=401))
         except ExpiredSignatureError:
-            response = HttpResponse("Expired JWT token signature", status=401)
+            raise ImmediateHttpResponse(response=HttpResponse("Expired JWT token signature", status=401))
         except InvalidSignatureError:
-            response = HttpResponse("Invalid JWT token signature", status=401)
-
-    return jwt_token, response
+            raise ImmediateHttpResponse(response=HttpResponse("Invalid JWT token signature", status=401))
+        except DecodeError:
+            raise ImmediateHttpResponse(response=HttpResponse("Invalid JWT token", status=401))
+    return jwt_token
 
 
 def get_max_scope(request, jwt_token):
-    scope = response =None
+    scope = None
     if settings.BOUWDOSSIER_EXTENDED_SCOPE in request.get_token_scopes + jwt_token.get('scopes', []):
         scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
     elif settings.BOUWDOSSIER_READ_SCOPE in request.get_token_scopes + jwt_token.get('scopes', []):
         scope = settings.BOUWDOSSIER_READ_SCOPE
     else:
-        response = HttpResponse("Invalid scope", status=401)
+        raise ImmediateHttpResponse(response=HttpResponse("Invalid scope", status=401))
 
-    return scope, response
+    return scope
 
 
 def get_url_info(request, iiif_url):
-    url_info = response = None
+    url_info = None
     try:
         url_info = get_info_from_iiif_url(iiif_url, request.GET.get('source_file') == 'true')
     except InvalidIIIFUrlError:
-        response = HttpResponse("Invalid formatted url", status=400)
-    return url_info, response
+        raise ImmediateHttpResponse(response=HttpResponse("Invalid formatted url", status=400))
+    return url_info
 
 
 def get_metadata(url_info, iiif_url):
-    response = meta_response = metadata = None
-
     # Get the image metadata from the metadata server
     try:
         meta_response = get_meta_data(url_info)
@@ -225,45 +239,37 @@ def get_metadata(url_info, iiif_url):
             f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER} "
             f"because of this error {e}"
         )
-        response = HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER, status=502)
+        raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER, status=502))
 
-    if meta_response:
-        if meta_response.status_code == 404:
-            response = HttpResponse("No metadata could be found for this file", status=404)
-        elif meta_response.status_code != 200:
-            log.info(
-                f"Got response code {meta_response.status_code} while retrieving "
-                f"the metadata for {iiif_url} from the stadsarchief metadata server."
-            )
-            response = HttpResponse(
-                f"We had a problem retrieving the metadata. We got status code {meta_response.status_code}",
-                status=400
-            )
-        metadata = meta_response.json()
+    if meta_response.status_code == 404:
+        raise ImmediateHttpResponse(response=HttpResponse("No metadata could be found for this file", status=404))
+    elif meta_response.status_code != 200:
+        log.info(
+            f"Got response code {meta_response.status_code} while retrieving "
+            f"the metadata for {iiif_url} from the stadsarchief metadata server."
+        )
+        raise ImmediateHttpResponse(response=HttpResponse(
+            f"We had a problem retrieving the metadata. We got status code {meta_response.status_code}",
+            status=400
+        ))
+    metadata = meta_response.json()
 
-    return metadata, response
+    return metadata
 
 
-def check_file_in_metadata(metadata, url_info, scope):
-    response = None
-
+def check_file_access_in_metadata(metadata, url_info, scope):
     # Check whether the image exists in the metadata
     try:
         is_public = img_is_public(metadata, url_info['document_barcode'])
         # Check whether the file is public
         if scope != settings.BOUWDOSSIER_EXTENDED_SCOPE \
                 and not (is_public and scope == settings.BOUWDOSSIER_READ_SCOPE):
-            response = HttpResponse("", status=401)
+            raise ImmediateHttpResponse(response=HttpResponse("", status=401))
     except DocumentNotFoundInMetadataError:
-        response = HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404)
-
-    return response
+        raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404))
 
 
 def get_file(request, url_info, iiif_url, metadata):
-    response = None
-    file_response = None
-
     # Get the file itself
     file_url, headers, cert = create_file_url_and_headers(request.META, url_info, iiif_url, metadata)
     try:
@@ -273,23 +279,22 @@ def get_file(request, url_info, iiif_url, metadata):
             f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE} "
             f"because of this error {e}"
         )
-        response = HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE, status=502)
+        raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE, status=502))
 
-    return file_response, file_url, response
+    return file_response, file_url
 
 
 def handle_file_response_errors(file_response, file_url):
-    response = None
     if file_response.status_code == 404:
-        response = HttpResponse(f"No source file could be found for internal url {file_url}", status=404)
+        raise ImmediateHttpResponse(
+            response=HttpResponse(f"No source file could be found for internal url {file_url}", status=404))
     elif file_response.status_code != 200:
         log.info(
             f"Got response code {file_response.status_code} while retrieving "
             f"the image {file_url} from the iiif-image-server."
         )
-        response = HttpResponse(
+        raise ImmediateHttpResponse(response=HttpResponse(
             f"We had a problem retrieving the image. We got status "
             f"code {file_response.status_code} for internal url {file_url}",
             status=400
-        )
-    return response
+        ))
