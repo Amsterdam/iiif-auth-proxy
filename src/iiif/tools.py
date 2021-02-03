@@ -1,13 +1,17 @@
+import json
 import logging
 import re
 from datetime import datetime, timedelta
 
 import jwt
 import requests
+import sendgrid
 from django.conf import settings
-from django.http import HttpResponse
-from jwt.exceptions import ExpiredSignatureError, InvalidSignatureError
+from django.http import HttpResponse, HttpResponseNotAllowed
+from jwt.exceptions import (DecodeError, ExpiredSignatureError,
+                            InvalidSignatureError)
 from requests.exceptions import RequestException
+from sendgrid.helpers.mail import Mail
 
 log = logging.getLogger(__name__)
 
@@ -162,6 +166,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
         raise InvalidIIIFUrlError(f"Invalid iiif url (no valid source): {iiif_url}")
 
     except Exception as e:
+        log.error(f"Invalid iiif url: {iiif_url} ({e})")
         raise InvalidIIIFUrlError(f"Invalid iiif url: {iiif_url}")
 
 
@@ -179,9 +184,14 @@ def img_is_public(metadata, document_barcode):
     raise DocumentNotFoundInMetadataError()
 
 
-def get_authentication_jwt(expiry_hours=24, key=settings.SECRET_KEY):
+def create_mail_login_token(email_address, key, expiry_hours=24):
+    """
+    For burgers to be able to login they can send their email address with which we create a
+    jwt token and send it to their email address.
+    """
     exp = int((datetime.utcnow() + timedelta(hours=expiry_hours)).timestamp())
-    return jwt.encode({"exp": exp, "scopes": [settings.BOUWDOSSIER_READ_SCOPE]}, key, algorithm=settings.JWT_ALGORITHM)
+    jwt_payload = {'sub': email_address, 'exp': exp, 'scopes': [settings.BOUWDOSSIER_READ_SCOPE]}
+    return jwt.encode(jwt_payload, key, algorithm=settings.JWT_ALGORITHM)
 
 
 def check_auth_availability(request):
@@ -189,7 +199,7 @@ def check_auth_availability(request):
         return HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
 
 
-def read_out_jwt_token(request):
+def read_out_mail_jwt_token(request):
     jwt_token = {}
     if not request.META.get('HTTP_AUTHORIZATION'):
         if not request.GET.get('auth'):
@@ -209,11 +219,12 @@ def read_out_jwt_token(request):
     return jwt_token
 
 
-def get_max_scope(request, jwt_token):
-    scope = None
-    if settings.BOUWDOSSIER_EXTENDED_SCOPE in request.get_token_scopes + jwt_token.get('scopes', []):
+def get_max_scope(request, mail_jwt_token):
+    # request.get_token_scopes gets the authz tokens
+    # mail_jwt_token['scopes'] = jwt tokens which non-ambtenaren get in their email
+    if settings.BOUWDOSSIER_EXTENDED_SCOPE in request.get_token_scopes + mail_jwt_token.get('scopes', []):
         scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
-    elif settings.BOUWDOSSIER_READ_SCOPE in request.get_token_scopes + jwt_token.get('scopes', []):
+    elif settings.BOUWDOSSIER_READ_SCOPE in request.get_token_scopes + mail_jwt_token.get('scopes', []):
         scope = settings.BOUWDOSSIER_READ_SCOPE
     else:
         raise ImmediateHttpResponse(response=HttpResponse("Invalid scope", status=401))
@@ -221,8 +232,20 @@ def get_max_scope(request, jwt_token):
     return scope
 
 
+def get_email_address(request, jwt_token):
+    email_address = None
+    if request.get_token_subject and '@' in request.get_token_subject:
+        email_address = request.get_token_subject
+    elif '@' in jwt_token.get('sub', ''):
+        email_address = jwt_token['sub']
+
+    if email_address is None:
+        raise ImmediateHttpResponse(response=HttpResponse("No sub (email address) found in tokens", status=400))
+
+    return email_address
+
+
 def get_url_info(request, iiif_url):
-    url_info = None
     try:
         url_info = get_info_from_iiif_url(iiif_url, request.GET.get('source_file') == 'true')
     except InvalidIIIFUrlError:
@@ -269,9 +292,9 @@ def check_file_access_in_metadata(metadata, url_info, scope):
         raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404))
 
 
-def get_file(request, url_info, iiif_url, metadata):
+def get_file(request_meta, url_info, iiif_url, metadata):
     # Get the file itself
-    file_url, headers, cert = create_file_url_and_headers(request.META, url_info, iiif_url, metadata)
+    file_url, headers, cert = create_file_url_and_headers(request_meta, url_info, iiif_url, metadata)
     try:
         file_response = get_image_from_iiif_server(file_url, headers, cert)
     except RequestException as e:
@@ -298,3 +321,42 @@ def handle_file_response_errors(file_response, file_url):
             f"code {file_response.status_code} for internal url {file_url}",
             status=400
         ))
+
+
+def check_for_post(request):
+    if request.method != "POST":
+        raise ImmediateHttpResponse(response=HttpResponseNotAllowed(['POST']))
+
+
+def parse_payload(request):
+    try:
+        return json.loads(request.body.decode("utf-8"))
+    except json.decoder.JSONDecodeError:
+        raise ImmediateHttpResponse(response=HttpResponse("JSON invalid", status=400))
+
+
+def check_login_url_payload(payload):
+    if 'email' not in payload or not len(payload['email']):
+        raise ImmediateHttpResponse(response=HttpResponse("No email field found in json", status=400))
+
+
+def check_email_validity(email_address):
+    EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")  # Just basic sanity check for a @ and a dot
+    if not EMAIL_REGEX.match(email_address):
+        raise ImmediateHttpResponse(response=HttpResponse("Email is not valid", status=400))
+
+
+def send_email(email_address, email_subject, email_body):
+    if not settings.SENDGRID_KEY:
+        log.error("No SENDGRID_KEY found. Not sending emails.")
+    if '@' not in email_address:
+        log.error("No valid email address. Not sending email.")
+
+    sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
+    email = Mail(
+        from_email='noreply@amsterdam.nl',
+        to_emails=[email_address],
+        subject=email_subject,
+        plain_text_content=email_body
+    )
+    sg.send(email)

@@ -30,14 +30,17 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 STADSARCHIEF_META_SERVER_BASE_URL = os.getenv('STADSARCHIEF_META_SERVER_BASE_URL', "http://iiif-metadata-server-api.service.consul")
 STADSARCHIEF_META_SERVER_PORT = os.getenv('STADSARCHIEF_META_SERVER_PORT', "8183")  # This port is static within the network
-ACCESS_PUBLIC = "PUBLIC"
-ACCESS_RESTRICTED = "RESTRICTED"
+ACCESS_PUBLIC = 'PUBLIC'
+ACCESS_RESTRICTED = 'RESTRICTED'
 BOUWDOSSIER_READ_SCOPE = 'BD/R'  # BouwDossiers_Read
 BOUWDOSSIER_EXTENDED_SCOPE = 'BD/X'  # BouwDossiers_eXtended
-IIIF_BASE_URL = os.getenv('IIIF_BASE_URL', "http://iiif.service.consul")
+IIIF_BASE_URL = os.getenv('IIIF_BASE_URL', 'http://iiif.service.consul')
 IIIF_PORT = os.getenv('IIIF_PORT', "8149")  # This port is static within the network
-WABO_BASE_URL = os.getenv('WABO_BASE_URL', "https://conversiestraatwabo.amsterdam.nl/webDAV/")
-JWT_ALGORITHM = "HS256"
+WABO_BASE_URL = os.getenv('WABO_BASE_URL', 'https://conversiestraatwabo.amsterdam.nl/webDAV/')
+JWT_ALGORITHM = 'HS256'
+SENDGRID_KEY = os.getenv('SENDGRID_KEY', 'mock_key')
+DATAPORTAAL_LOGIN_BASE_URL = os.getenv('DATAPORTAAL_LOGIN_BASE_URL', 'https://acc.data.amsterdam.nl/images-mail-login/')
+
 
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
 # This is a test public/private key def and added for testing .
