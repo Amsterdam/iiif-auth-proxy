@@ -17,7 +17,7 @@ def load_jwks(jwks):
         raise Exception("Failed to import keyset from settings") from e
 
 
-def create_token(scopes=None):
+def create_authz_token(scopes=None):
     if scopes is None:
         scopes = []
     if type(scopes) not in (list, tuple, set):
@@ -35,7 +35,7 @@ def create_token(scopes=None):
         'iat': now,
         'exp': now + 3600,
         'scopes': scopes,
-        'sub': 'testgas@amsterdam.nl',
+        'sub': 'authztest@amsterdam.nl',
     }
     token = JWT(
         header=header,

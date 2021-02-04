@@ -3,85 +3,56 @@ import logging
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from requests.exceptions import RequestException
+from ratelimit.decorators import ratelimit
 
-from . import tools
+from iiif import tools
 
 log = logging.getLogger(__name__)
-
-RESPONSE_CONTENT_NO_TOKEN = "No token supplied"
-RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA = "Document not found in metadata"
-RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER = "The iiif-metadata-server cannot be reached"
-RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = "The iiif-image-server cannot be reached"
 
 
 @csrf_exempt
 def index(request, iiif_url):
-    if not settings.DATAPUNT_AUTHZ['ALWAYS_OK']:
-        if not request.META.get('HTTP_AUTHORIZATION', None):
-            return HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
-        token = request.META['HTTP_AUTHORIZATION']
-    else:
-        token = 'NOT_SET'
-
     try:
-        url_info = tools.get_info_from_iiif_url(iiif_url, request.GET.get('source_file') == 'true')
-    except tools.InvalidIIIFUrlError:
-        return HttpResponse("Invalid formatted url", status=400)
+        tools.check_auth_availability(request)
+        mail_jwt_token = tools.read_out_mail_jwt_token(request)
+        scope = tools.get_max_scope(request, mail_jwt_token)
+        url_info = tools.get_url_info(request, iiif_url)
+        metadata = tools.get_metadata(url_info, iiif_url)
+        tools.check_file_access_in_metadata(metadata, url_info, scope)
+        file_response, file_url = tools.get_file(request.META, url_info, iiif_url, metadata)
+        tools.handle_file_response_errors(file_response, file_url)
+    except tools.ImmediateHttpResponse as e:
+        return e.response
 
-    # Get image meta data
-    try:
-        meta_response = tools.get_meta_data(url_info, token)
-    except RequestException as e:
-        log.error(
-            f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER} "
-            f"because of this error {e}"
-        )
-        return HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER, status=502)
-
-    if meta_response.status_code == 404:
-        return HttpResponse("No metadata could be found for this file", status=404)
-    elif meta_response.status_code != 200:
-        log.info(
-            f"Got response code {meta_response.status_code} while retrieving "
-            f"the metadata for {iiif_url} from the stadsarchief metadata server."
-        )
-        return HttpResponse(
-            f"We had a problem retrieving the metadata. We got status code {meta_response.status_code}",
-            status=400
-        )
-    metadata = meta_response.json()
-
-    # Check whether the image exists in the metadata and whether it is public
-    try:
-        is_public = tools.img_is_public(metadata, url_info['document_barcode'])
-    except tools.DocumentNotFoundInMetadataError:
-        return HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404)
-
-    if not request.is_authorized_for(settings.BOUWDOSSIER_EXTENDED_SCOPE) and not (
-            is_public and request.is_authorized_for(settings.BOUWDOSSIER_READ_SCOPE)):
-        return HttpResponse("", status=401)
-
-    # Get the file itself
-    file_url, headers, cert = tools.create_file_url_and_headers(request.META, url_info, iiif_url, metadata)
-    try:
-        file_response = tools.get_image_from_iiif_server(file_url, headers, cert)
-    except RequestException as e:
-        log.error(
-            f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE} "
-            f"because of this error {e}"
-        )
-        return HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE, status=502)
-    if file_response.status_code == 404:
-        return HttpResponse(f"No source file could be found for internal url {file_url}", status=404)
-    elif file_response.status_code != 200:
-        log.info(
-            f"Got response code {file_response.status_code} while retrieving "
-            f"the image {file_url} from the iiif-image-server."
-        )
-        return HttpResponse(
-            f"We had a problem retrieving the image. We got status code {file_response.status_code} for "
-            f"internal url {file_url}",
-            status=400
-        )
     return HttpResponse(file_response.content, content_type=file_response.headers.get('Content-Type', ''))
+
+
+# TODO: limit to dataportaal urls
+@csrf_exempt
+@ratelimit(key='ip', rate='3/d')  # TODO: Check django cache settings for rate limiter to work across paralel docker containers
+def send_dataportaal_login_url_to_burger_email_address(request):
+    try:
+        # Some basic sanity checks
+        tools.check_for_post(request)
+        payload = tools.parse_payload(request)
+        tools.check_login_url_payload(payload)
+        tools.check_email_validity(payload['email'])
+
+        # Create the login url
+        token = tools.create_mail_login_token(payload['email'], settings.SECRET_KEY)
+        login_url = f"{settings.DATAPORTAAL_LOGIN_BASE_URL}?auth={token}"
+
+        # Send the email
+        email_subject = "Amsterdam Dataportaal login"
+        # TODO: Make better text and maybe an email template for this email
+        email_body = f"Log in bij het Amsterdamse dataportaal met deze url: {login_url} " \
+                     f"\nAls u deze email niet heeft aangevraagd dan hoeft u niets te doen."
+        # TODO: move actually sending the email to a separate process
+        tools.send_email(payload['email'], email_subject, email_body)
+
+    except tools.ImmediateHttpResponse as e:
+        return e.response
+
+    # Respond with a 200 to signal success.
+    # The user will get an email asap with a login url
+    return HttpResponse()
