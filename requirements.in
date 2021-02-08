@@ -8,3 +8,4 @@ django-cors-headers
 pyjwt
 sendgrid
 django-ratelimit
+six # Needed by jwcrypto, which mistakenly doesn't include it. Will add an issue in

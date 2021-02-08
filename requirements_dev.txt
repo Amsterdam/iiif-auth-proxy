@@ -104,7 +104,9 @@ setuptools-rust==0.11.6
     #   -r ./requirements.txt
     #   cryptography
 six==1.15.0
-    # via python-dateutil
+    # via
+    #   -r ./requirements.txt
+    #   python-dateutil
 sqlparse==0.4.1
     # via
     #   -r ./requirements.txt
