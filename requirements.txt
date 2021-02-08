@@ -4,27 +4,58 @@
 #
 #    pip-compile --output-file=requirements.txt requirements.in
 #
-asgiref==3.3.1            # via django
-certifi==2020.12.5        # via requests, sentry-sdk
-cffi==1.14.4              # via cryptography
-chardet==4.0.0            # via requests
-cryptography==3.4.1       # via jwcrypto
-datapunt-authorization-django==1.3.0  # via -r requirements.in
-django-cors-headers==3.7.0  # via -r requirements.in
-django-ratelimit==3.0.1   # via -r requirements.in
-django==3.1.6             # via -r requirements.in, datapunt-authorization-django, django-cors-headers
-idna==2.10                # via requests
-jwcrypto==0.8             # via datapunt-authorization-django
-pycparser==2.20           # via cffi
-pyjwt==2.0.1              # via -r requirements.in
-python-http-client==3.3.1  # via sendgrid
-pytz==2021.1              # via django
-requests==2.25.1          # via datapunt-authorization-django
-semantic-version==2.8.5   # via setuptools-rust
-sendgrid==6.5.0           # via -r requirements.in
-sentry-sdk==0.19.5        # via -r requirements.in
-setuptools-rust==0.11.6   # via cryptography
-sqlparse==0.4.1           # via django
-starkbank-ecdsa==1.1.0    # via sendgrid
-toml==0.10.2              # via setuptools-rust
-urllib3==1.26.3           # via requests, sentry-sdk
+asgiref==3.3.1
+    # via django
+certifi==2020.12.5
+    # via
+    #   requests
+    #   sentry-sdk
+cffi==1.14.4
+    # via cryptography
+chardet==4.0.0
+    # via requests
+cryptography==3.4.1
+    # via jwcrypto
+datapunt-authorization-django==1.3.0
+    # via -r requirements.in
+django-cors-headers==3.7.0
+    # via -r requirements.in
+django-ratelimit==3.0.1
+    # via -r requirements.in
+django==3.1.6
+    # via
+    #   -r requirements.in
+    #   datapunt-authorization-django
+    #   django-cors-headers
+idna==2.10
+    # via requests
+jwcrypto==0.8
+    # via datapunt-authorization-django
+pycparser==2.20
+    # via cffi
+pyjwt==2.0.1
+    # via -r requirements.in
+python-http-client==3.3.1
+    # via sendgrid
+pytz==2021.1
+    # via django
+requests==2.25.1
+    # via datapunt-authorization-django
+semantic-version==2.8.5
+    # via setuptools-rust
+sendgrid==6.5.0
+    # via -r requirements.in
+sentry-sdk==0.19.5
+    # via -r requirements.in
+setuptools-rust==0.11.6
+    # via cryptography
+sqlparse==0.4.1
+    # via django
+starkbank-ecdsa==1.1.0
+    # via sendgrid
+toml==0.10.2
+    # via setuptools-rust
+urllib3==1.26.3
+    # via
+    #   requests
+    #   sentry-sdk
