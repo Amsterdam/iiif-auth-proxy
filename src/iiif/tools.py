@@ -195,7 +195,7 @@ def create_mail_login_token(email_address, key, expiry_hours=24):
 
 
 def check_auth_availability(request):
-    if not request.META.get('HTTP_AUTHORIZATION') and not request.GET.get('auth'):
+    if not request.META.get('HTTP_AUTHORIZATION') and not request.GET.get('auth') and not settings.DATAPUNT_AUTHZ['ALWAYS_OK']:
         return HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
 
 
@@ -203,6 +203,8 @@ def read_out_mail_jwt_token(request):
     jwt_token = {}
     if not request.META.get('HTTP_AUTHORIZATION'):
         if not request.GET.get('auth'):
+            if settings.DATAPUNT_AUTHZ['ALWAYS_OK']:
+                return jwt_token
             raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401))
         try:
             jwt_token = jwt.decode(request.GET.get('auth'), settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
@@ -222,7 +224,9 @@ def read_out_mail_jwt_token(request):
 def get_max_scope(request, mail_jwt_token):
     # request.get_token_scopes gets the authz tokens
     # mail_jwt_token['scopes'] = jwt tokens which non-ambtenaren get in their email
-    if settings.BOUWDOSSIER_EXTENDED_SCOPE in request.get_token_scopes + mail_jwt_token.get('scopes', []):
+    if settings.DATAPUNT_AUTHZ["ALWAYS_OK"]:
+        scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
+    elif settings.BOUWDOSSIER_EXTENDED_SCOPE in request.get_token_scopes + mail_jwt_token.get('scopes', []):
         scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
     elif settings.BOUWDOSSIER_READ_SCOPE in request.get_token_scopes + mail_jwt_token.get('scopes', []):
         scope = settings.BOUWDOSSIER_READ_SCOPE
