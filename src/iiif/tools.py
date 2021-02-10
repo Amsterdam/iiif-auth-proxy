@@ -205,8 +205,7 @@ def read_out_mail_jwt_token(request):
         if not request.GET.get('auth'):
             if settings.DATAPUNT_AUTHZ['ALWAYS_OK']:
                 return jwt_token
-            else:
-                raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401))
+            raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401))
         try:
             jwt_token = jwt.decode(request.GET.get('auth'), settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
             # Check scopes
