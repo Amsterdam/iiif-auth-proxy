@@ -6,6 +6,7 @@ EXPOSE 8000
 ENV PYTHONUNBUFFERED 1
 ENV CONSUL_HOST=${CONSUL_HOST:-notset}
 ENV CONSUL_PORT=${CONSUL_PORT:-8500}
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
 # Edit the openssl.cnf file to allow a lower security level.
 # This is needed to directly call the wabo data
