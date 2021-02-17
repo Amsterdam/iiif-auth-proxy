@@ -22,6 +22,7 @@ def index(request, iiif_url):
         file_response, file_url = tools.get_file(request.META, url_info, iiif_url, metadata)
         tools.handle_file_response_errors(file_response, file_url)
     except tools.ImmediateHttpResponse as e:
+        log.exception("ImmediateHttpResponse in index:")
         return e.response
 
     return HttpResponse(file_response.content, content_type=file_response.headers.get('Content-Type', ''))
@@ -51,6 +52,7 @@ def send_dataportaal_login_url_to_burger_email_address(request):
         tools.send_email(payload['email'], email_subject, email_body)
 
     except tools.ImmediateHttpResponse as e:
+        log.exception("ImmediateHttpResponse in login_url:")
         return e.response
 
     # Respond with a 200 to signal success.
