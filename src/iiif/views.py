@@ -46,8 +46,12 @@ def send_dataportaal_login_url_to_burger_email_address(request):
         # Send the email
         email_subject = "Amsterdam Dataportaal login"
         # TODO: Make better text and maybe an email template for this email
-        email_body = f"Log in bij het Amsterdamse dataportaal met deze url: {login_url} " \
-                     f"\nAls u deze email niet heeft aangevraagd dan hoeft u niets te doen."
+        email_body = (
+              "Log in bij het Amsterdamse dataportaal met deze url:"
+              f"<br/><br/><a clicktracking=off href='{login_url}'>{login_url}</a>"
+              "<br/><br/>Als u deze email niet heeft aangevraagd dan hoeft u niets te doen."
+          )
+
         # TODO: move actually sending the email to a separate process
         tools.send_email(payload['email'], email_subject, email_body)
 
