@@ -361,6 +361,6 @@ def send_email(email_address, email_subject, email_body):
         from_email='noreply@amsterdam.nl',
         to_emails=[email_address],
         subject=email_subject,
-        plain_text_content=email_body
+        html_content=email_body
     )
     sg.send(email)
