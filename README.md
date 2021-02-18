@@ -20,7 +20,41 @@ in the message body. An example is a `404` with a message body saying:
 
 > No metadata could be found for this image
 
-The specific authorization rules can be inspected in [views.py](src/iiif/views.py)
+### Authorization
+
+If the images can be shown to the user are based on two properties:
+
+**access** (Openbaarheid)  and **copyright** (Auteursrecht)
+
+There are three categories of users.
+
+1) Civilians or anybody else. They are identified with an e-mail threshold login.
+
+2) Civil servants of the city of Amsterdam. They use either a user password login, or are identified by being on
+the network of the municiplality of Amsterdam
+
+3) Civil servants with special rights to see construction files (bouwdossiers). They are identified by a user password login and special rights to access bouwdossiers.
+
+In the metadata the two properties access and copyright are present for every document. The access propertie can also be present on the bouwdossier level.
+
+If access is restricted, either on document or  bouwdossier level, the document can only be seen by category 3, civil servants with  special rights to access bouwdossiers.
+
+If access is not restricted, de documents can be accesed by category 2) any civil servant of the municiplality of Amsterdam. They
+
+If access is not restricted and the is no copyright for the document, the document can also be accessed by category 3) or
+anybody identified by e-mail threshold.
+
+With respect to copyright there is the following remark. Legally all drawings are protected by copyright till 70 years after publication(or death of the entitled party).
+It is only much less difficult than, for example, with photos. The starting point is: we will publish them (copyright is set to N), unless a rightholder objects.
+This should only happen sporadically. To enable identification, we enter the names of manufacturers (**copyright_manufacturers** property) and present them as such.
+
+In addition to **access** and **copyright** in the metadata also the properties **access_restricted_until** and **copyright_until** can be given. These are for information
+only and are not used for determining access to the document. This should be handled by future updates to the metadata delivery.
+
+If access is denied to a document https status 401 is returned with a reason. This can be either "Document has copyright restriction" or "Document access is restricted"
+and should be presented in the frontend with a appropriate link to the SAA website.
+
+Details for the specific authorization rules can be inspected in [tools.py](src/iiif/tools.py)
 
 ### Running
 

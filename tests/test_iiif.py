@@ -13,6 +13,8 @@ from iiif.generate_token import create_authz_token
 from iiif.tools import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
                         RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER,
                         RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
+                        RESPONSE_CONTENT_COPYRIGHT,
+                        RESPONSE_CONTENT_RESTRICTED,
                         RESPONSE_CONTENT_NO_TOKEN, InvalidIIIFUrlError,
                         create_file_url_and_headers, create_wabo_url,
                         create_mail_login_token, get_info_from_iiif_url)
@@ -186,8 +188,8 @@ class FileTestCaseWithAuthz(SimpleTestCase):
             json_content={
                 'access': settings.ACCESS_PUBLIC,
                 'documenten': [
-                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC},
-                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC, 'copyright': settings.COPYRIGHT_YES},
+                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_PUBLIC, 'copyright': settings.COPYRIGHT_NO},
                     {'barcode': 'SQ10092307', 'access': settings.ACCESS_PUBLIC}
                 ]
             }
@@ -232,7 +234,7 @@ class FileTestCaseWithAuthz(SimpleTestCase):
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content.decode("utf-8"), "")
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_RESTRICTED)
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
@@ -405,7 +407,7 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
                 'access': settings.ACCESS_PUBLIC,
                 'documenten': [
                     {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC},
-                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_PUBLIC, 'copyright': settings.COPYRIGHT_YES},
                     {'barcode': 'SQ10092307', 'access': settings.ACCESS_PUBLIC}
                 ]
             }
@@ -421,8 +423,9 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
 
         response = self.c.get(self.file_url + PRE_WABO_IMG_URL_X1 + '?auth=' + self.mail_login_token)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_COPYRIGHT)
+
 
         response = self.c.get(self.file_url + PRE_WABO_IMG_URL_X2 + '?auth=' + self.mail_login_token)
         self.assertEqual(response.status_code, 200)
@@ -447,7 +450,7 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
 
         response = self.c.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + self.mail_login_token)
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content.decode("utf-8"), "")
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_RESTRICTED)
 
     @patch('iiif.views.tools.get_image_from_iiif_server')
     @patch('iiif.views.tools.get_meta_data')
@@ -726,4 +729,4 @@ class ToolsTestCase(SimpleTestCase):
         self.assertIn('sub', decoded.keys())
         self.assertEqual(decoded['sub'], 'jwttest@amsterdam.nl')
         self.assertEqual(len(decoded['scopes']), 1)
-        self.assertEqual(decoded['scopes'][0], settings.BOUWDOSSIER_READ_SCOPE)
+        self.assertEqual(decoded['scopes'][0], settings.BOUWDOSSIER_PUBLIC_SCOPE)
