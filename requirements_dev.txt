@@ -15,7 +15,7 @@ certifi==2020.12.5
     #   -r ./requirements.txt
     #   requests
     #   sentry-sdk
-cffi==1.14.4
+cffi==1.14.5
     # via
     #   -r ./requirements.txt
     #   cryptography
@@ -27,7 +27,7 @@ click==7.1.2
     # via pip-tools
 coverage==5.4
     # via pytest-cov
-cryptography==3.4.1
+cryptography==3.4.6
     # via
     #   -r ./requirements.txt
     #   jwcrypto
@@ -37,7 +37,7 @@ django-cors-headers==3.7.0
     # via -r ./requirements.txt
 django-ratelimit==3.0.1
     # via -r ./requirements.txt
-django==3.1.6
+django==3.1.7
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
@@ -79,7 +79,7 @@ pytest==6.2.2
     #   pytest-django
 python-dateutil==2.8.1
     # via time-machine
-python-http-client==3.3.1
+python-http-client==3.3.2
     # via
     #   -r ./requirements.txt
     #   sendgrid
@@ -91,18 +91,10 @@ requests==2.25.1
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
-semantic-version==2.8.5
-    # via
-    #   -r ./requirements.txt
-    #   setuptools-rust
-sendgrid==6.5.0
+sendgrid==6.6.0
     # via -r ./requirements.txt
-sentry-sdk==0.19.5
+sentry-sdk==0.20.3
     # via -r ./requirements.txt
-setuptools-rust==0.11.6
-    # via
-    #   -r ./requirements.txt
-    #   cryptography
 six==1.15.0
     # via
     #   -r ./requirements.txt
@@ -115,13 +107,10 @@ starkbank-ecdsa==1.1.0
     # via
     #   -r ./requirements.txt
     #   sendgrid
-time-machine==2.0.1
+time-machine==2.1.0
     # via -r requirements_dev.in
 toml==0.10.2
-    # via
-    #   -r ./requirements.txt
-    #   pytest
-    #   setuptools-rust
+    # via pytest
 urllib3==1.26.3
     # via
     #   -r ./requirements.txt
