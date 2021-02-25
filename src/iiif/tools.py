@@ -17,10 +17,14 @@ log = logging.getLogger(__name__)
 
 
 RESPONSE_CONTENT_NO_TOKEN = "No token supplied"
+RESPONSE_CONTENT_INVALID_SCOPE = "Invalid scope"
 RESPONSE_CONTENT_JWT_TOKEN_EXPIRED = "Your token has expired. Request a new token."
 RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA = "Document not found in metadata"
 RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER = "The iiif-metadata-server cannot be reached"
 RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = "The iiif-image-server cannot be reached"
+RESPONSE_CONTENT_COPYRIGHT = "Document has copyright restriction"
+RESPONSE_CONTENT_RESTRICTED = "Document access is restricted"
+
 
 
 class InvalidIIIFUrlError(Exception):
@@ -170,18 +174,27 @@ def get_info_from_iiif_url(iiif_url, source_file):
         raise InvalidIIIFUrlError(f"Invalid iiif url: {iiif_url}")
 
 
-def img_is_public(metadata, document_barcode):
+def img_is_public_copyright(metadata, document_barcode):
+    """
+    Return if document is public and has copyright.
+    If it is not public the copyright is not used en returned as unknown
+    """
+    public = None
+    copyright1 = None
     if metadata['access'] != settings.ACCESS_PUBLIC:
-        return False
-
-    for meta_document in metadata['documenten']:
-        if meta_document['barcode'] == document_barcode:
-            if meta_document['access'] == settings.ACCESS_PUBLIC:
-                return True
-            elif meta_document['access'] == settings.ACCESS_RESTRICTED:
-                return False
-            break
-    raise DocumentNotFoundInMetadataError()
+        public = False
+    else:
+        for meta_document in metadata['documenten']:
+            if meta_document['barcode'] == document_barcode:
+                if meta_document['access'] == settings.ACCESS_PUBLIC:
+                    public = True
+                    copyright1 = meta_document.get('copyright') == settings.COPYRIGHT_YES
+                elif meta_document['access'] == settings.ACCESS_RESTRICTED:
+                    public = False
+                break
+    if public is None:
+        raise DocumentNotFoundInMetadataError()
+    return public, copyright1
 
 
 def create_mail_login_token(email_address, key, expiry_hours=24):
@@ -190,7 +203,7 @@ def create_mail_login_token(email_address, key, expiry_hours=24):
     jwt token and send it to their email address.
     """
     exp = int((datetime.utcnow() + timedelta(hours=expiry_hours)).timestamp())
-    jwt_payload = {'sub': email_address, 'exp': exp, 'scopes': [settings.BOUWDOSSIER_READ_SCOPE]}
+    jwt_payload = {'sub': email_address, 'exp': exp, 'scopes': [settings.BOUWDOSSIER_PUBLIC_SCOPE]}
     return jwt.encode(jwt_payload, key, algorithm=settings.JWT_ALGORITHM)
 
 
@@ -210,8 +223,8 @@ def read_out_mail_jwt_token(request):
             jwt_token = jwt.decode(request.GET.get('auth'), settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
             # Check scopes
             for scope in jwt_token.get('scopes'):
-                if scope not in (settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE):
-                    raise ImmediateHttpResponse(response=HttpResponse("Invalid scope", status=401))
+                if scope not in (settings.BOUWDOSSIER_PUBLIC_SCOPE, settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE):
+                    raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_INVALID_SCOPE, status=401))
         except ExpiredSignatureError:
             raise ImmediateHttpResponse(response=HttpResponse("Expired JWT token signature", status=401))
         except InvalidSignatureError:
@@ -230,8 +243,10 @@ def get_max_scope(request, mail_jwt_token):
         scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
     elif settings.BOUWDOSSIER_READ_SCOPE in request.get_token_scopes + mail_jwt_token.get('scopes', []):
         scope = settings.BOUWDOSSIER_READ_SCOPE
+    elif settings.BOUWDOSSIER_PUBLIC_SCOPE in mail_jwt_token.get('scopes', []):
+        scope = settings.BOUWDOSSIER_PUBLIC_SCOPE
     else:
-        raise ImmediateHttpResponse(response=HttpResponse("Invalid scope", status=401))
+        raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_INVALID_SCOPE, status=401))
 
     return scope
 
@@ -285,13 +300,16 @@ def get_metadata(url_info, iiif_url):
 
 
 def check_file_access_in_metadata(metadata, url_info, scope):
+    if scope not in (settings.BOUWDOSSIER_PUBLIC_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE, settings.BOUWDOSSIER_READ_SCOPE):
+        raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_INVALID_SCOPE, status=401))
     # Check whether the image exists in the metadata
     try:
-        is_public = img_is_public(metadata, url_info['document_barcode'])
-        # Check whether the file is public
-        if scope != settings.BOUWDOSSIER_EXTENDED_SCOPE \
-                and not (is_public and scope == settings.BOUWDOSSIER_READ_SCOPE):
-            raise ImmediateHttpResponse(response=HttpResponse("", status=401))
+        is_public, has_copyright = img_is_public_copyright(metadata, url_info['document_barcode'])
+        if is_public:
+            if scope == settings.BOUWDOSSIER_PUBLIC_SCOPE and has_copyright:
+                raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_COPYRIGHT, status=401))
+        elif scope != settings.BOUWDOSSIER_EXTENDED_SCOPE:
+            raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_RESTRICTED, status=401))
     except DocumentNotFoundInMetadataError:
         raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404))
 
