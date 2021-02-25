@@ -183,14 +183,15 @@ def img_is_public_copyright(metadata, document_barcode):
     copyright1 = None
     if metadata['access'] != settings.ACCESS_PUBLIC:
         public = False
-    for meta_document in metadata['documenten']:
-        if meta_document['barcode'] == document_barcode:
-            if meta_document['access'] == settings.ACCESS_PUBLIC:
-                public = True
-                copyright1 = meta_document.get('copyright') == settings.COPYRIGHT_YES
-            elif meta_document['access'] == settings.ACCESS_RESTRICTED:
-                public = False
-            break
+    else:
+        for meta_document in metadata['documenten']:
+            if meta_document['barcode'] == document_barcode:
+                if meta_document['access'] == settings.ACCESS_PUBLIC:
+                    public = True
+                    copyright1 = meta_document.get('copyright') == settings.COPYRIGHT_YES
+                elif meta_document['access'] == settings.ACCESS_RESTRICTED:
+                    public = False
+                break
     if public is None:
         raise DocumentNotFoundInMetadataError()
     return public, copyright1

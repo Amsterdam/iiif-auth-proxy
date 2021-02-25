@@ -17,7 +17,7 @@ from iiif.tools import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
                         RESPONSE_CONTENT_RESTRICTED,
                         RESPONSE_CONTENT_NO_TOKEN, InvalidIIIFUrlError,
                         create_file_url_and_headers, create_wabo_url,
-                        create_mail_login_token, get_info_from_iiif_url)
+                        create_mail_login_token, get_info_from_iiif_url, img_is_public_copyright)
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
@@ -730,3 +730,39 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(decoded['sub'], 'jwttest@amsterdam.nl')
         self.assertEqual(len(decoded['scopes']), 1)
         self.assertEqual(decoded['scopes'][0], settings.BOUWDOSSIER_PUBLIC_SCOPE)
+
+    def test_img_is_public_copyright(self):
+        metadata = {
+            'access': settings.ACCESS_PUBLIC,
+            'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}]
+        }
+        public, has_copyright = img_is_public_copyright(metadata, 'ST00000126')
+        self.assertEqual(public, True)
+        self.assertEqual(has_copyright, False)
+
+        # Although this should not happen if on bouwdossier level access is restricted
+        # and on document level it is public, the result shoulb be not public
+        metadata = {
+            'access': settings.ACCESS_RESTRICTED,
+            'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}]
+        }
+        public, has_copyright = img_is_public_copyright(metadata, 'ST00000126')
+        self.assertEqual(public, False)
+        self.assertEqual(has_copyright, None)
+
+        metadata = {
+            'access': settings.ACCESS_PUBLIC,
+            'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}]
+        }
+        public, has_copyright = img_is_public_copyright(metadata, 'ST00000126')
+        self.assertEqual(public, False)
+        self.assertEqual(has_copyright, None)
+
+        metadata = {
+            'access': settings.ACCESS_PUBLIC,
+            'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC, 'copyright': settings.COPYRIGHT_YES}]
+        }
+        public, has_copyright = img_is_public_copyright(metadata, 'ST00000126')
+        self.assertEqual(public, True)
+        self.assertEqual(has_copyright, True)
+

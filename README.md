@@ -30,18 +30,18 @@ There are three categories of users.
 
 1) Civilians or anybody else. They are identified with an e-mail threshold login.
 
-2) Civil servants of the city of Amsterdam. They use either a user password login, or are identified by being on
-the network of the municiplality of Amsterdam
+2) Civil servants of the city of Amsterdam. They are identified by JWT-tokens supplied by a central user/password login. 
 
-3) Civil servants with special rights to see construction files (bouwdossiers). They are identified by a user password login and special rights to access bouwdossiers.
+3) Civil servants with special rights to see construction files (bouwdossiers). They are also identified by JWT-tokens supplied by a central user/password login and they have 
+   special rights to access **bouwdossiers**.
 
-In the metadata the two properties access and copyright are present for every document. The access propertie can also be present on the bouwdossier level.
+In the metadata the two properties access and copyright are present for every document. The access property can also be present on the **bouwdossier** level.
 
-If access is restricted, either on document or  bouwdossier level, the document can only be seen by category 3, civil servants with  special rights to access bouwdossiers.
+If access is restricted, either on document or **bouwdossier** level, the document can only be seen by category 3, civil servants with special rights to access **bouwdossiers**.
 
-If access is not restricted, de documents can be accesed by category 2) any civil servant of the municiplality of Amsterdam. They
+If access is not restricted, the documents can be accessed by category 2, any civil servant of the municipality of Amsterdam.
 
-If access is not restricted and the is no copyright for the document, the document can also be accessed by category 3) or
+If access is not restricted and there is no copyright for the document, the document can also be accessed by category 3 or
 anybody identified by e-mail threshold.
 
 With respect to copyright there is the following remark. Legally all drawings are protected by copyright till 70 years after publication(or death of the entitled party).
