@@ -43,7 +43,7 @@ requests==2.25.1
     # via datapunt-authorization-django
 sendgrid==6.6.0
     # via -r requirements.in
-sentry-sdk==0.20.3
+sentry-sdk==1.0.0
     # via -r requirements.in
 six==1.15.0
     # via -r requirements.in
