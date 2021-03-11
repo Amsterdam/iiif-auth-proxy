@@ -1,9 +1,18 @@
-version: "3.4"
+version: "3.5"
 services:
+  database:
+    image: amsterdam/postgres11
+    environment:
+      POSTGRES_DB: iiif_auth_proxy
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+
   x-app: &base-app
     build:
       context: .
       target: app
+    depends_on:
+      - database
     volumes:
       - ./src:/src
       - ./tests:/tests

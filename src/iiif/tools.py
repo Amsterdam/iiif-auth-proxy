@@ -1,17 +1,27 @@
+import glob
+import hmac
 import json
 import logging
+import os
 import re
+import shutil
 from datetime import datetime, timedelta
+from hashlib import sha1
+from time import time
+from uuid import uuid4
+from zipfile import ZipFile
 
 import jwt
 import requests
 import sendgrid
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotAllowed
+from ingress.models import Collection, Message
 from jwt.exceptions import (DecodeError, ExpiredSignatureError,
                             InvalidSignatureError)
 from requests.exceptions import RequestException
 from sendgrid.helpers.mail import Mail
+from swiftclient import Connection
 
 log = logging.getLogger(__name__)
 
@@ -121,12 +131,12 @@ def get_info_from_iiif_url(iiif_url, source_file):
     ## PRE-WABO
     # iiif_url = \
     # "https://acc.images.data.amsterdam.nl/iiif/2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
-    # ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
+    # ST-00015-ST00000126_00001.jpg=filename  ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
 
     ## WABO
     # iiif_url = \
     # "https://acc.images.data.amsterdam.nl/iiif/2/wabo:SDZ-38657-4900487_628547/full/full/0/default.jpg""
-    # SDZ=stadsdeel  38657=dossier  4900487=olo_liaan_nummer  628547=document_barcode
+    # SDZ-38657-4900487_628547=filename  SDZ=stadsdeel  38657=dossier  4900487=olo_liaan_nummer  628547=document_barcode
 
     # At the end of the url, this can be appended '?source_file=true', which means we'll bypass
     # cantaloupe and go directly for the source file
@@ -197,13 +207,18 @@ def img_is_public_copyright(metadata, document_barcode):
     return public, copyright1
 
 
-def create_mail_login_token(email_address, key, expiry_hours=24):
+def create_mail_login_token(email_address, origin_url, key, expiry_hours=24):
     """
     For burgers to be able to login they can send their email address with which we create a
     jwt token and send it to their email address.
     """
     exp = int((datetime.utcnow() + timedelta(hours=expiry_hours)).timestamp())
-    jwt_payload = {'sub': email_address, 'exp': exp, 'scopes': [settings.BOUWDOSSIER_PUBLIC_SCOPE]}
+    jwt_payload = {
+        'sub': email_address,
+        'exp': exp,
+        'scopes': [settings.BOUWDOSSIER_PUBLIC_SCOPE],
+        'origin_url': origin_url,  # Refers to the page from which the user originated. Can be used by the dataportaal to return the user to that same page
+    }
     return jwt.encode(jwt_payload, key, algorithm=settings.JWT_ALGORITHM)
 
 
@@ -284,7 +299,7 @@ def get_metadata(url_info, iiif_url):
         raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER, status=502))
 
     if meta_response.status_code == 404:
-        raise ImmediateHttpResponse(response=HttpResponse("No metadata could be found for this file", status=404))
+        raise ImmediateHttpResponse(response=HttpResponse("No metadata could be found for this dossier", status=404))
     elif meta_response.status_code != 200:
         log.info(
             f"Got response code {meta_response.status_code} while retrieving "
@@ -358,8 +373,11 @@ def parse_payload(request):
 
 
 def check_login_url_payload(payload):
-    if 'email' not in payload or not len(payload['email']):
-        raise ImmediateHttpResponse(response=HttpResponse("No email field found in json", status=400))
+    if not payload.get('email', ''):
+        raise ImmediateHttpResponse(response=HttpResponse("No email found in json", status=400))
+    if not payload.get('origin_url', ''):
+        raise ImmediateHttpResponse(response=HttpResponse("No origin_url found in json", status=400))
+    return payload['email'], payload['origin_url']
 
 
 def check_email_validity(email_address):
@@ -382,3 +400,88 @@ def send_email(email_address, email_subject, email_body):
         html_content=email_body
     )
     sg.send(email)
+
+
+def check_zip_payload(payload):
+    if 'urls' not in payload or len(payload['urls']) == 0:
+        raise ImmediateHttpResponse(response=HttpResponse("No urls detected in json", status=400))
+
+
+def strip_full_iiif_url(url):
+    if '/iiif/' not in url:
+        raise ImmediateHttpResponse(response=HttpResponse("Misformed paths", status=400))
+
+    # Strip the domain from the url and return the only relevant part
+    return url.split('/iiif/')[-1]
+
+
+def store_zip_job(zip_info):
+    # There's a lot of things in the request_meta that is not JSON serializable.
+    # Since we just need some headers we simply remove all values that are not strings
+    zip_info['request_meta'] = {k: v for k, v in zip_info['request_meta'].items() if type(v) is str}
+
+    collection = Collection.objects.get(name=settings.ZIP_COLLECTION_NAME)
+    message = Message.objects.create(
+        raw_data=json.dumps(zip_info),
+        collection=collection
+    )
+    return message
+
+
+def create_tmp_folder():
+    zipjob_uuid = uuid4()
+    tmp_folder_path = f'/tmp/{zipjob_uuid}/'
+    os.mkdir(tmp_folder_path)
+    return zipjob_uuid, tmp_folder_path
+
+
+def save_file_to_folder(folder, filename, content):
+    with open(folder+filename, 'w') as f:
+        f.write(content)
+
+
+def create_local_zip_file(zipjob_uuid, folder_path):
+    zip_file_path = f'/tmp/{zipjob_uuid}.zip'
+    with ZipFile(zip_file_path, 'w') as zip_obj:
+        for filename in glob.glob(f"{folder_path}/*"):
+            zip_obj.write(filename)
+    return zip_file_path
+
+
+def get_object_store_connection():
+    return Connection(**settings.OBJECT_STORE)
+
+
+def store_object_on_object_store(connection, local_zip_file_path, filename):
+    with open(local_zip_file_path, 'r') as local:
+        connection.put_object(
+            settings.OBJECT_STORE_CONTAINER_NAME,
+            filename,
+            contents=local.read(),
+            content_type='application/zip'
+        )
+
+
+def create_object_store_temp_url(connection, file_name, expiry_minutes=0, expiry_hours=0, expiry_days=0):
+    # Create signature body
+    method = 'GET'
+    duration_in_seconds = ((((expiry_days * 24) + expiry_hours) * 60) + expiry_minutes) * 60
+    expires = int(time() + duration_in_seconds)
+    path = f'/{settings.OBJECT_STORE_CONTAINER_NAME}/{file_name}'
+    hmac_body = f'{method}\n{expires}\n{path}'.encode('utf-8')
+
+    # Create signature
+    key = bytes(settings.OBJECT_STORE_TEMP_URL_KEY, 'UTF-8')
+    sig = hmac.new(key, hmac_body, sha1).hexdigest()
+
+    # Create url
+    tenant_id = connection.os_options['tenant_id']
+    url = f'https://{tenant_id}.{settings.OBJECT_STORE_TLD}{path}?temp_url_sig={sig}&temp_url_expires={expires}'
+
+    return url
+
+
+def cleanup_local_files(zip_file_path, tmp_folder_path):
+    # Cleanup the local zip file and folder with images
+    os.remove(zip_file_path)
+    shutil.rmtree(tmp_folder_path)

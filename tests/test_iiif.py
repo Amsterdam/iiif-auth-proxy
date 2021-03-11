@@ -1,23 +1,31 @@
 import json
 import logging
+import os
 from datetime import datetime, timedelta
+from pathlib import Path
 from unittest.mock import patch
+from uuid import uuid4
+from zipfile import ZipFile
 
 import jwt
 import pytz
 import time_machine
 from django.conf import settings
-from django.test import Client, SimpleTestCase
+from django.test import Client, SimpleTestCase, TestCase
+from ingress.models import FailedMessage, Message
 
+from iiif import tools
 from iiif.generate_token import create_authz_token
-from iiif.tools import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
+from iiif.ingress_zip_consumer import ZipConsumer
+from iiif.tools import (RESPONSE_CONTENT_COPYRIGHT,
+                        RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
                         RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER,
                         RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
-                        RESPONSE_CONTENT_COPYRIGHT,
-                        RESPONSE_CONTENT_RESTRICTED,
-                        RESPONSE_CONTENT_NO_TOKEN, InvalidIIIFUrlError,
-                        create_file_url_and_headers, create_wabo_url,
-                        create_mail_login_token, get_info_from_iiif_url, img_is_public_copyright)
+                        RESPONSE_CONTENT_NO_TOKEN, RESPONSE_CONTENT_RESTRICTED,
+                        InvalidIIIFUrlError, create_file_url_and_headers,
+                        create_mail_login_token, create_wabo_url,
+                        get_info_from_iiif_url, img_is_public_copyright)
+from tests.tools_for_testing import call_man_command
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
@@ -361,12 +369,12 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
         self.login_link_url = '/iiif/login-link-to-email/'
         self.c = Client()
         self.test_email_address = 'jwttest@amsterdam.nl'
-        self.mail_login_token = create_mail_login_token(self.test_email_address, settings.SECRET_KEY)
+        self.mail_login_token = create_mail_login_token(self.test_email_address, 'the_return_url', settings.SECRET_KEY)
 
     @patch('iiif.views.tools.send_email')
     def test_send_dataportaal_login_url_to_burger_email_address(self, mock_send_email):
         mock_send_email.return_value = None  # Prevent it from sending actual emails
-        payload = {'email': 'burger@amsterdam.nl'}
+        payload = {'email': 'burger@amsterdam.nl', 'origin_url': 'http://some.page'}
         response = self.c.post(self.login_link_url, json.dumps(payload), content_type="application/json")
         self.assertEqual(response.status_code, 200)
 
@@ -475,7 +483,7 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
 
         # Time travel to two days ago so that the jwt token will be invalid
         with time_machine.travel(datetime.now() - timedelta(days=2)):
-            jwt_token = create_mail_login_token(self.test_email_address, settings.SECRET_KEY)
+            jwt_token = create_mail_login_token(self.test_email_address, 'the_return_url', settings.SECRET_KEY)
 
         response = self.c.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + jwt_token)
         self.assertEqual(response.status_code, 401)
@@ -500,7 +508,7 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
             content=IMAGE_BINARY_DATA,
             headers={'Content-Type': 'image/png'}
         )
-        mail_login_token = create_mail_login_token(self.test_email_address, 'invalid_key')
+        mail_login_token = create_mail_login_token(self.test_email_address, 'the_return_url', 'invalid_key')
         response = self.c.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + mail_login_token)
         self.assertEqual(response.status_code, 401)
 
@@ -721,15 +729,17 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(cert, '/tmp/sw444v1912.pem')
 
     def test_get_authentication_jwt(self):
-        token = create_mail_login_token('jwttest@amsterdam.nl', settings.SECRET_KEY)
+        token = create_mail_login_token('jwttest@amsterdam.nl', 'http://some.page/', settings.SECRET_KEY)
         decoded = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
-        self.assertEqual(len(decoded.keys()), 3)
+        self.assertEqual(len(decoded.keys()), 4)
         self.assertIn('exp', decoded.keys())
         self.assertIn('scopes', decoded.keys())
         self.assertIn('sub', decoded.keys())
+        self.assertIn('origin_url', decoded.keys())
         self.assertEqual(decoded['sub'], 'jwttest@amsterdam.nl')
         self.assertEqual(len(decoded['scopes']), 1)
         self.assertEqual(decoded['scopes'][0], settings.BOUWDOSSIER_PUBLIC_SCOPE)
+        self.assertEqual(decoded['origin_url'], 'http://some.page/')
 
     def test_img_is_public_copyright(self):
         metadata = {
@@ -765,4 +775,258 @@ class ToolsTestCase(SimpleTestCase):
         public, has_copyright = img_is_public_copyright(metadata, 'ST00000126')
         self.assertEqual(public, True)
         self.assertEqual(has_copyright, True)
+
+    def test_create_local_zip_file(self):
+
+        # First create some files
+        uuid = uuid4()
+        folder_path = f'/tmp/{uuid}/'
+        os.mkdir(folder_path)
+        for i in range(5):
+            with open(f'/tmp/{uuid}/{i}.txt', 'w') as f:
+                f.write(f'content{i}')
+
+        # Create the zip file
+        tools.create_local_zip_file(uuid, folder_path)
+
+        # Check whether the newly created zip file exists
+        self.assertTrue(Path(f'/tmp/{uuid}.zip').is_file())
+
+        # Unzip the file
+        unzip_uuid = uuid4()
+        unzip_folder = f'/tmp/{unzip_uuid}/'
+        os.mkdir(unzip_folder)
+        with ZipFile(f'/tmp/{uuid}.zip', 'r') as zip_ref:
+            zip_ref.extractall(unzip_folder)
+
+        # TODO: check whether the files are unzipped correctly
+
+
+class TestZipEndpoint(TestCase):
+    def setUp(self):
+        self.url = '/iiif/zip/'
+        self.c = Client()
+        self.BASE_URL = 'https://images.data.amsterdam.nl/iiif/'
+        self.test_email_address = 'zip@amsterdam.nl'
+        self.mail_login_token = create_mail_login_token(self.test_email_address, 'the_origin_url', settings.SECRET_KEY)
+        call_man_command('add_collection', settings.ZIP_COLLECTION_NAME)
+        call_man_command('enable_consumer', settings.ZIP_COLLECTION_NAME)
+
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_public_image_with_jwt_token(self, mock_get_meta_data):
+        # Set up mock metadata response
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10092307', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
+        # Request two images
+        response = self.c.post(
+            self.url + '?auth=' + self.mail_login_token,
+            json.dumps({
+                'urls': [
+                    self.BASE_URL+PRE_WABO_IMG_URL,
+                    self.BASE_URL+PRE_WABO_IMG_URL_X1
+                ]
+            }),
+            content_type="application/json"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Message.objects.count(), 1)
+        message = Message.objects.first()
+        data = json.loads(message.raw_data)
+        self.assertEqual(data['email_address'], 'zip@amsterdam.nl')
+        self.assertEqual(len(data['urls']), 2)
+        self.assertIn('request_meta', data)
+
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_public_image_with_authz_token(self, mock_get_meta_data):
+        # Set up mock metadata response
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10092307', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
+
+        # Request two images
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token([settings.BOUWDOSSIER_READ_SCOPE])}
+        response = self.c.post(
+            self.url + '?auth=' + self.mail_login_token,
+            json.dumps({
+                'urls': [
+                    self.BASE_URL+PRE_WABO_IMG_URL,
+                    self.BASE_URL+PRE_WABO_IMG_URL_X1
+                ]
+            }),
+            content_type="application/json",
+            ** header
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Message.objects.count(), 1)
+        message = Message.objects.first()
+        data = json.loads(message.raw_data)
+        self.assertEqual(data['email_address'], 'authztest@amsterdam.nl')
+        self.assertEqual(len(data['urls']), 2)
+        self.assertIn('request_meta', data)
+
+    def test_other_methods_than_post_fail(self):
+        response = self.c.get(self.url + '?auth=' + self.mail_login_token)
+        self.assertEqual(response.status_code, 405)
+        response = self.c.put(self.url + '?auth=' + self.mail_login_token)
+        self.assertEqual(response.status_code, 405)
+        response = self.c.delete(self.url + '?auth=' + self.mail_login_token)
+        self.assertEqual(response.status_code, 405)
+
+    def test_request_without_auth_fails(self):
+        response = self.c.post(
+            self.url,
+            json.dumps({
+                'urls': [
+                    self.BASE_URL+PRE_WABO_IMG_URL,
+                    self.BASE_URL+PRE_WABO_IMG_URL_X1
+                ]
+            }),
+            content_type="application/json"
+        )
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_request_with_invalid_json_fails(self):
+        response = self.c.post(
+            self.url + '?auth=' + self.mail_login_token,
+            "invalid json",
+            content_type="application/json"
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_request_with_missing_urls_in_json_fails(self):
+        response = self.c.post(
+            self.url + '?auth=' + self.mail_login_token,
+            json.dumps({'something': 'else'}),
+            content_type="application/json"
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_request_with_invalid_urls_in_json_fails(self):
+        response = self.c.post(
+            self.url + '?auth=' + self.mail_login_token,
+            json.dumps({
+                'urls': [
+                    PRE_WABO_IMG_URL,  # NO BASE URL HERE, SO IT'S MISFORMED
+                    self.BASE_URL + PRE_WABO_IMG_URL_X1
+                ]
+            }),
+            content_type="application/json"
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+
+    @patch('iiif.views.tools.get_meta_data')
+    def test_get_restricted_image_with_read_scope_fails(self, mock_get_meta_data):
+        # Set up mock metadata response
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_RESTRICTED},
+                    {'barcode': 'SQ10092307', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
+
+        # Request two images
+        response = self.c.post(
+            self.url + '?auth=' + self.mail_login_token,
+            json.dumps({
+                'urls': [
+                    self.BASE_URL+PRE_WABO_IMG_URL,
+                    self.BASE_URL+PRE_WABO_IMG_URL_X1
+                ]
+            }),
+            content_type="application/json"
+        )
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.content.decode("utf-8"), tools.RESPONSE_CONTENT_RESTRICTED)
+        self.assertEqual(Message.objects.count(), 0)
+
+    @patch('iiif.views.tools.get_image_from_iiif_server')
+    @patch('iiif.views.tools.get_meta_data')
+    @patch('iiif.views.tools.store_object_on_object_store')
+    @patch('iiif.views.tools.send_email')
+    @patch('iiif.views.tools.cleanup_local_files')
+    def test_consume_ingress(
+            self,
+            mock_cleanup_local_files,
+            mock_send_email,
+            mock_store_object_on_object_store,
+            mock_get_meta_data,
+            mock_get_image_from_iiif_server
+    ):
+        # Setting up mocks
+        mock_cleanup_local_files.return_value = None
+        mock_send_email.return_value = None
+        mock_store_object_on_object_store.return_value = None
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10092307', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
+        )
+
+        # Request some images in a zip
+        response = self.c.post(
+            self.url + '?auth=' + self.mail_login_token,
+            json.dumps({
+                'urls': [
+                    self.BASE_URL + PRE_WABO_IMG_URL,
+                    self.BASE_URL + PRE_WABO_IMG_URL_X1
+                ]
+            }),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Message.objects.count(), 1)
+
+        # Then run the parser
+        parser = ZipConsumer()
+        parser.consume(end_at_empty_queue=True)
+
+        # Test whether the records in the ingress queue are correctly set to consumed
+        self.assertEqual(Message.objects.filter(consume_succeeded_at__isnull=False).count(), 1)
+        self.assertEqual(FailedMessage.objects.count(), 0)
+        for ingress in Message.objects.all():
+            self.assertIsNotNone(ingress.consume_started_at)
+            self.assertIsNotNone(ingress.consume_succeeded_at)
+
+        # TODO: Check whether the local files were correctly created
 

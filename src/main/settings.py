@@ -43,6 +43,7 @@ WABO_BASE_URL = os.getenv('WABO_BASE_URL', 'https://conversiestraatwabo.amsterda
 JWT_ALGORITHM = 'HS256'
 SENDGRID_KEY = os.getenv('SENDGRID_KEY', 'mock_key')
 DATAPORTAAL_LOGIN_BASE_URL = os.getenv('DATAPORTAAL_LOGIN_BASE_URL', 'https://acc.data.amsterdam.nl/images-mail-login/')
+ZIP_COLLECTION_NAME = 'zip_queue'
 
 
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
@@ -74,6 +75,21 @@ DATAPUNT_AUTHZ = {
     'FORCED_ANONYMOUS_ROUTES': ['/status/health']
 }
 
+OBJECT_STORE = {
+    'auth_version': '2.0',
+    'authurl': 'https://identity.stack.cloudvps.com/v2.0',
+    'user': os.getenv('OBJECT_STORE_USER', 'iiif'),
+    'key': os.getenv('OBJECT_STORE_PASSWORD', 'insecure'),
+    'tenant_name': os.getenv('OBJECT_STORE_TENANT_NAME', 'insecure'),
+    'os_options': {
+        'tenant_id': '9d078258c1a547c09e0b5f88834554f1',
+        'region_name': 'NL',
+    }
+}
+OBJECT_STORE_CONTAINER_NAME = os.getenv('OBJECT_STORE_CONTAINER_NAME', 'downloads_acceptance')
+OBJECT_STORE_TEMP_URL_KEY = os.getenv('OBJECT_STORE_TEMP_URL_KEY', 'insecure')
+OBJECT_STORE_TLD = os.getenv('OBJECT_STORE_TLD', 'objectstore.eu')
+TEMP_URL_EXPIRY_DAYS = 7
 
 INSTALLED_APPS = [
     'django.contrib.auth',
@@ -84,6 +100,7 @@ INSTALLED_APPS = [
     'iiif',
     'health',
     'corsheaders',
+    'ingress',
 ]
 
 MIDDLEWARE = [
@@ -122,7 +139,17 @@ WSGI_APPLICATION = 'main.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {}
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": os.getenv("DATABASE_NAME", "iiif_auth_proxy"),
+        "USER": os.getenv("DATABASE_USER", "dev"),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD", "dev"),
+        "HOST": os.getenv("DATABASE_HOST", "database"),
+        "CONN_MAX_AGE": 20,
+        "PORT": os.getenv("DATABASE_PORT", "5432"),
+    },
+}
 
 
 # Password validation
