@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
@@ -777,14 +778,14 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(has_copyright, True)
 
     def test_create_local_zip_file(self):
-
         # First create some files
-        uuid = uuid4()
+        uuid = str(uuid4())
         folder_path = f'/tmp/{uuid}/'
         os.mkdir(folder_path)
-        for i in range(5):
-            with open(f'/tmp/{uuid}/{i}.txt', 'w') as f:
-                f.write(f'content{i}')
+        filenames = [f'content{i}.txt' for i in range(5)]
+        for filename in filenames:
+            with open(f'/tmp/{uuid}/{filename}', 'w') as f:
+                f.write('content')
 
         # Create the zip file
         tools.create_local_zip_file(uuid, folder_path)
@@ -799,7 +800,14 @@ class ToolsTestCase(SimpleTestCase):
         with ZipFile(f'/tmp/{uuid}.zip', 'r') as zip_ref:
             zip_ref.extractall(unzip_folder)
 
-        # TODO: check whether the files are unzipped correctly
+        os.path.isdir(os.path.join(unzip_folder, uuid))
+        extracted_files = sorted([file.name for file in Path(os.path.join(unzip_folder, uuid)).glob("*")])
+        self.assertEqual(extracted_files, filenames)
+
+        # Cleanup so that other tests are not influenced
+        shutil.rmtree(folder_path)
+        os.remove(f'/tmp/{uuid}.zip')
+        shutil.rmtree(unzip_folder)
 
 
 class TestZipEndpoint(TestCase):
@@ -1028,5 +1036,13 @@ class TestZipEndpoint(TestCase):
             self.assertIsNotNone(ingress.consume_started_at)
             self.assertIsNotNone(ingress.consume_succeeded_at)
 
-        # TODO: Check whether the local files were correctly created
+        # Check whether the newly created zip file exists
+        tmp_contents = sorted(os.listdir('/tmp/'))  # Sorting it so the first is the folder and the second the zip
+        self.assertEqual(len(tmp_contents), 2)
+        self.assertTrue(os.path.isdir(os.path.join('/tmp/', tmp_contents[0])))
+        self.assertTrue(os.path.isfile(os.path.join('/tmp/', tmp_contents[1])))
+        self.assertEqual(tmp_contents[0]+'.zip', tmp_contents[1])
 
+        # Cleanup so that other tests are not influenced
+        shutil.rmtree(os.path.join('/tmp/', tmp_contents[0]))
+        os.remove(os.path.join('/tmp/', tmp_contents[1]))

@@ -31,7 +31,7 @@ def index(request, iiif_url):
 # TODO: limit to dataportaal urls
 @csrf_exempt
 @ratelimit(key='ip', rate='3/d')  # TODO: Check django cache settings for rate limiter to work across parallel docker containers
-def send_dataportaal_login_url_to_burger_email_address(request):
+def send_dataportaal_login_url_to_mail(request):
     try:
         # Some basic sanity checks
         tools.check_for_post(request)
@@ -40,7 +40,7 @@ def send_dataportaal_login_url_to_burger_email_address(request):
         tools.check_email_validity(email)
 
         # Create the login url
-        token = tools.create_mail_login_token(email, origin_url, settings.SECRET_KEY)
+        token = tools.create_mail_login_token(email, origin_url, settings.JWT_SECRET_KEY)
         login_url = f"{settings.DATAPORTAAL_LOGIN_BASE_URL}?auth={token}"
 
         # Send the email

@@ -7,6 +7,7 @@ import re
 import shutil
 from datetime import datetime, timedelta
 from hashlib import sha1
+from pathlib import Path
 from time import time
 from uuid import uuid4
 from zipfile import ZipFile
@@ -159,9 +160,10 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 'stadsdeel': stadsdeel,
                 'dossier': dossier,
                 'document_barcode': document_barcode,
-                'file': file.split('.')[0],
+                'file': file.split('.')[0],  # The file in the dossier
                 'formatting': formatting,
                 'source_file': source_file,
+                'filename': relevant_url_part,  # The filename if this file needs to be stored on disc
             }
 
         elif source == 'wabo':  # = pre-wabo
@@ -175,6 +177,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 'document_barcode': document_barcode,
                 'formatting': formatting,
                 'source_file': source_file,
+                'filename': relevant_url_part,  # The filename if this file needs to be stored on disc
             }
 
         raise InvalidIIIFUrlError(f"Invalid iiif url (no valid source): {iiif_url}")
@@ -209,8 +212,9 @@ def img_is_public_copyright(metadata, document_barcode):
 
 def create_mail_login_token(email_address, origin_url, key, expiry_hours=24):
     """
-    For burgers to be able to login they can send their email address with which we create a
-    jwt token and send it to their email address.
+    Prepare a JSON web token to be used by the dataportaal. A link which includes this token is sent to the
+    citizens email address which in turn leads them to the dataportaal. This enables citizens to view images
+    by sending along this token along with every file request.
     """
     exp = int((datetime.utcnow() + timedelta(hours=expiry_hours)).timestamp())
     jwt_payload = {
@@ -235,7 +239,7 @@ def read_out_mail_jwt_token(request):
                 return jwt_token
             raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401))
         try:
-            jwt_token = jwt.decode(request.GET.get('auth'), settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+            jwt_token = jwt.decode(request.GET.get('auth'), settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
             # Check scopes
             for scope in jwt_token.get('scopes'):
                 if scope not in (settings.BOUWDOSSIER_PUBLIC_SCOPE, settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE):
@@ -373,9 +377,9 @@ def parse_payload(request):
 
 
 def check_login_url_payload(payload):
-    if not payload.get('email', ''):
+    if not payload.get('email'):
         raise ImmediateHttpResponse(response=HttpResponse("No email found in json", status=400))
-    if not payload.get('origin_url', ''):
+    if not payload.get('origin_url'):
         raise ImmediateHttpResponse(response=HttpResponse("No origin_url found in json", status=400))
     return payload['email'], payload['origin_url']
 
@@ -403,7 +407,7 @@ def send_email(email_address, email_subject, email_body):
 
 
 def check_zip_payload(payload):
-    if 'urls' not in payload or len(payload['urls']) == 0:
+    if not payload.get('urls'):
         raise ImmediateHttpResponse(response=HttpResponse("No urls detected in json", status=400))
 
 
@@ -430,21 +434,20 @@ def store_zip_job(zip_info):
 
 def create_tmp_folder():
     zipjob_uuid = uuid4()
-    tmp_folder_path = f'/tmp/{zipjob_uuid}/'
+    tmp_folder_path = os.path.join('/tmp/', str(zipjob_uuid))
     os.mkdir(tmp_folder_path)
     return zipjob_uuid, tmp_folder_path
 
 
 def save_file_to_folder(folder, filename, content):
-    with open(folder+filename, 'w') as f:
+    with open(os.path.join(folder, filename), 'w') as f:
         f.write(content)
 
-
 def create_local_zip_file(zipjob_uuid, folder_path):
-    zip_file_path = f'/tmp/{zipjob_uuid}.zip'
+    zip_file_path = os.path.join('/tmp/', f'{zipjob_uuid}.zip')
     with ZipFile(zip_file_path, 'w') as zip_obj:
-        for filename in glob.glob(f"{folder_path}/*"):
-            zip_obj.write(filename)
+        for file in Path(folder_path).glob("*"):
+            zip_obj.write(file, arcname=os.path.join(str(zipjob_uuid), file.name))
     return zip_file_path
 
 
@@ -467,7 +470,7 @@ def create_object_store_temp_url(connection, file_name, expiry_minutes=0, expiry
     method = 'GET'
     duration_in_seconds = ((((expiry_days * 24) + expiry_hours) * 60) + expiry_minutes) * 60
     expires = int(time() + duration_in_seconds)
-    path = f'/{settings.OBJECT_STORE_CONTAINER_NAME}/{file_name}'
+    path = os.path.join(f'/{settings.OBJECT_STORE_CONTAINER_NAME}', file_name)
     hmac_body = f'{method}\n{expires}\n{path}'.encode('utf-8')
 
     # Create signature

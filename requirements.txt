@@ -18,7 +18,7 @@ cryptography==3.4.6
     # via jwcrypto
 datapunt-authorization-django==1.3.0
     # via -r requirements.in
-datapunt-data-ingress==2.0.1
+datapunt-data-ingress==2.0.2
     # via -r requirements.in
 django-cors-headers==3.7.0
     # via -r requirements.in
@@ -62,7 +62,7 @@ sqlparse==0.4.1
     # via django
 starkbank-ecdsa==1.1.0
     # via sendgrid
-urllib3==1.26.3
+urllib3==1.26.4
     # via
     #   requests
     #   sentry-sdk

@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import shutil
 
 from django.conf import settings
 from ingress.consumer.base import BaseConsumer
@@ -9,7 +8,7 @@ from ingress.consumer.base import BaseConsumer
 from iiif import tools
 from main import settings
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class ZipConsumer(BaseConsumer):
@@ -43,15 +42,18 @@ class ZipConsumer(BaseConsumer):
                     record['request_meta'], info['url_info'], iiif_url, info['metadata'])
                 tools.handle_file_response_errors(file_response, file_url)
             except tools.ImmediateHttpResponse as e:
-                # Write small file
-                info_txt_contents += f"Not included in this zip: {e.response.content}\n"
+                log.error(f"Error while retrieving {iiif_url} from the source system: {e.response.content}")
+                info_txt_contents += f"Not included in this zip because an error occurred " \
+                                     f"while getting it from the source system\n"
                 continue
             except Exception as e:
-                info_txt_contents += f"Not included in this zip: {e}\n"
+                log.error(f"Error while retrieving {iiif_url} from the source system: {e}")
+                info_txt_contents += f"Not included in this zip because an error occurred " \
+                                     f"while getting it from the source system\n"
                 continue
 
             # Save image file to tmp folder
-            tools.save_file_to_folder(tmp_folder_path, str(i), file_response.content)
+            tools.save_file_to_folder(tmp_folder_path, info['url_info']['filename'], file_response.content)
             info_txt_contents += "included\n"
 
         # Store the info_file_along_with_the_image_files
@@ -59,7 +61,7 @@ class ZipConsumer(BaseConsumer):
 
         # Zip all files together
         zip_file_path = tools.create_local_zip_file(zipjob_uuid, tmp_folder_path)
-        zip_file_name = zip_file_path.split('/')[-1]
+        zip_file_name = os.path.basename(zip_file_path)
 
         # Move the file to the object store
         conn = tools.get_object_store_connection()

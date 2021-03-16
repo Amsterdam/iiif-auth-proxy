@@ -40,6 +40,7 @@ BOUWDOSSIER_EXTENDED_SCOPE = 'BD/X'  # BouwDossiers_eXtended. Access civil serva
 IIIF_BASE_URL = os.getenv('IIIF_BASE_URL', 'http://iiif.service.consul')
 IIIF_PORT = os.getenv('IIIF_PORT', "8149")  # This port is static within the network
 WABO_BASE_URL = os.getenv('WABO_BASE_URL', 'https://conversiestraatwabo.amsterdam.nl/webDAV/')
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
 JWT_ALGORITHM = 'HS256'
 SENDGRID_KEY = os.getenv('SENDGRID_KEY', 'mock_key')
 DATAPORTAAL_LOGIN_BASE_URL = os.getenv('DATAPORTAAL_LOGIN_BASE_URL', 'https://acc.data.amsterdam.nl/images-mail-login/')
@@ -90,6 +91,10 @@ OBJECT_STORE_CONTAINER_NAME = os.getenv('OBJECT_STORE_CONTAINER_NAME', 'download
 OBJECT_STORE_TEMP_URL_KEY = os.getenv('OBJECT_STORE_TEMP_URL_KEY', 'insecure')
 OBJECT_STORE_TLD = os.getenv('OBJECT_STORE_TLD', 'objectstore.eu')
 TEMP_URL_EXPIRY_DAYS = 7
+
+INGRESS_CONSUMER_CLASSES = [
+    'iiif.ingress_zip_consumer.ZipConsumer',  # worker to zip files, upload to object store and email user
+]
 
 INSTALLED_APPS = [
     'django.contrib.auth',

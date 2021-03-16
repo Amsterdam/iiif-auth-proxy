@@ -21,6 +21,7 @@ services:
       - "8000:8000"
     environment: &base-app-env
       SECRET_KEY: 'insecure'
+      JWT_SECRET_KEY: 'insecure'
       START_STUNNEL: 'false'
       IIIF_IMAGE_SERVER_WABO_CERT: dGhlIGNvbnRlbnRzIG9mIHRoZSBjZXJ0IGZpbGU=  # This says "the contents of the cert file"
 
