@@ -1,4 +1,3 @@
-import glob
 import hmac
 import json
 import logging
@@ -23,6 +22,7 @@ from jwt.exceptions import (DecodeError, ExpiredSignatureError,
 from requests.exceptions import RequestException
 from sendgrid.helpers.mail import Mail
 from swiftclient import Connection
+from swiftclient.exceptions import ClientException
 
 log = logging.getLogger(__name__)
 
@@ -443,6 +443,7 @@ def save_file_to_folder(folder, filename, content):
     with open(os.path.join(folder, filename), 'w') as f:
         f.write(content)
 
+
 def create_local_zip_file(zipjob_uuid, folder_path):
     zip_file_path = os.path.join('/tmp/', f'{zipjob_uuid}.zip')
     with ZipFile(zip_file_path, 'w') as zip_obj:
@@ -488,3 +489,29 @@ def cleanup_local_files(zip_file_path, tmp_folder_path):
     # Cleanup the local zip file and folder with images
     os.remove(zip_file_path)
     shutil.rmtree(tmp_folder_path)
+
+
+def remove_old_zips_from_object_store():
+    conn = get_object_store_connection()
+
+    # Get list of files from the object store
+    headers, files = conn.get_container(settings.OBJECT_STORE_CONTAINER_NAME)
+    log.info(f"Checking {headers['x-container-object-count']} files for removal")
+
+    # Loop over files on object store and remove the old ones
+    removed_counter = 0
+    failed_counter = 0
+    for file in files:
+        file_age = datetime.now() - datetime.fromisoformat(file['last_modified'])
+        if file_age.days > settings.TEMP_URL_EXPIRY_DAYS:
+            try:
+                conn.delete_object(settings.OBJECT_STORE_CONTAINER_NAME, file['name'])
+                log.info(f"Removed {file['name']}")
+                removed_counter += 1
+            except ClientException as e:
+                log.error(f"Failed to remove {file['name']} with error: {e}")
+                failed_counter += 1
+
+    log.info(f"\nSuccessfully removed {removed_counter} old files from the object store.\n")
+    if failed_counter:
+        log.info(f"\nFAILED removing {failed_counter} old files from the object store.\n")
