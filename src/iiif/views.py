@@ -44,13 +44,15 @@ def send_dataportaal_login_url_to_mail(request):
         login_url = f"{settings.DATAPORTAAL_LOGIN_BASE_URL}?auth={token}"
 
         # Send the email
-        email_subject = "Amsterdam Dataportaal login"
-        # TODO: Make better text and maybe an email template for this email
-        email_body = (
-              "Log in bij het Amsterdamse dataportaal met deze url:"
-              f"<br/><br/><a clicktracking=off href='{login_url}'>{login_url}</a>"
-              "<br/><br/>Als u deze email niet heeft aangevraagd dan hoeft u niets te doen."
-          )
+        email_subject = "Toegang bouw- en omgevingsdossiers data.amsterdam.nl"
+        # TODO: Maybe move email text to a template
+        email_body = "Beste gebruiker van data.amsterdam.nl," \
+                     "<br/><br/>Via onderstaande link bent u direct ingelogd op data.amsterdam.nl om de" \
+                     "door u aangevraagde bouw- en omgevingsdossiers in te zien en te" \
+                     "downloaden. Deze link is 24 uur geldig." \
+                     f"<br/><br/><a clicktracking=off href='{login_url}'>Login dataportaal</a>" \
+                     "<br/><br/>Met vriendelijke groet," \
+                     "<br/><br/>Gemeente Amsterdam"
 
         # TODO: move actually sending the email to a separate process
         tools.send_email(payload['email'], email_subject, email_body)
