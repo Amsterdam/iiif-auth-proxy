@@ -5,7 +5,8 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from ratelimit.decorators import ratelimit
 
-from iiif import tools
+from iiif import authentication, cantaloupe, mailing, parsing, tools, zip_tools
+from iiif.metadata import get_metadata
 
 log = logging.getLogger(__name__)
 
@@ -13,14 +14,14 @@ log = logging.getLogger(__name__)
 @csrf_exempt
 def index(request, iiif_url):
     try:
-        tools.check_auth_availability(request)
-        mail_jwt_token = tools.read_out_mail_jwt_token(request)
-        scope = tools.get_max_scope(request, mail_jwt_token)
-        url_info = tools.get_url_info(request, iiif_url)
-        metadata = tools.get_metadata(url_info, iiif_url)
-        tools.check_file_access_in_metadata(metadata, url_info, scope)
-        file_response, file_url = tools.get_file(request.META, url_info, iiif_url, metadata)
-        tools.handle_file_response_errors(file_response, file_url)
+        authentication.check_auth_availability(request)
+        mail_jwt_token = authentication.read_out_mail_jwt_token(request)
+        scope = authentication.get_max_scope(request, mail_jwt_token)
+        url_info = parsing.get_url_info(request, iiif_url)
+        metadata = get_metadata(url_info, iiif_url)
+        authentication.check_file_access_in_metadata(metadata, url_info, scope)
+        file_response, file_url = cantaloupe.get_file(request.META, url_info, iiif_url, metadata)
+        cantaloupe.handle_file_response_errors(file_response, file_url)
     except tools.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in index:")
         return e.response
@@ -34,13 +35,13 @@ def index(request, iiif_url):
 def send_dataportaal_login_url_to_mail(request):
     try:
         # Some basic sanity checks
-        tools.check_for_post(request)
-        payload = tools.parse_payload(request)
-        email, origin_url = tools.check_login_url_payload(payload)
-        tools.check_email_validity(email)
+        parsing.check_for_post(request)
+        payload = parsing.parse_payload(request)
+        email, origin_url = parsing.check_login_url_payload(payload)
+        parsing.check_email_validity(email)
 
         # Create the login url
-        token = tools.create_mail_login_token(email, origin_url, settings.JWT_SECRET_KEY)
+        token = authentication.create_mail_login_token(email, origin_url, settings.JWT_SECRET_KEY)
         login_url = f"{settings.DATAPORTAAL_LOGIN_BASE_URL}?auth={token}"
 
         # Send the email
@@ -55,7 +56,7 @@ def send_dataportaal_login_url_to_mail(request):
                      "<br/><br/>Gemeente Amsterdam"
 
         # TODO: move actually sending the email to a separate process
-        tools.send_email(payload['email'], email_subject, email_body)
+        mailing.send_email(payload['email'], email_subject, email_body)
 
     except tools.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in login_url:")
@@ -69,13 +70,13 @@ def send_dataportaal_login_url_to_mail(request):
 @csrf_exempt
 def request_multiple_files_in_zip(request):
     try:
-        tools.check_for_post(request)
-        tools.check_auth_availability(request)
-        read_jwt_token = tools.read_out_mail_jwt_token(request)
-        scope = tools.get_max_scope(request, read_jwt_token)
-        email_address = tools.get_email_address(request, read_jwt_token)
-        payload = tools.parse_payload(request)
-        tools.check_zip_payload(payload)
+        parsing.check_for_post(request)
+        authentication.check_auth_availability(request)
+        read_jwt_token = authentication.read_out_mail_jwt_token(request)
+        scope = authentication.get_max_scope(request, read_jwt_token)
+        email_address = parsing.get_email_address(request, read_jwt_token)
+        payload = parsing.parse_payload(request)
+        parsing.check_zip_payload(payload)
     except tools.ImmediateHttpResponse as e:
         log.error(e.response.content)
         return e.response
@@ -87,10 +88,10 @@ def request_multiple_files_in_zip(request):
     }
     for url in payload['urls']:
         try:
-            iiif_url = tools.strip_full_iiif_url(url)
-            url_info = tools.get_url_info(request, iiif_url)
-            metadata = tools.get_metadata(url_info, iiif_url)
-            tools.check_file_access_in_metadata(metadata, url_info, scope)
+            iiif_url = parsing.strip_full_iiif_url(url)
+            url_info = parsing.get_url_info(request, iiif_url)
+            metadata = get_metadata(url_info, iiif_url)
+            authentication.check_file_access_in_metadata(metadata, url_info, scope)
             # TODO: Get the file headers to check whether not only the metadata but also the source file itself exists
             #   Alternatively this can be handled when zipping the files
 
@@ -105,7 +106,7 @@ def request_multiple_files_in_zip(request):
 
     # The fact that we arrived here means that the the metadata exists for all files, and that the user is allowed to
     # access all the files. We proceed with storing it as a zip job so that a zip worker can pick it up.
-    tools.store_zip_job(zip_info)
+    zip_tools.store_zip_job(zip_info)
 
     # Respond with a 200 to signal success.
     # The user will get an email once the files have been zipped by a worker.
