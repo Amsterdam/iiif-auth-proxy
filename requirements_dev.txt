@@ -54,7 +54,9 @@ jwcrypto==0.8
     #   datapunt-authorization-django
 packaging==20.9
     # via pytest
-pip-tools==5.5.0
+pep517==0.10.0
+    # via pip-tools
+pip-tools==6.0.1
     # via -r requirements_dev.in
 pluggy==0.13.1
     # via pytest
@@ -110,8 +112,10 @@ starkbank-ecdsa==1.1.0
 time-machine==2.1.0
     # via -r requirements_dev.in
 toml==0.10.2
-    # via pytest
-urllib3==1.26.3
+    # via
+    #   pep517
+    #   pytest
+urllib3==1.26.4
     # via
     #   -r ./requirements.txt
     #   requests
