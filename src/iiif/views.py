@@ -2,6 +2,7 @@ import logging
 
 from django.conf import settings
 from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 from ratelimit.decorators import ratelimit
 
@@ -46,15 +47,7 @@ def send_dataportaal_login_url_to_mail(request):
 
         # Send the email
         email_subject = "Toegang bouw- en omgevingsdossiers data.amsterdam.nl"
-        # TODO: Maybe move email text to a template
-        email_body = "Beste gebruiker van data.amsterdam.nl," \
-                     "<br/><br/>Via onderstaande link bent u direct ingelogd op data.amsterdam.nl om de" \
-                     "door u aangevraagde bouw- en omgevingsdossiers in te zien en te" \
-                     "downloaden. Deze link is 24 uur geldig." \
-                     f"<br/><br/><a clicktracking=off href='{login_url}'>Login dataportaal</a>" \
-                     "<br/><br/>Met vriendelijke groet," \
-                     "<br/><br/>Gemeente Amsterdam"
-
+        email_body = render_to_string('login_link.html', {'login_url': login_url})
         # TODO: move actually sending the email to a separate process
         mailing.send_email(payload['email'], email_subject, email_body)
 

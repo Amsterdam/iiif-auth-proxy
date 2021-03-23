@@ -3,6 +3,7 @@ import logging
 import os
 
 from django.conf import settings
+from django.template.loader import render_to_string
 from ingress.consumer.base import BaseConsumer
 
 from iiif import cantaloupe, mailing, object_store, tools, zip_tools
@@ -49,13 +50,8 @@ class ZipConsumer(BaseConsumer):
             expiry_days=settings.TEMP_URL_EXPIRY_DAYS)
 
         # Send the email
-        # TODO: Maybe move email text to a template
         email_subject = "Downloadlink Bouw- en omgevingdossiers"
-        email_body = "Beste gebruiker van data.amsterdam.nl," \
-                     "<br/><br/>U kunt de dossiers downloaden gedurende 7 dagen via deze link:" \
-                     f"<a clicktracking=off href='{temp_zip_download_url}'>download dossiers</a>" \
-                     "<br/><br/>Met vriendelijke groet," \
-                     "<br/><br/>Gemeente Amsterdam"
+        email_body = render_to_string('download_zip.html', {'temp_zip_download_url': temp_zip_download_url})
         mailing.send_email(record['email_address'], email_subject, email_body)
 
         # Cleanup the local zip file and folder with images
