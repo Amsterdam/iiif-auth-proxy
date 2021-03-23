@@ -42,8 +42,8 @@ def send_dataportaal_login_url_to_mail(request):
         parsing.check_email_validity(email)
 
         # Create the login url
-        token = authentication.create_mail_login_token(email, origin_url, settings.JWT_SECRET_KEY)
-        login_url = f"{settings.DATAPORTAAL_LOGIN_BASE_URL}?auth={token}"
+        token = authentication.create_mail_login_token(email, settings.JWT_SECRET_KEY)
+        login_url = origin_url + '?auth=' + token
 
         # Send the email
         email_subject = "Toegang bouw- en omgevingsdossiers data.amsterdam.nl"

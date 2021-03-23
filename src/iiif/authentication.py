@@ -105,7 +105,7 @@ def img_is_public_copyright(metadata, document_barcode):
     return public, copyright1
 
 
-def create_mail_login_token(email_address, origin_url, key, expiry_hours=24):
+def create_mail_login_token(email_address, key, expiry_hours=24):
     """
     Prepare a JSON web token to be used by the dataportaal. A link which includes this token is sent to the
     citizens email address which in turn leads them to the dataportaal. This enables citizens to view images
@@ -115,7 +115,6 @@ def create_mail_login_token(email_address, origin_url, key, expiry_hours=24):
     jwt_payload = {
         'sub': email_address,
         'exp': exp,
-        'scopes': [settings.BOUWDOSSIER_PUBLIC_SCOPE],
-        'origin_url': origin_url,  # Refers to the page from which the user originated. Can be used by the dataportaal to return the user to that same page
+        'scopes': [settings.BOUWDOSSIER_PUBLIC_SCOPE]
     }
     return jwt.encode(jwt_payload, key, algorithm=settings.JWT_ALGORITHM)

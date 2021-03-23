@@ -367,7 +367,7 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
         self.login_link_url = '/iiif/login-link-to-email/'
         self.c = Client()
         self.test_email_address = 'jwttest@amsterdam.nl'
-        self.mail_login_token = create_mail_login_token(self.test_email_address, 'the_return_url', settings.SECRET_KEY)
+        self.mail_login_token = create_mail_login_token(self.test_email_address, settings.SECRET_KEY)
 
     @patch('iiif.mailing.send_email')
     def test_send_dataportaal_login_url_to_burger_email_address(self, mock_send_email):
@@ -481,7 +481,7 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
 
         # Time travel to two days ago so that the jwt token will be invalid
         with time_machine.travel(datetime.now() - timedelta(days=2)):
-            jwt_token = create_mail_login_token(self.test_email_address, 'the_return_url', settings.SECRET_KEY)
+            jwt_token = create_mail_login_token(self.test_email_address, settings.SECRET_KEY)
 
         response = self.c.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + jwt_token)
         self.assertEqual(response.status_code, 401)
@@ -506,7 +506,7 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
             content=IMAGE_BINARY_DATA,
             headers={'Content-Type': 'image/png'}
         )
-        mail_login_token = create_mail_login_token(self.test_email_address, 'the_return_url', 'invalid_key')
+        mail_login_token = create_mail_login_token(self.test_email_address, 'invalid_key')
         response = self.c.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + mail_login_token)
         self.assertEqual(response.status_code, 401)
 
@@ -727,17 +727,15 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(cert, '/tmp/sw444v1912.pem')
 
     def test_get_authentication_jwt(self):
-        token = create_mail_login_token('jwttest@amsterdam.nl', 'http://some.page/', settings.SECRET_KEY)
+        token = create_mail_login_token('jwttest@amsterdam.nl', settings.SECRET_KEY)
         decoded = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
-        self.assertEqual(len(decoded.keys()), 4)
+        self.assertEqual(len(decoded.keys()), 3)
         self.assertIn('exp', decoded.keys())
         self.assertIn('scopes', decoded.keys())
         self.assertIn('sub', decoded.keys())
-        self.assertIn('origin_url', decoded.keys())
         self.assertEqual(decoded['sub'], 'jwttest@amsterdam.nl')
         self.assertEqual(len(decoded['scopes']), 1)
         self.assertEqual(decoded['scopes'][0], settings.BOUWDOSSIER_PUBLIC_SCOPE)
-        self.assertEqual(decoded['origin_url'], 'http://some.page/')
 
     def test_img_is_public_copyright(self):
         metadata = {
@@ -813,7 +811,7 @@ class TestZipEndpoint(TestCase):
         self.c = Client()
         self.BASE_URL = 'https://images.data.amsterdam.nl/iiif/'
         self.test_email_address = 'zip@amsterdam.nl'
-        self.mail_login_token = create_mail_login_token(self.test_email_address, 'the_origin_url', settings.SECRET_KEY)
+        self.mail_login_token = create_mail_login_token(self.test_email_address, settings.SECRET_KEY)
         call_man_command('add_collection', settings.ZIP_COLLECTION_NAME)
         call_man_command('enable_consumer', settings.ZIP_COLLECTION_NAME)
 

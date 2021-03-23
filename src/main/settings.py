@@ -43,7 +43,6 @@ WABO_BASE_URL = os.getenv('WABO_BASE_URL', 'https://conversiestraatwabo.amsterda
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
 JWT_ALGORITHM = 'HS256'
 SENDGRID_KEY = os.getenv('SENDGRID_KEY', 'mock_key')
-DATAPORTAAL_LOGIN_BASE_URL = os.getenv('DATAPORTAAL_LOGIN_BASE_URL', 'https://acc.data.amsterdam.nl/images-mail-login/')
 ZIP_COLLECTION_NAME = 'zip_queue'
 
 
