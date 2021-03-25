@@ -44,7 +44,7 @@ JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
 JWT_ALGORITHM = 'HS256'
 SENDGRID_KEY = os.getenv('SENDGRID_KEY', 'mock_key')
 ZIP_COLLECTION_NAME = 'zip_queue'
-
+LOGIN_ORIGIN_URL_TLD_WHITELIST = ['data.amsterdam.nl', 'acc.data.amsterdam.nl']
 
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
 # This is a test public/private key def and added for testing .

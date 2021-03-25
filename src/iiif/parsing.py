@@ -1,7 +1,9 @@
 import json
 import logging
 import re
+import urllib
 
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotAllowed
 
 from iiif.tools import ImmediateHttpResponse
@@ -108,8 +110,15 @@ def parse_payload(request):
 def check_login_url_payload(payload):
     if not payload.get('email'):
         raise ImmediateHttpResponse(response=HttpResponse("No email found in json", status=400))
+
     if not payload.get('origin_url'):
         raise ImmediateHttpResponse(response=HttpResponse("No origin_url found in json", status=400))
+
+    origin_url_hostname = urllib.parse.urlparse(payload['origin_url']).hostname
+    if origin_url_hostname not in settings.LOGIN_ORIGIN_URL_TLD_WHITELIST:
+        raise ImmediateHttpResponse(
+            response=HttpResponse(f"origin_url must be one of {settings.LOGIN_ORIGIN_URL_TLD_WHITELIST}", status=400))
+
     return payload['email'], payload['origin_url']
 
 

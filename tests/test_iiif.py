@@ -372,7 +372,7 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
     @patch('iiif.mailing.send_email')
     def test_send_dataportaal_login_url_to_burger_email_address(self, mock_send_email):
         mock_send_email.return_value = None  # Prevent it from sending actual emails
-        payload = {'email': 'burger@amsterdam.nl', 'origin_url': 'http://some.page'}
+        payload = {'email': 'burger@amsterdam.nl', 'origin_url': 'https://data.amsterdam.nl'}
         response = self.c.post(self.login_link_url, json.dumps(payload), content_type="application/json")
         self.assertEqual(response.status_code, 200)
 
@@ -401,6 +401,16 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
         # Missing dot
         payload = {'email': 'burger@amsterdamnl'}
         response = self.c.post(self.login_link_url, json.dumps(payload), content_type="application/json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_request_with_missing_origin_url_field_fails(self):
+        payload = json.dumps({'email': 'a@b.c'})
+        response = self.c.post(self.login_link_url, payload, content_type="application/json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_request_with_origin_url_not_in_whitelist_fails(self):
+        payload = json.dumps({'email': 'a@b.c', 'origin_url': 'https://somethingelse.amsterdam.nl'})
+        response = self.c.post(self.login_link_url, payload, content_type="application/json")
         self.assertEqual(response.status_code, 400)
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
