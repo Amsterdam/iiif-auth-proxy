@@ -17,6 +17,7 @@ RESPONSE_CONTENT_INVALID_SCOPE = "Invalid scope"
 RESPONSE_CONTENT_RESTRICTED = "Document access is restricted"
 RESPONSE_CONTENT_NO_TOKEN = "No token supplied"
 RESPONSE_CONTENT_COPYRIGHT = "Document has copyright restriction"
+RESPONSE_CONTENT_RESTRICTED_IN_ZIP = "Restricted documents cannot be requested in a zip"
 
 
 class DocumentNotFoundInMetadataError(Exception):
@@ -80,6 +81,12 @@ def check_file_access_in_metadata(metadata, url_info, scope):
             raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_RESTRICTED, status=401))
     except DocumentNotFoundInMetadataError:
         raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404))
+
+
+def check_restricted_file(metadata, url_info):
+    is_public, has_copyright = img_is_public_copyright(metadata, url_info['document_barcode'])
+    if not is_public:
+        raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_RESTRICTED_IN_ZIP, status=400))
 
 
 def img_is_public_copyright(metadata, document_barcode):

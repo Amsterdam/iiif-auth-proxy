@@ -85,6 +85,7 @@ def request_multiple_files_in_zip(request):
             url_info = parsing.get_url_info(request, iiif_url)
             metadata = get_metadata(url_info, iiif_url)
             authentication.check_file_access_in_metadata(metadata, url_info, scope)
+            authentication.check_restricted_file(metadata, url_info)
             # TODO: Get the file headers to check whether not only the metadata but also the source file itself exists
             #   Alternatively this can be handled when zipping the files
 

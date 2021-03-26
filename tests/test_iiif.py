@@ -1,4 +1,3 @@
-from iiif.zip_tools import create_local_zip_file
 import json
 import logging
 import os
@@ -17,12 +16,20 @@ from django.test import Client, SimpleTestCase, TestCase
 from ingress.models import FailedMessage, Message
 
 from iiif import tools
+from iiif.authentication import (RESPONSE_CONTENT_COPYRIGHT,
+                                 RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
+                                 RESPONSE_CONTENT_NO_TOKEN,
+                                 RESPONSE_CONTENT_RESTRICTED,
+                                 RESPONSE_CONTENT_RESTRICTED_IN_ZIP,
+                                 create_mail_login_token,
+                                 img_is_public_copyright)
+from iiif.cantaloupe import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
+                             create_file_url_and_headers, create_wabo_url)
 from iiif.generate_token import create_authz_token
 from iiif.ingress_zip_consumer import ZipConsumer
-from iiif.authentication import create_mail_login_token, RESPONSE_CONTENT_COPYRIGHT, RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, RESPONSE_CONTENT_NO_TOKEN, RESPONSE_CONTENT_RESTRICTED, img_is_public_copyright, RESPONSE_CONTENT_RESTRICTED
-from iiif.cantaloupe import create_wabo_url, RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE, create_file_url_and_headers
 from iiif.metadata import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
 from iiif.parsing import InvalidIIIFUrlError, get_info_from_iiif_url
+from iiif.zip_tools import create_local_zip_file
 from tests.tools_for_testing import call_man_command
 
 log = logging.getLogger(__name__)
@@ -103,7 +110,6 @@ class FileTestCaseWithAuthz(SimpleTestCase):
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 502)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE)
-
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
@@ -312,7 +318,6 @@ class FileTestCaseWithAuthz(SimpleTestCase):
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
-
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
@@ -979,8 +984,47 @@ class TestZipEndpoint(TestCase):
         )
 
         self.assertEqual(response.status_code, 401)
-
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_RESTRICTED)
+        self.assertEqual(Message.objects.count(), 0)
+
+    @patch('iiif.metadata.do_metadata_request')
+    def test_get_restricted_image_with_restricted_scope_fails(self, mock_get_meta_data):
+        """
+        Because we send the link to the zip file with sendgrid, we cannot send links to
+        restricted files. For this reason we return an error upon requesting a restricted
+        file in a zip, even when the user normally has access to it. Instead, the user
+        has to download restricted files one by one.
+        """
+        # Set up mock metadata response
+        mock_get_meta_data.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_RESTRICTED},
+                    {'barcode': 'SQ10092307', 'access': settings.ACCESS_PUBLIC}
+                ]
+            }
+        )
+
+        # Request two images with extended scope
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(
+            [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
+        response = self.c.post(
+            self.url,
+            json.dumps({
+                'urls': [
+                    self.BASE_URL+PRE_WABO_IMG_URL,
+                    self.BASE_URL+PRE_WABO_IMG_URL_X1
+                ]
+            }),
+            content_type="application/json",
+            ** header
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_RESTRICTED_IN_ZIP)
         self.assertEqual(Message.objects.count(), 0)
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
