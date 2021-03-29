@@ -50,3 +50,5 @@ coverage.xml
 
 # SQLite databse files
 *.sqlite3
+
+docker-compose.override.yml

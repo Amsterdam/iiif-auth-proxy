@@ -18,6 +18,8 @@ cryptography==3.4.6
     # via jwcrypto
 datapunt-authorization-django==1.3.0
     # via -r requirements.in
+datapunt-data-ingress==2.0.3
+    # via -r requirements.in
 django-cors-headers==3.7.0
     # via -r requirements.in
 django-ratelimit==3.0.1
@@ -26,27 +28,36 @@ django==3.1.7
     # via
     #   -r requirements.in
     #   datapunt-authorization-django
+    #   datapunt-data-ingress
     #   django-cors-headers
 idna==2.10
     # via requests
 jwcrypto==0.8
     # via datapunt-authorization-django
+psycopg2-binary==2.8.6
+    # via -r requirements.in
 pycparser==2.20
     # via cffi
 pyjwt==2.0.1
     # via -r requirements.in
 python-http-client==3.3.2
     # via sendgrid
+python-swiftclient==3.11.1
+    # via -r requirements.in
 pytz==2021.1
     # via django
 requests==2.25.1
-    # via datapunt-authorization-django
+    # via
+    #   datapunt-authorization-django
+    #   python-swiftclient
 sendgrid==6.6.0
     # via -r requirements.in
 sentry-sdk==1.0.0
     # via -r requirements.in
 six==1.15.0
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   python-swiftclient
 sqlparse==0.4.1
     # via django
 starkbank-ecdsa==1.1.0
