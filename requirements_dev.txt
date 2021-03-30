@@ -45,6 +45,9 @@ django==3.1.7
     #   datapunt-authorization-django
     #   datapunt-data-ingress
     #   django-cors-headers
+    #   djangorestframework
+djangorestframework==3.12.4
+    # via -r ./requirements.txt
 idna==2.10
     # via
     #   -r ./requirements.txt
