@@ -17,7 +17,7 @@ def get_object_store_connection():
 
 
 def store_object_on_object_store(connection, local_zip_file_path, filename):
-    with open(local_zip_file_path, 'r') as local:
+    with open(local_zip_file_path, 'rb') as local:
         connection.put_object(
             settings.OBJECT_STORE_CONTAINER_NAME,
             filename,
