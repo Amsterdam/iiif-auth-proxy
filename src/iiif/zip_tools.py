@@ -30,7 +30,7 @@ def create_tmp_folder():
 
 
 def save_file_to_folder(folder, filename, content):
-    with open(os.path.join(folder, filename), 'w') as f:
+    with open(os.path.join(folder, filename), 'wb') as f:
         f.write(content)
 
 
