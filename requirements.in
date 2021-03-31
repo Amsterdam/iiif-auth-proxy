@@ -12,3 +12,4 @@ six # Needed by jwcrypto, which mistakenly doesn't include it. PR with fix here:
 psycopg2-binary
 python-swiftclient
 datapunt-data-ingress
+python-keystoneclient  # Although it is not directly imported anywhere, it is needed for the connection with the objectstore to work
