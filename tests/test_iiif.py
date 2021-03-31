@@ -35,7 +35,7 @@ from tests.tools_for_testing import call_man_command
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
 
-IMAGE_BINARY_DATA = "image binary data"
+IMAGE_BINARY_DATA = bytes(10)
 PRE_WABO_IMG_URL = "2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
 PRE_WABO_IMG_URL_X1 = "2/edepot:SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg/full/1000,1000/0/default.jpg"
 PRE_WABO_IMG_URL_X2 = "2/edepot:SQ11426-SQ-file5BAIoi-SQ10092307_00001.jpg/info.json"
@@ -215,15 +215,15 @@ class FileTestCaseWithAuthz(SimpleTestCase):
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+        self.assertEqual(response.content, IMAGE_BINARY_DATA)
 
         response = self.c.get(self.url + PRE_WABO_IMG_URL_X1, **header)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+        self.assertEqual(response.content, IMAGE_BINARY_DATA)
 
         response = self.c.get(self.url + PRE_WABO_IMG_URL_X2, **header)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+        self.assertEqual(response.content, IMAGE_BINARY_DATA)
 
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
@@ -269,7 +269,7 @@ class FileTestCaseWithAuthz(SimpleTestCase):
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+        self.assertEqual(response.content, IMAGE_BINARY_DATA)
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
@@ -292,7 +292,7 @@ class FileTestCaseWithAuthz(SimpleTestCase):
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+        self.assertEqual(response.content, IMAGE_BINARY_DATA)
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
@@ -317,7 +317,7 @@ class FileTestCaseWithAuthz(SimpleTestCase):
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+        self.assertEqual(response.content, IMAGE_BINARY_DATA)
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
@@ -340,7 +340,7 @@ class FileTestCaseWithAuthz(SimpleTestCase):
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+        self.assertEqual(response.content, IMAGE_BINARY_DATA)
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
@@ -363,7 +363,7 @@ class FileTestCaseWithAuthz(SimpleTestCase):
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])}
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+        self.assertEqual(response.content, IMAGE_BINARY_DATA)
 
 
 class FileTestCaseWithMailJWT(SimpleTestCase):
@@ -441,7 +441,7 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
 
         response = self.c.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + self.mail_login_token)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+        self.assertEqual(response.content, IMAGE_BINARY_DATA)
 
         response = self.c.get(self.file_url + PRE_WABO_IMG_URL_X1 + '?auth=' + self.mail_login_token)
         self.assertEqual(response.status_code, 401)
@@ -450,7 +450,7 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
 
         response = self.c.get(self.file_url + PRE_WABO_IMG_URL_X2 + '?auth=' + self.mail_login_token)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), IMAGE_BINARY_DATA)
+        self.assertEqual(response.content, IMAGE_BINARY_DATA)
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')

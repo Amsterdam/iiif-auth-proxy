@@ -30,9 +30,10 @@ def create_tmp_folder():
 
 
 def save_file_to_folder(folder, filename, content):
-    with open(os.path.join(folder, filename), 'w') as f:
+    file_path = os.path.join(folder, filename)
+    open_mode = 'w' if isinstance(content, str) else 'wb'
+    with open(file_path, open_mode) as f:
         f.write(content)
-
 
 def create_local_zip_file(zipjob_uuid, folder_path):
     zip_file_path = os.path.join('/tmp/', f'{zipjob_uuid}.zip')
