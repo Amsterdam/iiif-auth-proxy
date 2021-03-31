@@ -12,4 +12,3 @@ six # Needed by jwcrypto, which mistakenly doesn't include it. PR with fix here:
 psycopg2-binary
 python-swiftclient
 datapunt-data-ingress
-djangorestframework  # Needed because datapunt-data-ingress mistakenly doesn't require it
