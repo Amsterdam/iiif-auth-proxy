@@ -96,6 +96,7 @@ def request_multiple_files_in_zip(request):
             }
 
         except tools.ImmediateHttpResponse as e:
+            log.error(e.response.content)
             return e.response
 
     # The fact that we arrived here means that the the metadata exists for all files, and that the user is allowed to

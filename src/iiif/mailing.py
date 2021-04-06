@@ -4,7 +4,9 @@ import sendgrid
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from sendgrid.helpers.mail import Mail
+from sendgrid.helpers.mail import (ClickTracking, Ganalytics, Mail,
+                                   OpenTracking, SubscriptionTracking,
+                                   TrackingSettings)
 
 log = logging.getLogger(__name__)
 
@@ -19,11 +21,20 @@ def send_email(email_address, email_subject, email_body):
         log.error("No valid email address. Not sending email.")
         return
 
-    sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
     email = Mail(
         from_email='noreply@amsterdam.nl',
         to_emails=[email_address],
         subject=email_subject,
         html_content=email_body
     )
+
+    # Disable all sendgrid tracking
+    tracking_settings = TrackingSettings()
+    tracking_settings.click_tracking = ClickTracking(False)
+    tracking_settings.open_tracking = OpenTracking(False)
+    tracking_settings.subscription_tracking = SubscriptionTracking(False)
+    tracking_settings.ganalytics = Ganalytics(False)
+    email.tracking_settings = tracking_settings
+
+    sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
     sg.send(email)
