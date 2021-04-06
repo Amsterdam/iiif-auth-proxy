@@ -34,8 +34,6 @@ def index(request, iiif_url):
 @csrf_exempt
 @ratelimit(key='ip', rate='3/d')  # TODO: Check django cache settings for rate limiter to work across parallel docker containers
 def send_dataportaal_login_url_to_mail(request):
-    return HttpResponse(status=401)  # Panic solution because mistakes were made upstream
-
     try:
         # Some basic sanity checks
         parsing.check_for_post(request)
