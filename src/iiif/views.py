@@ -1,9 +1,11 @@
+import json
 import logging
 
 from django.conf import settings
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
+from ingress.models import Collection, Message
 from ratelimit.decorators import ratelimit
 
 from iiif import authentication, cantaloupe, mailing, parsing, tools, zip_tools
@@ -45,11 +47,17 @@ def send_dataportaal_login_url_to_mail(request):
         token = authentication.create_mail_login_token(email, settings.JWT_SECRET_KEY)
         login_url = origin_url + '?auth=' + token
 
-        # Send the email
-        email_subject = "Toegang bouw- en omgevingsdossiers data.amsterdam.nl"
-        email_body = render_to_string('login_link.html', {'login_url': login_url})
-        # TODO: move actually sending the email to a separate process
-        mailing.send_email(payload['email'], email_subject, email_body)
+        # Store a job to send the email
+        email_info = {
+            'email': payload['email'],
+            'subject': "Toegang bouw- en omgevingsdossiers data.amsterdam.nl",
+            'body': render_to_string('login_link.html', {'login_url': login_url}),
+        }
+        collection = Collection.objects.get(name=settings.EMAIL_COLLECTION_NAME)
+        Message.objects.create(
+            raw_data=json.dumps(email_info),
+            collection=collection
+        )
 
     except tools.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in login_url:")

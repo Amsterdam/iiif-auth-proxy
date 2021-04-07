@@ -15,7 +15,6 @@ from django.conf import settings
 from django.test import Client, SimpleTestCase, TestCase
 from ingress.models import FailedMessage, Message
 
-from iiif import tools
 from iiif.authentication import (RESPONSE_CONTENT_COPYRIGHT,
                                  RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
                                  RESPONSE_CONTENT_NO_TOKEN,
@@ -26,6 +25,7 @@ from iiif.authentication import (RESPONSE_CONTENT_COPYRIGHT,
 from iiif.cantaloupe import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
                              create_file_url_and_headers, create_wabo_url)
 from iiif.generate_token import create_authz_token
+from iiif.ingress_email_consumer import EmailConsumer
 from iiif.ingress_zip_consumer import ZipConsumer
 from iiif.metadata import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
 from iiif.parsing import InvalidIIIFUrlError, get_info_from_iiif_url
@@ -366,20 +366,32 @@ class FileTestCaseWithAuthz(SimpleTestCase):
         self.assertEqual(response.content, IMAGE_BINARY_DATA)
 
 
-class FileTestCaseWithMailJWT(SimpleTestCase):
+class FileTestCaseWithMailJWT(TestCase):
     def setUp(self):
         self.file_url = '/iiif/'
         self.login_link_url = '/iiif/login-link-to-email/'
         self.c = Client()
         self.test_email_address = 'jwttest@amsterdam.nl'
         self.mail_login_token = create_mail_login_token(self.test_email_address, settings.SECRET_KEY)
+        call_man_command('add_collection', settings.EMAIL_COLLECTION_NAME)
+        call_man_command('enable_consumer', settings.EMAIL_COLLECTION_NAME)
 
     @patch('iiif.mailing.send_email')
     def test_send_dataportaal_login_url_to_burger_email_address(self, mock_send_email):
         mock_send_email.return_value = None  # Prevent it from sending actual emails
         payload = {'email': 'burger@amsterdam.nl', 'origin_url': 'https://data.amsterdam.nl'}
         response = self.c.post(self.login_link_url, json.dumps(payload), content_type="application/json")
+
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(Message.objects.count(), 1)
+
+        # Then run the parser
+        parser = EmailConsumer()
+        parser.consume(end_at_empty_queue=True)
+
+        # Test whether the records in the ingress queue are correctly set to consumed
+        self.assertEqual(Message.objects.count(), 0)
+        self.assertEqual(FailedMessage.objects.count(), 0)
 
     def test_login_url_to_burger_fails_on_other_than_post(self):
         response = self.c.get(self.login_link_url)

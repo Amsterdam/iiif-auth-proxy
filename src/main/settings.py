@@ -44,6 +44,7 @@ JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
 JWT_ALGORITHM = 'HS256'
 SENDGRID_KEY = os.getenv('SENDGRID_KEY', 'mock_key')
 ZIP_COLLECTION_NAME = 'zip_queue'
+EMAIL_COLLECTION_NAME = 'email_queue'
 LOGIN_ORIGIN_URL_TLD_WHITELIST = ['data.amsterdam.nl', 'acc.data.amsterdam.nl']
 
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
@@ -93,6 +94,7 @@ TEMP_URL_EXPIRY_DAYS = 7
 
 INGRESS_CONSUMER_CLASSES = [
     'iiif.ingress_zip_consumer.ZipConsumer',  # worker to zip files, upload to object store and email user
+    'iiif.ingress_email_consumer.EmailConsumer',  # worker to send login emails to citizens
 ]
 
 INSTALLED_APPS = [
