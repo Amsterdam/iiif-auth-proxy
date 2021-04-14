@@ -16,9 +16,10 @@ log = logging.getLogger(__name__)
 def index(request, iiif_url):
     try:
         authentication.check_auth_availability(request)
-        mail_jwt_token = authentication.read_out_mail_jwt_token(request)
+        mail_jwt_token, is_mail_login = authentication.read_out_mail_jwt_token(request)
         scope = authentication.get_max_scope(request, mail_jwt_token)
         url_info = parsing.get_url_info(request, iiif_url)
+        authentication.check_wabo_for_mail_login(is_mail_login, url_info)
         metadata = get_metadata(url_info, iiif_url)
         authentication.check_file_access_in_metadata(metadata, url_info, scope)
         file_response, file_url = cantaloupe.get_file(request.META, url_info, iiif_url, metadata)
@@ -65,7 +66,7 @@ def request_multiple_files_in_zip(request):
     try:
         parsing.check_for_post(request)
         authentication.check_auth_availability(request)
-        read_jwt_token = authentication.read_out_mail_jwt_token(request)
+        read_jwt_token, is_mail_login = authentication.read_out_mail_jwt_token(request)
         scope = authentication.get_max_scope(request, read_jwt_token)
         email_address = parsing.get_email_address(request, read_jwt_token)
         payload = parsing.parse_payload(request)
@@ -83,6 +84,7 @@ def request_multiple_files_in_zip(request):
         try:
             iiif_url = parsing.strip_full_iiif_url(url)
             url_info = parsing.get_url_info(request, iiif_url)
+            authentication.check_wabo_for_mail_login(is_mail_login, url_info)
             metadata = get_metadata(url_info, iiif_url)
             authentication.check_file_access_in_metadata(metadata, url_info, scope)
             authentication.check_restricted_file(metadata, url_info)
