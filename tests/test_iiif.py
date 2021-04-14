@@ -15,10 +15,10 @@ from django.conf import settings
 from django.test import Client, SimpleTestCase, TestCase
 from ingress.models import FailedMessage, Message
 
-from iiif import tools
 from iiif.authentication import (RESPONSE_CONTENT_COPYRIGHT,
                                  RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
                                  RESPONSE_CONTENT_NO_TOKEN,
+                                 RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN,
                                  RESPONSE_CONTENT_RESTRICTED,
                                  RESPONSE_CONTENT_RESTRICTED_IN_ZIP,
                                  create_mail_login_token,
@@ -53,8 +53,7 @@ class MockResponse:
         return self.json_content
 
 
-# We're using SimpleTestCase because the normal TestCase fails because it checks for a DB connection (which is not used)
-class FileTestCaseWithAuthz(SimpleTestCase):
+class FileTestCaseWithAuthz(TestCase):
     def setUp(self):
         self.url = '/iiif/'
         self.c = Client()
@@ -224,7 +223,6 @@ class FileTestCaseWithAuthz(SimpleTestCase):
         response = self.c.get(self.url + PRE_WABO_IMG_URL_X2, **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, IMAGE_BINARY_DATA)
-
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
@@ -521,9 +519,15 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
             content=IMAGE_BINARY_DATA,
             headers={'Content-Type': 'image/png'}
         )
+
         mail_login_token = create_mail_login_token(self.test_email_address, 'invalid_key')
         response = self.c.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + mail_login_token)
         self.assertEqual(response.status_code, 401)
+
+    def test_get_wabo_image_with_mail_login_fails(self):
+        response = self.c.get(self.file_url + WABO_IMG_URL + '?auth=' + self.mail_login_token)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN)
 
 
 class ToolsTestCase(SimpleTestCase):
@@ -954,6 +958,23 @@ class TestZipEndpoint(TestCase):
         )
 
         self.assertEqual(response.status_code, 400)
+
+    def test_get_wabo_image_with_mail_login_fails(self):
+        # Request two images of which one is a WABO image
+        response = self.c.post(
+            self.url + '?auth=' + self.mail_login_token,
+            json.dumps({
+                'urls': [
+                    self.BASE_URL+WABO_IMG_URL,
+                    self.BASE_URL+PRE_WABO_IMG_URL
+                ]
+            }),
+            content_type="application/json"
+        )
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN)
+        self.assertEqual(Message.objects.count(), 0)
 
 
     @patch('iiif.metadata.do_metadata_request')
