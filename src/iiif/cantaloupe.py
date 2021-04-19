@@ -114,6 +114,10 @@ def download_files_for_zip(record):
 
     # Get all the source files and put them in a folder to be zipped afterwards
     for i, (iiif_url, info) in enumerate(record['urls'].items()):
+
+        # Tell cantaloupe we want the full image
+        iiif_url += '/full/full/0/default.jpg'
+
         info_txt_contents += f"{iiif_url}: "
         try:
             file_response, file_url = get_file(
