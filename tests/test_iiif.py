@@ -416,6 +416,13 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
         response = self.c.post(self.login_link_url, payload, content_type="application/json")
         self.assertEqual(response.status_code, 400)
 
+    @patch('iiif.mailing.send_email')
+    def test_request_with_localhost_and_port_in_origin_url_succeeds(self, mock_send_email):
+        mock_send_email.return_value = None  # Prevent it from sending actual emails
+        payload = {'email': 'burger@amsterdam.nl', 'origin_url': 'https://localhost:8000/something'}
+        response = self.c.post(self.login_link_url, json.dumps(payload), content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
     def test_get_public_image_with_read_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
