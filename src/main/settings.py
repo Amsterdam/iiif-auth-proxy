@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+from distutils.util import strtobool
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -45,6 +46,9 @@ JWT_ALGORITHM = 'HS256'
 SENDGRID_KEY = os.getenv('SENDGRID_KEY', 'mock_key')
 ZIP_COLLECTION_NAME = 'zip_queue'
 LOGIN_ORIGIN_URL_TLD_WHITELIST = ['data.amsterdam.nl', 'acc.data.amsterdam.nl']
+if strtobool(os.getenv('ALLOW_LOCALHOST_LOGIN_URL', 'false')):
+    LOGIN_ORIGIN_URL_TLD_WHITELIST += ['localhost', '127.0.0.1']
+
 
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
 # This is a test public/private key def and added for testing .
@@ -94,6 +98,7 @@ TEMP_URL_EXPIRY_DAYS = 7
 INGRESS_CONSUMER_CLASSES = [
     'iiif.ingress_zip_consumer.ZipConsumer',  # worker to zip files, upload to object store and email user
 ]
+INGRESS_DISABLE_ALL_AUTH_PERMISSION_CHECKS = True  # No endpoint is used, so no checks are needed
 
 INSTALLED_APPS = [
     'django.contrib.auth',
