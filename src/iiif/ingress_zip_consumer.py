@@ -6,7 +6,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from ingress.consumer.base import BaseConsumer
 
-from iiif import cantaloupe, mailing, object_store, tools, zip_tools
+from iiif import cantaloupe, mailing, object_store, zip_tools
 from main import settings
 
 log = logging.getLogger(__name__)
