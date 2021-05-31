@@ -6,7 +6,7 @@
 #
 asgiref==3.3.4
     # via django
-certifi==2020.12.5
+certifi==2021.5.30
     # via
     #   requests
     #   sentry-sdk
@@ -54,7 +54,7 @@ netaddr==0.8.0
     # via
     #   oslo.config
     #   oslo.utils
-netifaces==0.10.9
+netifaces==0.11.0
     # via oslo.utils
 os-service-types==1.7.0
     # via keystoneauth1
@@ -136,7 +136,7 @@ stevedore==3.3.0
     #   keystoneauth1
     #   oslo.config
     #   python-keystoneclient
-urllib3==1.26.4
+urllib3==1.26.5
     # via
     #   requests
     #   sentry-sdk

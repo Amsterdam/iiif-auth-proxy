@@ -10,7 +10,7 @@ asgiref==3.3.4
     #   django
 attrs==21.2.0
     # via pytest
-certifi==2020.12.5
+certifi==2021.5.30
     # via
     #   -r ./requirements.txt
     #   requests
@@ -23,7 +23,7 @@ chardet==4.0.0
     # via
     #   -r ./requirements.txt
     #   requests
-click==8.0.0
+click==8.0.1
     # via pip-tools
 coverage[toml]==5.5
     # via pytest-cov
@@ -84,7 +84,7 @@ netaddr==0.8.0
     #   -r ./requirements.txt
     #   oslo.config
     #   oslo.utils
-netifaces==0.10.9
+netifaces==0.11.0
     # via
     #   -r ./requirements.txt
     #   oslo.utils
@@ -223,7 +223,7 @@ toml==0.10.2
     #   coverage
     #   pep517
     #   pytest
-urllib3==1.26.4
+urllib3==1.26.5
     # via
     #   -r ./requirements.txt
     #   requests
