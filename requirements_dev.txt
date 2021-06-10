@@ -45,7 +45,7 @@ django-cors-headers==3.7.0
     # via -r ./requirements.txt
 django-ratelimit==3.0.1
     # via -r ./requirements.txt
-django==3.2.3
+django==3.2.4
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
