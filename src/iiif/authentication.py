@@ -57,13 +57,18 @@ def read_out_mail_jwt_token(request):
 
 
 def get_max_scope(request, mail_jwt_token):
-    # request.get_token_scopes gets the authz tokens
-    # mail_jwt_token['scopes'] = jwt tokens which non-ambtenaren get in their email
+    # request.get_token_scopes gets the authz or keycloak tokens.
+    # mail_jwt_token['scopes'] get the in-url token which non-ambtenaren get in their email
+    #
+    # In case of an authz token a list is returned: https://github.com/Amsterdam/authorization_django/blob/97194d7a61deb25ac30ad2954bc913cc6ec28887/authorization_django/middleware.py#L159
+    # but in case of a keycloak token a set is returned: https://github.com/Amsterdam/authorization_django/blob/97194d7a61deb25ac30ad2954bc913cc6ec28887/authorization_django/middleware.py#L166
+    # So to not breaking adding a set with a list, below we always convert both structures to a list.
+
     if settings.DATAPUNT_AUTHZ["ALWAYS_OK"]:
         scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
-    elif settings.BOUWDOSSIER_EXTENDED_SCOPE in request.get_token_scopes + mail_jwt_token.get('scopes', []):
+    elif settings.BOUWDOSSIER_EXTENDED_SCOPE in list(request.get_token_scopes) + list(mail_jwt_token.get('scopes', [])):
         scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
-    elif settings.BOUWDOSSIER_READ_SCOPE in request.get_token_scopes + mail_jwt_token.get('scopes', []):
+    elif settings.BOUWDOSSIER_READ_SCOPE in list(request.get_token_scopes) + list(mail_jwt_token.get('scopes', [])):
         scope = settings.BOUWDOSSIER_READ_SCOPE
     elif settings.BOUWDOSSIER_PUBLIC_SCOPE in mail_jwt_token.get('scopes', []):
         scope = settings.BOUWDOSSIER_PUBLIC_SCOPE
