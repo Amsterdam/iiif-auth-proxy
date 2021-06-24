@@ -838,29 +838,31 @@ class ToolsTestCase(SimpleTestCase):
         shutil.rmtree(unzip_folder)
 
     def test_get_email_address(self):
-        Request = namedtuple('Request', 'get_token_subject')
-        request = Request(get_token_subject=self.test_email_address)
+        Request = namedtuple('Request', 'get_token_subject, get_token_claims')
 
         # test getting the email address from the authz token
+        request = Request(get_token_subject=self.test_email_address, get_token_claims={})
         self.assertEqual(
-            get_email_address(request, {'sub': 'a@a.a', 'email': 'b@b.b'}),
+            get_email_address(request, {'sub': 'a@a.a'}),
             self.test_email_address
         )
 
         # test getting the email address from the email login link jwt token
-        request = Request(get_token_subject=None)
+        request = Request(get_token_subject=None, get_token_claims={})
         self.assertEqual(
-            get_email_address(request, {'sub': self.test_email_address, 'email': 'b@b.b'}),
+            get_email_address(request, {'sub': self.test_email_address}),
             self.test_email_address
         )
 
         # test getting the email address from the keycloak token
+        request = Request(get_token_subject=None, get_token_claims={'email': self.test_email_address})
         self.assertEqual(
-            get_email_address(request, {'sub': 'other str', 'email': self.test_email_address}),
+            get_email_address(request, {'sub': 'other str'}),
             self.test_email_address
         )
 
         # test getting no email address from any token
+        request = Request(get_token_subject=None, get_token_claims={})
         self.assertRaises(ImmediateHttpResponse, get_email_address, request, {'sub': 'other str'})
 
 
