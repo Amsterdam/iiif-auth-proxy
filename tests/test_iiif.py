@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import shutil
+from collections import namedtuple
 from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
@@ -28,7 +29,9 @@ from iiif.cantaloupe import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
 from iiif.generate_token import create_authz_token
 from iiif.ingress_zip_consumer import ZipConsumer
 from iiif.metadata import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
-from iiif.parsing import InvalidIIIFUrlError, get_info_from_iiif_url
+from iiif.parsing import (InvalidIIIFUrlError, get_email_address,
+                          get_info_from_iiif_url)
+from iiif.tools import ImmediateHttpResponse
 from iiif.zip_tools import create_local_zip_file
 from tests.tools_for_testing import call_man_command
 
@@ -539,6 +542,9 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
 
 
 class ToolsTestCase(SimpleTestCase):
+    def setUp(self):
+        self.test_email_address = 'toolstest@amsterdam.nl'
+
     def test_get_info_from_pre_wabo_url_vanilla(self):
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL, False)
         self.assertEqual(url_info['source'], "edepot")
@@ -830,6 +836,32 @@ class ToolsTestCase(SimpleTestCase):
         shutil.rmtree(folder_path)
         os.remove(f'/tmp/{uuid}.zip')
         shutil.rmtree(unzip_folder)
+
+    def test_get_email_address(self):
+        Request = namedtuple('Request', 'get_token_subject')
+        request = Request(get_token_subject=self.test_email_address)
+
+        # test getting the email address from the authz token
+        self.assertEqual(
+            get_email_address(request, {'sub': 'a@a.a', 'email': 'b@b.b'}),
+            self.test_email_address
+        )
+
+        # test getting the email address from the email login link jwt token
+        request = Request(get_token_subject=None)
+        self.assertEqual(
+            get_email_address(request, {'sub': self.test_email_address, 'email': 'b@b.b'}),
+            self.test_email_address
+        )
+
+        # test getting the email address from the keycloak token
+        self.assertEqual(
+            get_email_address(request, {'sub': 'other str', 'email': self.test_email_address}),
+            self.test_email_address
+        )
+
+        # test getting no email address from any token
+        self.assertRaises(ImmediateHttpResponse, get_email_address, request, {'sub': 'other str'})
 
 
 class TestZipEndpoint(TestCase):
