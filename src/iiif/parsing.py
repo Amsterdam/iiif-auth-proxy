@@ -85,9 +85,11 @@ def get_email_address(request, jwt_token):
         email_address = request.get_token_subject
     elif '@' in jwt_token.get('sub', ''):
         email_address = jwt_token['sub']
+    elif '@' in request.get_token_claims.get('email', ''):
+        email_address = request.get_token_claims['email']
 
     if email_address is None:
-        raise ImmediateHttpResponse(response=HttpResponse("No sub (email address) found in tokens", status=400))
+        raise ImmediateHttpResponse(response=HttpResponse("No email address found in tokens", status=400))
 
     return email_address
 
