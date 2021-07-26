@@ -48,15 +48,21 @@ def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
             headers['X-Forwarded-Port'] = http_host[1]
 
     if url_info['source'] == 'edepot':
-        # If the iiif url contains a reference to dossier like SQ1421 without - then
-        # this was added to ad reference to stadsdeel and dossiernumber and it should be removed
-        iiif_url_edepot = re.sub(r":[A-Z]+\d+-", ":", iiif_url)
-        if iiif_url_edepot != iiif_url:
-            headers['X-Forwarded-ID'] = iiif_url.split('/')[1]
-        iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url_edepot}"
-        return iiif_image_url, headers, ()
+        if url_info['source_file']:
+            # This means that in order to avoid any file conversions we're bypassing cantaloupe
+            # and going directly to the source server to get the raw file and serve that
+            url = settings.EDEPOT_BASE_URL + url_info['filename'].replace('-', '/')
+            return url, {'Authorization': settings.HCP_AUTHORIZATION}, ()
+        else:
+            # If the iiif url contains a reference to dossier like SQ1421 without - then
+            # this was added to ad reference to stadsdeel and dossiernumber and it should be removed
+            iiif_url_edepot = re.sub(r":[A-Z]+\d+-", ":", iiif_url)
+            if iiif_url_edepot != iiif_url:
+                headers['X-Forwarded-ID'] = iiif_url.split('/')[1]
+            iiif_image_url = f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url_edepot}"
+            return iiif_image_url, headers, ()
     elif url_info['source'] == 'wabo':
-        if url_info['source_file'] == True:
+        if url_info['source_file']:
             # This means that in order to avoid any file conversions we're bypassing cantaloupe
             # and going directly to the source server to get the raw file and serve that
             wabo_url = create_wabo_url(url_info, metadata)

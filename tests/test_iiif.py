@@ -646,7 +646,7 @@ class ToolsTestCase(SimpleTestCase):
         # pre-wabo with no headers
         url, headers, cert = create_file_url_and_headers(
             {},
-            {'source': 'edepot'},
+            {'source': 'edepot', 'source_file': False},
             PRE_WABO_IMG_URL,
             metadata
         )
@@ -657,7 +657,7 @@ class ToolsTestCase(SimpleTestCase):
         # pre-wabo with one header (which we expect to not be used)
         url, headers, cert = create_file_url_and_headers(
             {'HTTP_X_FORWARDED_PROTO': 'a'},
-            {'source': 'edepot'},
+            {'source': 'edepot', 'source_file': False},
             PRE_WABO_IMG_URL,
             metadata
         )
@@ -668,7 +668,7 @@ class ToolsTestCase(SimpleTestCase):
         # pre-wabo with one header (which we expect to not be used)
         url, headers, cert = create_file_url_and_headers(
             {'HTTP_X_FORWARDED_HOST': 'a'},
-            {'source': 'edepot'},
+            {'source': 'edepot', 'source_file': False},
             PRE_WABO_IMG_URL,
             metadata
         )
@@ -679,7 +679,7 @@ class ToolsTestCase(SimpleTestCase):
         # pre-wabo with both forwarded headers (which we both expect to be used)
         url, headers, cert = create_file_url_and_headers(
             {'HTTP_X_FORWARDED_PROTO': 'proto', 'HTTP_X_FORWARDED_HOST': 'host'},
-            {'source': 'edepot'},
+            {'source': 'edepot', 'source_file': False},
             PRE_WABO_IMG_URL,
             metadata
         )
@@ -688,10 +688,21 @@ class ToolsTestCase(SimpleTestCase):
         self.assertEqual(headers['X-Forwarded-Host'], 'host')
         self.assertEqual(cert, ())
 
+        # pre-wabo with source_file set to true
+        url, headers, cert = create_file_url_and_headers(
+            {},
+            {'source': 'edepot', 'source_file': True, 'filename': 'ST-00015-ST00000126_00001.jpg'},
+            PRE_WABO_IMG_URL,
+            metadata
+        )
+        self.assertEqual(url, f"{settings.EDEPOT_BASE_URL}ST/00015/ST00000126_00001.jpg")
+        self.assertEqual(headers['Authorization'], settings.HCP_AUTHORIZATION)
+        self.assertEqual(cert, ())
+
         # pre-wabo with other structure 1
         url, headers, cert = create_file_url_and_headers(
             {},
-            {'source': 'edepot'},
+            {'source': 'edepot', 'source_file': False},
             PRE_WABO_IMG_URL_X1,
             metadata
         )
@@ -701,7 +712,7 @@ class ToolsTestCase(SimpleTestCase):
         # pre-wabo with other structure 2
         url, headers, cert = create_file_url_and_headers(
             {},
-            {'source': 'edepot'},
+            {'source': 'edepot', 'source_file': False},
             PRE_WABO_IMG_URL_X2,
             metadata
         )
