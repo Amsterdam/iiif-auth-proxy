@@ -82,7 +82,7 @@ def get_image_from_iiif_server(file_url, headers, cert, verify=True):
 
 def get_file(request_meta, url_info, iiif_url, metadata):
     # If we need to get an edepot source file directly from the stadsarchief we need to disable
-    # certificate checks until they've managed to fix the certificates.
+    # certificate checks because the wildcard cert doesn't include the host name.
     # TODO: remove this once the cert is fixed
     verify = True
     if url_info['source'] == 'edepot' and url_info['source_file']:
