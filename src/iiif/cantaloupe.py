@@ -76,15 +76,22 @@ def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
             return iiif_image_url, headers, ()
 
 
-def get_image_from_iiif_server(file_url, headers, cert):
-    return requests.get(file_url, headers=headers, cert=cert)
+def get_image_from_iiif_server(file_url, headers, cert, verify=True):
+    return requests.get(file_url, headers=headers, cert=cert, verify=verify)
 
 
 def get_file(request_meta, url_info, iiif_url, metadata):
+    # If we need to get an edepot source file directly from the stadsarchief we need to disable
+    # certificate checks because the wildcard cert doesn't include the host name.
+    # TODO: remove this once the cert is fixed
+    verify = True
+    if url_info['source'] == 'edepot' and url_info['source_file']:
+        verify = False
+
     # Get the file itself
     file_url, headers, cert = create_file_url_and_headers(request_meta, url_info, iiif_url, metadata)
     try:
-        file_response = get_image_from_iiif_server(file_url, headers, cert)
+        file_response = get_image_from_iiif_server(file_url, headers, cert, verify)
     except RequestException as e:
         log.error(
             f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE} "
