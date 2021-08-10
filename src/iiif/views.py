@@ -20,7 +20,7 @@ def index(request, iiif_url):
         scope = authentication.get_max_scope(request, mail_jwt_token)
         url_info = parsing.get_url_info(request, iiif_url)
         authentication.check_wabo_for_mail_login(is_mail_login, url_info)
-        metadata = get_metadata(url_info, iiif_url)
+        metadata = get_metadata(url_info, iiif_url, request.META.get('HTTP_AUTHORIZATION'))
         authentication.check_file_access_in_metadata(metadata, url_info, scope)
         file_response, file_url = cantaloupe.get_file(request.META, url_info, iiif_url, metadata)
         cantaloupe.handle_file_response_errors(file_response, file_url)
@@ -85,11 +85,11 @@ def request_multiple_files_in_zip(request):
             iiif_url = parsing.strip_full_iiif_url(url)
             url_info = parsing.get_url_info(request, iiif_url)
             authentication.check_wabo_for_mail_login(is_mail_login, url_info)
-            metadata = get_metadata(url_info, iiif_url)
+            metadata = get_metadata(url_info, iiif_url, request.META.get('HTTP_AUTHORIZATION'))
             authentication.check_file_access_in_metadata(metadata, url_info, scope)
             authentication.check_restricted_file(metadata, url_info)
             # TODO: Get the file headers to check whether not only the metadata but also the source file itself exists
-            #   Alternatively this can be handled when zipping the files
+            #   Currently this is handled when zipping the files
 
             # We create a new dict with all the info so that we have it when we want to get and zip the files later
             zip_info['urls'][iiif_url] = {

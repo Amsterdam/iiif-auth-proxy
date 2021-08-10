@@ -5,7 +5,7 @@ import shutil
 from collections import namedtuple
 from datetime import datetime, timedelta
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 from uuid import uuid4
 from zipfile import ZipFile
 
@@ -56,6 +56,20 @@ class MockResponse:
         return self.json_content
 
 
+# MOCK_KEYCLOAK_TOKEN = "Bearer " + create_authz_token(
+#             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])
+#
+# def mock_do_metadata_request(url_info, keycloak_token):
+#     assert keycloak_token == MOCK_KEYCLOAK_TOKEN
+#     return MockResponse(
+#         200,
+#         json_content={
+#             'access': settings.ACCESS_RESTRICTED,
+#             'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}]
+#         }
+#     )
+
+
 class TestFileRetrievalWithAuthz(TestCase):
     def setUp(self):
         self.url = '/iiif/'
@@ -90,6 +104,36 @@ class TestFileRetrievalWithAuthz(TestCase):
         response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA)
+
+    # @patch('iiif.metadata.do_metadata_request', side_effect=mock_do_metadata_request)
+    # def test_keycloak_token_is_passed_on_to_metadata_server(self, mock_do_metadata_request):
+    #     header = {'HTTP_AUTHORIZATION': MOCK_KEYCLOAK_TOKEN}
+    #     response = self.c.get(self.url + WABO_IMG_URL, **header)
+
+
+    @patch('iiif.cantaloupe.get_image_from_iiif_server')
+    @patch('iiif.metadata.do_metadata_request')
+    def test_keycloak_token_is_sent_to_metadata_server(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+        # Setting up mocks
+        mock_do_metadata_request.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_RESTRICTED,
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_RESTRICTED}]
+            }
+        )
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA,
+            headers={}
+        )
+
+        mock_token = "Bearer " + create_authz_token([settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])
+        header = {'HTTP_AUTHORIZATION': mock_token}
+        response = self.c.get(self.url + WABO_IMG_URL, **header)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, IMAGE_BINARY_DATA)
+        mock_do_metadata_request.assert_called_with(ANY, mock_token)
 
     def test_get_image_when_metadata_server_is_not_available(self):
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
