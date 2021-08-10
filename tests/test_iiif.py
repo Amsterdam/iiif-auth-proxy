@@ -56,7 +56,7 @@ class MockResponse:
         return self.json_content
 
 
-class FileTestCaseWithAuthz(TestCase):
+class TestFileRetrievalWithAuthz(TestCase):
     def setUp(self):
         self.url = '/iiif/'
         self.c = Client()
@@ -72,9 +72,9 @@ class FileTestCaseWithAuthz(TestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_image_which_does_not_exist_in_metadata(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_image_which_does_not_exist_in_metadata(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -98,9 +98,9 @@ class FileTestCaseWithAuthz(TestCase):
         self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER)
 
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_image_when_cantaloupe_server_is_not_available(self, mock_get_meta_data):
+    def test_get_image_when_cantaloupe_server_is_not_available(self, mock_do_metadata_request):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -115,9 +115,9 @@ class FileTestCaseWithAuthz(TestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_without_token(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_public_image_without_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -135,9 +135,9 @@ class FileTestCaseWithAuthz(TestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_without_token(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_without_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_RESTRICTED,
@@ -155,9 +155,9 @@ class FileTestCaseWithAuthz(TestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_in_public_dossier_without_token(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_in_public_dossier_without_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -175,9 +175,9 @@ class FileTestCaseWithAuthz(TestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_in_restricted_dossier_without_token(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_public_image_in_restricted_dossier_without_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_RESTRICTED,
@@ -195,9 +195,9 @@ class FileTestCaseWithAuthz(TestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_read_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_read_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -229,9 +229,9 @@ class FileTestCaseWithAuthz(TestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_with_read_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_with_read_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_RESTRICTED,
@@ -251,9 +251,9 @@ class FileTestCaseWithAuthz(TestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_extended_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_extended_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -274,9 +274,9 @@ class FileTestCaseWithAuthz(TestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_with_extended_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_with_extended_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_RESTRICTED,
@@ -298,10 +298,10 @@ class FileTestCaseWithAuthz(TestCase):
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
     def test_get_public_dossier_and_restricted_image_with_extended_scope(
-            self, mock_get_meta_data, mock_get_image_from_iiif_server
+            self, mock_do_metadata_request, mock_get_image_from_iiif_server
     ):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -323,9 +323,9 @@ class FileTestCaseWithAuthz(TestCase):
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
     def test_get_public_image_with_only_extended_scope_and_no_read_scope(
-            self, mock_get_meta_data, mock_get_image_from_iiif_server):
+            self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -346,9 +346,9 @@ class FileTestCaseWithAuthz(TestCase):
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
     def test_get_restricted_image_with_only_extended_scope_and_no_read_scope(
-            self, mock_get_meta_data, mock_get_image_from_iiif_server):
+            self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_RESTRICTED,
@@ -429,9 +429,9 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_read_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_read_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -463,9 +463,9 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_with_read_scope(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_with_read_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_RESTRICTED,
@@ -484,9 +484,9 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_expired_token(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_expired_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -512,9 +512,9 @@ class FileTestCaseWithMailJWT(SimpleTestCase):
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_invalid_token_signature(self, mock_get_meta_data, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_invalid_token_signature(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
         # Setting up mocks
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -888,9 +888,9 @@ class TestZipEndpoint(TestCase):
         call_man_command('enable_consumer', settings.ZIP_COLLECTION_NAME)
 
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_jwt_token(self, mock_get_meta_data):
+    def test_get_public_image_with_jwt_token(self, mock_do_metadata_request):
         # Set up mock metadata response
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -922,9 +922,9 @@ class TestZipEndpoint(TestCase):
         self.assertIn('request_meta', data)
 
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_authz_token(self, mock_get_meta_data):
+    def test_get_public_image_with_authz_token(self, mock_do_metadata_request):
         # Set up mock metadata response
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -1031,9 +1031,9 @@ class TestZipEndpoint(TestCase):
 
 
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_with_read_scope_fails(self, mock_get_meta_data):
+    def test_get_restricted_image_with_read_scope_fails(self, mock_do_metadata_request):
         # Set up mock metadata response
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -1062,7 +1062,7 @@ class TestZipEndpoint(TestCase):
         self.assertEqual(Message.objects.count(), 0)
 
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_with_restricted_scope_fails(self, mock_get_meta_data):
+    def test_get_restricted_image_with_restricted_scope_fails(self, mock_do_metadata_request):
         """
         Because we send the link to the zip file with sendgrid, we cannot send links to
         restricted files. For this reason we return an error upon requesting a restricted
@@ -1070,7 +1070,7 @@ class TestZipEndpoint(TestCase):
         has to download restricted files one by one.
         """
         # Set up mock metadata response
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
@@ -1111,14 +1111,14 @@ class TestZipEndpoint(TestCase):
             mock_cleanup_local_files,
             mock_send_email,
             mock_store_object_on_object_store,
-            mock_get_meta_data,
+            mock_do_metadata_request,
             mock_get_image_from_iiif_server
     ):
         # Setting up mocks
         mock_cleanup_local_files.return_value = None
         mock_send_email.return_value = None
         mock_store_object_on_object_store.return_value = None
-        mock_get_meta_data.return_value = MockResponse(
+        mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
                 'access': settings.ACCESS_PUBLIC,
