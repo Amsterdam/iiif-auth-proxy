@@ -12,18 +12,25 @@ log = logging.getLogger(__name__)
 RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER = "The iiif-metadata-server cannot be reached"
 
 
-def do_metadata_request(url_info):
+def do_metadata_request(url_info, keycloak_token):
     # Test with:
     # curl -i -H "Accept: application/json" http://iiif-metadata-server-api.service.consul:8183/iiif-metadata/bouwdossier/SA85385/
     metadata_url = f"{settings.STADSARCHIEF_META_SERVER_BASE_URL}:" \
                    f"{settings.STADSARCHIEF_META_SERVER_PORT}/iiif-metadata/bouwdossier/{url_info['stadsdeel']}{url_info['dossier']}/"
-    return requests.get(metadata_url)
+
+    # Metadata for restricted images can only be retrieved by ambtenaren with VTH clearances (the extended scope). So
+    # in case there's a keycloak token available we send it along to the metadata server.
+    headers = {}
+    if keycloak_token:
+        headers['Authorization'] = keycloak_token
+
+    return requests.get(metadata_url, headers=headers)
 
 
-def get_metadata(url_info, iiif_url):
+def get_metadata(url_info, iiif_url, keycloak_token):
     # Get the image metadata from the metadata server
     try:
-        meta_response = do_metadata_request(url_info)
+        meta_response = do_metadata_request(url_info, keycloak_token)
     except RequestException as e:
         log.error(
             f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER} "

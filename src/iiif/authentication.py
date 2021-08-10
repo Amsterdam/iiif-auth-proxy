@@ -27,7 +27,7 @@ class DocumentNotFoundInMetadataError(Exception):
 
 def check_auth_availability(request):
     if not request.META.get('HTTP_AUTHORIZATION') and not request.GET.get('auth') and not settings.DATAPUNT_AUTHZ['ALWAYS_OK']:
-        return HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
+        raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401))
 
 
 def read_out_mail_jwt_token(request):
