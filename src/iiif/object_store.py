@@ -21,7 +21,7 @@ def store_object_on_object_store(connection, local_zip_file_path, filename):
         connection.put_object(
             settings.OBJECT_STORE_CONTAINER_NAME,
             filename,
-            contents=local.read(),
+            contents=local,
             content_type='application/zip'
         )
 
