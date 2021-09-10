@@ -45,10 +45,6 @@ deprecated==1.2.12
     # via
     #   -r ./requirements.txt
     #   jwcrypto
-django-cors-headers==3.7.0
-    # via -r ./requirements.txt
-django-ratelimit==3.0.1
-    # via -r ./requirements.txt
 django==3.2.6
     # via
     #   -r ./requirements.txt
@@ -56,6 +52,10 @@ django==3.2.6
     #   datapunt-data-ingress
     #   django-cors-headers
     #   djangorestframework
+django-cors-headers==3.7.0
+    # via -r ./requirements.txt
+django-ratelimit==3.0.1
+    # via -r ./requirements.txt
 djangorestframework==3.12.4
     # via
     #   -r ./requirements.txt
@@ -152,15 +152,15 @@ pyparsing==2.4.7
     #   -r ./requirements.txt
     #   oslo.utils
     #   packaging
-pytest-cov==2.12.1
-    # via -r requirements_dev.in
-pytest-django==4.4.0
-    # via -r requirements_dev.in
 pytest==6.2.4
     # via
     #   -r requirements_dev.in
     #   pytest-cov
     #   pytest-django
+pytest-cov==2.12.1
+    # via -r requirements_dev.in
+pytest-django==4.4.0
+    # via -r requirements_dev.in
 python-dateutil==2.8.2
     # via time-machine
 python-http-client==3.3.2
@@ -207,7 +207,7 @@ six==1.16.0
     #   python-dateutil
     #   python-keystoneclient
     #   python-swiftclient
-sqlparse==0.4.1
+sqlparse==0.4.2
     # via
     #   -r ./requirements.txt
     #   django
