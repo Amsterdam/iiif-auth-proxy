@@ -60,5 +60,5 @@ class ZipConsumer(BaseConsumer):
             zip_tools.cleanup_local_files(zip_file_path, tmp_folder_path)
 
         except Exception as e:
-            log.error("ingress_zip_consumer_error:", e)
+            log.exception("ingress_zip_consumer_error:", e)
             raise e
