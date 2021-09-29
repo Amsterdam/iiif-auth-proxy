@@ -27,6 +27,7 @@ class ZipConsumer(BaseConsumer):
     set_consume_started_at = True
 
     def consume_raw_data(self, raw_data):
+        log.info("Started consume_raw_data")
         try:
             record = json.loads(raw_data)
 
