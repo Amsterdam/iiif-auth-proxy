@@ -46,14 +46,14 @@ def create_object_store_temp_url(connection, file_name, expiry_minutes=0, expiry
 
 
 def remove_old_zips_from_object_store(logger=None):
-    if logger:
-        log = logger
+    if logger is None:
+        logger = log
 
     conn = get_object_store_connection()
 
     # Get list of files from the object store
     headers, files = conn.get_container(settings.OBJECT_STORE_CONTAINER_NAME)
-    log.info(f"Checking {headers['x-container-object-count']} files for removal")
+    logger.info(f"Checking {headers['x-container-object-count']} files for removal")
 
     # Loop over files on object store and remove the old ones
     removed_counter = 0
@@ -63,12 +63,12 @@ def remove_old_zips_from_object_store(logger=None):
         if file_age.days > settings.TEMP_URL_EXPIRY_DAYS:
             try:
                 conn.delete_object(settings.OBJECT_STORE_CONTAINER_NAME, file['name'])
-                log.info(f"Removed {file['name']}")
+                logger.info(f"Removed {file['name']}")
                 removed_counter += 1
             except ClientException as e:
-                log.error(f"Failed to remove {file['name']} with error: {e}")
+                logger.error(f"Failed to remove {file['name']} with error: {e}")
                 failed_counter += 1
 
-    log.info(f"\nSuccessfully removed {removed_counter} old files from the object store.\n")
+    logger.info(f"\nSuccessfully removed {removed_counter} old files from the object store.\n")
     if failed_counter:
-        log.info(f"\nFAILED removing {failed_counter} old files from the object store.\n")
+        logger.info(f"\nFAILED removing {failed_counter} old files from the object store.\n")
