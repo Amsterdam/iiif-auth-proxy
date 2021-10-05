@@ -45,7 +45,10 @@ def create_object_store_temp_url(connection, file_name, expiry_minutes=0, expiry
     return url
 
 
-def remove_old_zips_from_object_store():
+def remove_old_zips_from_object_store(logger=None):
+    if logger:
+        log = logger
+
     conn = get_object_store_connection()
 
     # Get list of files from the object store
