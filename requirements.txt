@@ -27,10 +27,6 @@ debtcollector==2.3.0
     #   python-keystoneclient
 deprecated==1.2.13
     # via jwcrypto
-django-cors-headers==3.10.0
-    # via -r requirements.in
-django-ratelimit==3.0.1
-    # via -r requirements.in
 django==3.2.8
     # via
     #   -r requirements.in
@@ -38,6 +34,10 @@ django==3.2.8
     #   datapunt-data-ingress
     #   django-cors-headers
     #   djangorestframework
+django-cors-headers==3.10.0
+    # via -r requirements.in
+django-ratelimit==3.0.1
+    # via -r requirements.in
 djangorestframework==3.12.4
     # via datapunt-data-ingress
 idna==3.3
@@ -130,7 +130,7 @@ six==1.16.0
     #   python-swiftclient
 sqlparse==0.4.2
     # via django
-starkbank-ecdsa==2.0.0
+starkbank-ecdsa==2.0.1
     # via sendgrid
 stevedore==3.4.0
     # via
