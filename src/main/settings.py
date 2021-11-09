@@ -74,7 +74,7 @@ JWKS_TEST_KEY = """
 """
 
 USE_JWKS_TEST_KEY = os.getenv('USE_JWKS_TEST_KEY', 'false').lower() == 'true'
-PUB_JWKS = JWKS_TEST_KEY if not os.getenv('PUB_JWKS') and USE_JWKS_TEST_KEY else os.getenv('PUB_JWKS')
+PUB_JWKS = JWKS_TEST_KEY if USE_JWKS_TEST_KEY else os.getenv('PUB_JWKS')
 
 DATAPUNT_AUTHZ = {
     # 'ALWAYS_OK': True if DEBUG else False,  # disable authz. tests will fail...
