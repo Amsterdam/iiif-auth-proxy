@@ -73,10 +73,13 @@ JWKS_TEST_KEY = """
     }
 """
 
+USE_JWKS_TEST_KEY = os.getenv('USE_JWKS_TEST_KEY', 'false').lower() == 'true'
+PUB_JWKS = JWKS_TEST_KEY if USE_JWKS_TEST_KEY else os.getenv('PUB_JWKS')
+
 DATAPUNT_AUTHZ = {
     # 'ALWAYS_OK': True if DEBUG else False,  # disable authz. tests will fail...
     'ALWAYS_OK': False,
-    'JWKS': os.getenv('PUB_JWKS', JWKS_TEST_KEY),
+    'JWKS': PUB_JWKS,
     "JWKS_URL": os.getenv("KEYCLOAK_JWKS_URL"),
     'FORCED_ANONYMOUS_ROUTES': ['/status/health']
 }
