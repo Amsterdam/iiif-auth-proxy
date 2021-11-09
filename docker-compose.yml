@@ -23,6 +23,8 @@ services:
       SECRET_KEY: 'insecure'
       JWT_SECRET_KEY: 'insecure'
       START_STUNNEL: 'false'
+      DEBUG: 'true'
+      USE_JWKS_TEST_KEY: 'true'
       IIIF_IMAGE_SERVER_WABO_CERT: dGhlIGNvbnRlbnRzIG9mIHRoZSBjZXJ0IGZpbGU=  # This says "the contents of the cert file"
 
   dev:
