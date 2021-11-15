@@ -1,4 +1,25 @@
 version: "3.5"
+
+x-app: &base-app
+  build:
+    context: .
+    target: app
+  depends_on:
+    - database
+  volumes:
+    - ./src:/src
+    - ./tests:/tests
+    - ./deploy:/deploy
+  ports:
+    - "8000:8000"
+  environment: &base-app-env
+    SECRET_KEY: 'insecure'
+    JWT_SECRET_KEY: 'insecure'
+    START_STUNNEL: 'false'
+    DEBUG: 'true'
+    USE_JWKS_TEST_KEY: 'true'
+    IIIF_IMAGE_SERVER_WABO_CERT: dGhlIGNvbnRlbnRzIG9mIHRoZSBjZXJ0IGZpbGU=  # This says "the contents of the cert file"
+
 services:
   database:
     image: amsterdam/postgres11
@@ -6,26 +27,6 @@ services:
       POSTGRES_DB: iiif_auth_proxy
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: dev
-
-  x-app: &base-app
-    build:
-      context: .
-      target: app
-    depends_on:
-      - database
-    volumes:
-      - ./src:/src
-      - ./tests:/tests
-      - ./deploy:/deploy
-    ports:
-      - "8000:8000"
-    environment: &base-app-env
-      SECRET_KEY: 'insecure'
-      JWT_SECRET_KEY: 'insecure'
-      START_STUNNEL: 'false'
-      DEBUG: 'true'
-      USE_JWKS_TEST_KEY: 'true'
-      IIIF_IMAGE_SERVER_WABO_CERT: dGhlIGNvbnRlbnRzIG9mIHRoZSBjZXJ0IGZpbGU=  # This says "the contents of the cert file"
 
   dev:
     <<: *base-app
