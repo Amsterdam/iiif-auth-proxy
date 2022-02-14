@@ -10,7 +10,7 @@ asgiref==3.5.0
     #   django
 attrs==21.4.0
     # via pytest
-backports.zoneinfo==0.2.1
+backports-zoneinfo==0.2.1
     # via
     #   -r ./requirements.txt
     #   django
@@ -23,13 +23,13 @@ cffi==1.15.0
     # via
     #   -r ./requirements.txt
     #   cryptography
-charset-normalizer==2.0.10
+charset-normalizer==2.0.12
     # via
     #   -r ./requirements.txt
     #   requests
 click==8.0.3
     # via pip-tools
-coverage[toml]==6.2
+coverage[toml]==6.3.1
     # via pytest-cov
 cryptography==36.0.1
     # via
@@ -42,14 +42,14 @@ datapunt-data-ingress==2.3.0
 debtcollector==2.4.0
     # via
     #   -r ./requirements.txt
-    #   oslo.config
-    #   oslo.utils
+    #   oslo-config
+    #   oslo-utils
     #   python-keystoneclient
 deprecated==1.2.13
     # via
     #   -r ./requirements.txt
     #   jwcrypto
-django==4.0.1
+django==4.0.2
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
@@ -74,7 +74,7 @@ iso8601==1.0.2
     # via
     #   -r ./requirements.txt
     #   keystoneauth1
-    #   oslo.utils
+    #   oslo-utils
 jwcrypto==1.0
     # via
     #   -r ./requirements.txt
@@ -86,58 +86,58 @@ keystoneauth1==4.4.0
 msgpack==1.0.3
     # via
     #   -r ./requirements.txt
-    #   oslo.serialization
+    #   oslo-serialization
 netaddr==0.8.0
     # via
     #   -r ./requirements.txt
-    #   oslo.config
-    #   oslo.utils
+    #   oslo-config
+    #   oslo-utils
 netifaces==0.11.0
     # via
     #   -r ./requirements.txt
-    #   oslo.utils
+    #   oslo-utils
 os-service-types==1.7.0
     # via
     #   -r ./requirements.txt
     #   keystoneauth1
-oslo.config==8.7.1
+oslo-config==8.7.1
     # via
     #   -r ./requirements.txt
     #   python-keystoneclient
-oslo.i18n==5.1.0
+oslo-i18n==5.1.0
     # via
     #   -r ./requirements.txt
-    #   oslo.config
-    #   oslo.utils
+    #   oslo-config
+    #   oslo-utils
     #   python-keystoneclient
-oslo.serialization==4.2.0
+oslo-serialization==4.2.0
     # via
     #   -r ./requirements.txt
     #   python-keystoneclient
-oslo.utils==4.12.1
+oslo-utils==4.12.1
     # via
     #   -r ./requirements.txt
-    #   oslo.serialization
+    #   oslo-serialization
     #   python-keystoneclient
 packaging==21.3
     # via
     #   -r ./requirements.txt
-    #   oslo.utils
+    #   oslo-utils
     #   pytest
-pbr==5.8.0
+pbr==5.8.1
     # via
     #   -r ./requirements.txt
     #   debtcollector
     #   keystoneauth1
     #   os-service-types
-    #   oslo.i18n
-    #   oslo.serialization
-    #   oslo.utils
+    #   oslo-i18n
+    #   oslo-serialization
+    #   oslo-utils
     #   python-keystoneclient
     #   stevedore
 pep517==0.12.0
     # via pip-tools
-pip-tools==6.4.0
+pip-tools==6.5.1
     # via -r requirements_dev.in
 pluggy==1.0.0
     # via pytest
@@ -154,9 +154,9 @@ pyjwt==2.3.0
 pyparsing==3.0.7
     # via
     #   -r ./requirements.txt
-    #   oslo.utils
+    #   oslo-utils
     #   packaging
-pytest==6.2.5
+pytest==7.0.1
     # via
     #   -r requirements_dev.in
     #   pytest-cov
@@ -167,7 +167,7 @@ pytest-django==4.5.2
     # via -r requirements_dev.in
 python-dateutil==2.8.2
     # via time-machine
-python-http-client==3.3.5
+python-http-client==3.3.6
     # via
     #   -r ./requirements.txt
     #   sendgrid
@@ -179,27 +179,27 @@ pytz==2021.3
     # via
     #   -r ./requirements.txt
     #   djangorestframework
-    #   oslo.serialization
-    #   oslo.utils
+    #   oslo-serialization
+    #   oslo-utils
 pyyaml==6.0
     # via
     #   -r ./requirements.txt
-    #   oslo.config
+    #   oslo-config
 requests==2.27.1
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
     #   keystoneauth1
-    #   oslo.config
+    #   oslo-config
     #   python-keystoneclient
     #   python-swiftclient
 rfc3986==2.0.0
     # via
     #   -r ./requirements.txt
-    #   oslo.config
-sendgrid==6.9.4
+    #   oslo-config
+sendgrid==6.9.6
     # via -r ./requirements.txt
-sentry-sdk==1.5.3
+sentry-sdk==1.5.5
     # via -r ./requirements.txt
 six==1.16.0
     # via
@@ -220,16 +220,15 @@ stevedore==3.5.0
     # via
     #   -r ./requirements.txt
     #   keystoneauth1
-    #   oslo.config
+    #   oslo-config
     #   python-keystoneclient
 time-machine==2.6.0
     # via -r requirements_dev.in
-toml==0.10.2
-    # via pytest
-tomli==2.0.0
+tomli==2.0.1
     # via
     #   coverage
     #   pep517
+    #   pytest
 urllib3==1.26.8
     # via
     #   -r ./requirements.txt
