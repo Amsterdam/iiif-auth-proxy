@@ -134,7 +134,7 @@ def download_files_for_zip(record):
         info_txt_contents += f"{iiif_url}: "
 
         if info['fail_reason']:
-            info_txt_contents += f"Not included in this zip because {info['fail_reason']}"
+            info_txt_contents += f"Not included in this zip because {info['fail_reason']}\n"
             continue
 
         try:
