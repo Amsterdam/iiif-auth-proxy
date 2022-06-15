@@ -18,7 +18,7 @@ def index(request, iiif_url):
         authentication.check_auth_availability(request)
         mail_jwt_token, is_mail_login = authentication.read_out_mail_jwt_token(request)
         scope = authentication.get_max_scope(request, mail_jwt_token)
-        url_info = parsing.get_url_info(request, iiif_url)
+        url_info = parsing.get_url_info(iiif_url, tools.str_to_bool(request.GET.get('source_file')))
         authentication.check_wabo_for_mail_login(is_mail_login, url_info)
         metadata = get_metadata(url_info, iiif_url, request.META.get('HTTP_AUTHORIZATION'))
         authentication.check_file_access_in_metadata(metadata, url_info, scope)
@@ -78,31 +78,27 @@ def request_multiple_files_in_zip(request):
     zip_info = {
         'email_address': email_address,
         'request_meta': request.META,
-        'urls': {}
+        'urls': {},
+        'scope': scope,
+        'is_mail_login': is_mail_login,
     }
-    for url in payload['urls']:
+    for full_url in payload['urls']:
         try:
-            iiif_url = parsing.strip_full_iiif_url(url)
-            url_info = parsing.get_url_info(request, iiif_url)
+            iiif_url = parsing.strip_full_iiif_url(full_url)
+            url_info = parsing.get_url_info(iiif_url, tools.str_to_bool(request.GET.get('source_file')))
             authentication.check_wabo_for_mail_login(is_mail_login, url_info)
-            metadata = get_metadata(url_info, iiif_url, request.META.get('HTTP_AUTHORIZATION'))
-            authentication.check_file_access_in_metadata(metadata, url_info, scope)
-            authentication.check_restricted_file(metadata, url_info)
-            # TODO: Get the file headers to check whether not only the metadata but also the source file itself exists
-            #   Currently this is handled when zipping the files
 
             # We create a new dict with all the info so that we have it when we want to get and zip the files later
-            zip_info['urls'][iiif_url] = {
-                'url_info': url_info,
-                'metadata': metadata,
-            }
+            zip_info['urls'][iiif_url] = {'url_info': url_info}
 
         except tools.ImmediateHttpResponse as e:
             log.error(e.response.content)
             return e.response
 
-    # The fact that we arrived here means that the the metadata exists for all files, and that the user is allowed to
-    # access all the files. We proceed with storing it as a zip job so that a zip worker can pick it up.
+    # The fact that we arrived here means that urls are formatted correctly and the info is extracted from it.
+    # It does NOT mean that the metadata exists or that the user is allowed to access all the files. This will
+    # be checked in the consumer. We now proceed with storing the info as a zip job so that a zip worker
+    # can pick it up.
     zip_tools.store_zip_job(zip_info)
 
     # Respond with a 200 to signal success.

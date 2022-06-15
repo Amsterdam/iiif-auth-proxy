@@ -1055,7 +1055,12 @@ class TestZipEndpoint(TestCase):
 
 
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_with_read_scope_fails(self, mock_do_metadata_request):
+    def test_request_restricted_image_with_read_scope_succeeds(self, mock_do_metadata_request):
+        """
+        It is possible to request a restricted image with a read scope, but it should fail
+        when the consumer is run. This is tested in the consumer tests below.
+        """
+
         # Set up mock metadata response
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -1081,18 +1086,22 @@ class TestZipEndpoint(TestCase):
             content_type="application/json"
         )
 
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_RESTRICTED)
-        self.assertEqual(Message.objects.count(), 0)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Message.objects.count(), 1)
 
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_with_restricted_scope_fails(self, mock_do_metadata_request):
+    def test_get_restricted_image_with_restricted_scope_succeeds(self, mock_do_metadata_request):
         """
         Because we send the link to the zip file with sendgrid, we cannot send links to
-        restricted files. For this reason we return an error upon requesting a restricted
-        file in a zip, even when the user normally has access to it. Instead, the user
-        has to download restricted files one by one.
+        restricted files. Since checking the metadata for all requested files gives problems
+        when dealing with very large dossiers (thousands of files) we check this in the
+        consumer stage. So when restricted images are requested we give back a 200 but
+        fail in the conumer stage.
+
+        Note that this should not happen in practice, since the frontend also checks whether
+        restricted files are requested and informs the user that they cannot be requested.
         """
+
         # Set up mock metadata response
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -1121,9 +1130,8 @@ class TestZipEndpoint(TestCase):
             ** header
         )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.content.decode("utf-8"), RESPONSE_CONTENT_RESTRICTED_IN_ZIP)
-        self.assertEqual(Message.objects.count(), 0)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Message.objects.count(), 1)
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
@@ -1194,3 +1202,94 @@ class TestZipEndpoint(TestCase):
         # Cleanup so that other tests are not influenced
         shutil.rmtree(os.path.join('/tmp/', tmp_contents[0]))
         os.remove(os.path.join('/tmp/', tmp_contents[1]))
+
+    @patch('iiif.cantaloupe.get_image_from_iiif_server')
+    @patch('iiif.metadata.do_metadata_request')
+    @patch('iiif.object_store.store_object_on_object_store')
+    @patch('iiif.mailing.send_email')
+    @patch('iiif.zip_tools.cleanup_local_files')
+    def test_consumer_get_restricted_image_with_read_scope_fails(
+            self,
+            mock_cleanup_local_files,
+            mock_send_email,
+            mock_store_object_on_object_store,
+            mock_do_metadata_request,
+            mock_get_image_from_iiif_server
+    ):
+        # Setting up mocks
+        mock_cleanup_local_files.return_value = None
+        mock_send_email.return_value = None
+        mock_store_object_on_object_store.return_value = None
+        mock_do_metadata_request.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [
+                    {'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC},
+                    {'barcode': 'SQ10079651', 'access': settings.ACCESS_RESTRICTED},
+                    {'barcode': 'SQ10092307', 'access': settings.ACCESS_RESTRICTED}
+                ]
+            }
+        )
+        mock_get_image_from_iiif_server.return_value = MockResponse(
+            200,
+            content=IMAGE_BINARY_DATA,
+            headers={'Content-Type': 'image/png'}
+        )
+
+        # Request some images in a zip
+        response = self.c.post(
+            self.url + '?auth=' + self.mail_login_token,
+            json.dumps({
+                'urls': [
+                    self.BASE_URL + PRE_WABO_IMG_URL,
+                    self.BASE_URL + PRE_WABO_IMG_URL_X1
+                ]
+            }),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Message.objects.count(), 1)
+
+        # Then run the parser
+        parser = ZipConsumer()
+        parser.consume(end_at_empty_queue=True)
+
+        # Test whether the records in the ingress queue are correctly set to consumed
+        self.assertEqual(Message.objects.filter(consume_succeeded_at__isnull=False).count(), 1)
+        self.assertEqual(FailedMessage.objects.count(), 0)
+        for ingress in Message.objects.all():
+            self.assertIsNotNone(ingress.consume_started_at)
+            self.assertIsNotNone(ingress.consume_succeeded_at)
+
+        # Check whether the newly created zip file exists
+        tmp_contents = sorted(os.listdir('/tmp/'))  # Sorting it so the first is the folder and the second the zip
+        self.assertEqual(len(tmp_contents), 2)
+        self.assertTrue(os.path.isdir(os.path.join('/tmp/', tmp_contents[0])))
+        self.assertTrue(os.path.isfile(os.path.join('/tmp/', tmp_contents[1])))
+        self.assertEqual(tmp_contents[0] + '.zip', tmp_contents[1])
+
+        # Check whether the zip contains one image file and one report.txt
+        files = os.listdir(f'/tmp/{tmp_contents[0]}')
+
+        # Check whether the report.txt contains info about the missing restrictions
+        with open(f'/tmp/{tmp_contents[0]}/report.txt', 'r') as f:
+            expected = '2/edepot:SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg/full/1000,1000/0/default.jpg/full/full/0/default.jpg: Not included in this zip because Document access is restricted'
+            self.assertTrue(f.readlines()[-1].endswith(expected))
+
+        # Cleanup so that other tests are not influenced
+        shutil.rmtree(os.path.join('/tmp/', tmp_contents[0]))
+        os.remove(os.path.join('/tmp/', tmp_contents[1]))
+
+    def test_consumer_get_restricted_image_with_restricted_scope_fails(self):
+        """
+        Because we send the link to the zip file with sendgrid, we cannot send links to
+        restricted files. For this reason the consumer should not include restricted files.
+
+        Note that this should not happen in practice, since the frontend also checks whether
+        restricted files are requested and informs the user that they cannot be requested.
+
+        """
+        pass
+
+        # TODO: Check whether the report.txt contains info about the reason for the missing file
