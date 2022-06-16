@@ -392,7 +392,7 @@ class TestFileRetrievalWithAuthz:
         assert response.content == IMAGE_BINARY_DATA
 
 
-class FileTestCaseWithMailJWT:
+class TestFileRetrievalWithMailJWT:
     def setup_method(self):
         self.file_url = '/iiif/'
         self.login_link_url = '/iiif/login-link-to-email/'
@@ -566,7 +566,7 @@ class FileTestCaseWithMailJWT:
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN
 
 
-class ToolsTestCase:
+class TestTools:
     def setup_method(self):
         self.test_email_address = 'toolstest@amsterdam.nl'
 
