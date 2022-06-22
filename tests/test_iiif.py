@@ -1136,23 +1136,25 @@ class TestZipEndpoint:
     @patch('iiif.mailing.send_email')
     @patch('iiif.zip_tools.cleanup_local_files')
     @pytest.mark.parametrize(
-        "scope, second_image_access, expected",
+        "scope, second_image_access, expected_line_end, expected_files",
         [
             (
                 settings.BOUWDOSSIER_READ_SCOPE,
                 settings.ACCESS_RESTRICTED,
                 f'Not included in this zip because {RESPONSE_CONTENT_RESTRICTED}',
+                2,  # The first file and the report.txt
             ),
-
             (
                 settings.BOUWDOSSIER_EXTENDED_SCOPE,
                 settings.ACCESS_RESTRICTED,
                 f'Not included in this zip because {RESPONSE_CONTENT_RESTRICTED_IN_ZIP}',
+                2,  # The first file and the report.txt
             ),
             (
                 settings.BOUWDOSSIER_READ_SCOPE,
                 settings.ACCESS_PUBLIC,
                 'included',
+                3,  # Both files and the report.txt
             ),
         ],
     )
@@ -1165,7 +1167,8 @@ class TestZipEndpoint:
             mock_get_image_from_iiif_server,
             scope,
             second_image_access,
-            expected
+            expected_line_end,
+            expected_files
     ):
         # Setting up mocks
         mock_cleanup_local_files.return_value = None
@@ -1223,12 +1226,13 @@ class TestZipEndpoint:
         assert os.path.isfile(os.path.join('/tmp/', tmp_contents[1]))
         assert tmp_contents[0] + '.zip' == tmp_contents[1]
 
-        # Check whether the zip contains one image file and one report.txt
+        # Check whether the zip contains the expected number of files
         files = os.listdir(f'/tmp/{tmp_contents[0]}')
+        assert len(files) == expected_files
 
         # Check whether the report.txt contains info about the missing restrictions
         with open(f'/tmp/{tmp_contents[0]}/report.txt', 'r') as f:
-            assert f.readlines()[-1].endswith(expected + "\n")
+            assert f.readlines()[-1].endswith(expected_line_end + "\n")
 
         # Cleanup so that other tests are not influenced
         shutil.rmtree(os.path.join('/tmp/', tmp_contents[0]))

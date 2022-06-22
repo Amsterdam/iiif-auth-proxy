@@ -145,8 +145,8 @@ def download_files_for_zip(record):
             info_txt_contents += f"Not included in this zip because an error occurred " \
                                  f"while getting it from the source system\n"
             continue
-        except Exception as e:
-            log.error(f"Error while retrieving {iiif_url} from the source system: {e}")
+        except Exception:
+            log.exception(f"Exception while retrieving {iiif_url} from the source system.")
             info_txt_contents += f"Not included in this zip because an error occurred " \
                                  f"while getting it from the source system\n"
             continue
