@@ -1,12 +1,15 @@
 import json
 import logging
 import os
+from urllib.parse import parse_qs, urlparse
 
 from django.conf import settings
 from django.template.loader import render_to_string
 from ingress.consumer.base import BaseConsumer
 
-from iiif import cantaloupe, mailing, object_store, zip_tools
+from iiif import (authentication, cantaloupe, mailing, metadata, object_store,
+                  parsing, tools, zip_tools)
+from iiif.tools import str_to_bool
 from main import settings
 
 log = logging.getLogger(__name__)
@@ -30,6 +33,19 @@ class ZipConsumer(BaseConsumer):
         log.info("Started consume_raw_data")
         try:
             record = json.loads(raw_data)
+
+            # Get metadata and check file access
+            for iiif_url, image_info in record['urls'].items():
+                fail_reason = None
+                url_metadata = metadata.get_metadata(image_info['url_info'], iiif_url, record['request_meta'].get('HTTP_AUTHORIZATION'))
+                try:
+                    authentication.check_file_access_in_metadata(url_metadata, image_info['url_info'], record['scope'])
+                    authentication.check_restricted_file(url_metadata, image_info['url_info'])
+                except tools.ImmediateHttpResponse as e:
+                    fail_reason = e.response.content.decode('utf-8')
+                record['urls'][iiif_url]['metadata'] = url_metadata
+                record['urls'][iiif_url]['fail_reason'] = fail_reason
+
 
             # Download all the files from the source systems through cantaloupe
             tmp_folder_path, info_txt_contents, zipjob_uuid = cantaloupe.download_files_for_zip(record)

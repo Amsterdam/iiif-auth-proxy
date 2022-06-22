@@ -132,17 +132,21 @@ def download_files_for_zip(record):
         iiif_url += '/full/full/0/default.jpg'
 
         info_txt_contents += f"{iiif_url}: "
+
+        if info['fail_reason']:
+            info_txt_contents += f"Not included in this zip because {info['fail_reason']}\n"
+            continue
+
         try:
             file_response, file_url = get_file(
                 record['request_meta'], info['url_info'], iiif_url, info['metadata'])
             handle_file_response_errors(file_response, file_url)
         except ImmediateHttpResponse as e:
-            # log.error(f"Error while retrieving {iiif_url} from the source system: {e.response.content}")
             info_txt_contents += f"Not included in this zip because an error occurred " \
                                  f"while getting it from the source system\n"
             continue
-        except Exception as e:
-            # log.error(f"Error while retrieving {iiif_url} from the source system: {e}")
+        except Exception:
+            log.exception(f"Exception while retrieving {iiif_url} from the source system.")
             info_txt_contents += f"Not included in this zip because an error occurred " \
                                  f"while getting it from the source system\n"
             continue

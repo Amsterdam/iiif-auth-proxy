@@ -94,9 +94,9 @@ def get_email_address(request, jwt_token):
     return email_address
 
 
-def get_url_info(request, iiif_url):
+def get_url_info(iiif_url, source_file):
     try:
-        url_info = get_info_from_iiif_url(iiif_url, request.GET.get('source_file') == 'true')
+        url_info = get_info_from_iiif_url(iiif_url, source_file)
     except InvalidIIIFUrlError:
         raise ImmediateHttpResponse(response=HttpResponse("Invalid formatted url", status=400))
     return url_info
