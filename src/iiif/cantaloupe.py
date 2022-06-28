@@ -118,41 +118,42 @@ def handle_file_response_errors(file_response, file_url):
         ))
 
 
-def download_files_for_zip(record):
+def prepare_zip_downloads():
     # Create a tmp folder to store downloaded source files
     zipjob_uuid, tmp_folder_path = zip_tools.create_tmp_folder()
 
     # Init contents of txt info file which is sent along in the zip
     info_txt_contents = "The following files were requested:\n"
 
-    # Get all the source files and put them in a folder to be zipped afterwards
-    for i, (iiif_url, info) in enumerate(record['urls'].items()):
+    return zipjob_uuid, tmp_folder_path, info_txt_contents
 
-        # Tell cantaloupe we want the full image
-        iiif_url += '/full/full/0/default.jpg'
 
-        info_txt_contents += f"{iiif_url}: "
+def download_file_for_zip(iiif_url, info_txt_contents, url_info, fail_reason, metadata, request_meta, tmp_folder_path):
+    # Tell cantaloupe we want the full image
+    iiif_url += '/full/full/0/default.jpg'
 
-        if info['fail_reason']:
-            info_txt_contents += f"Not included in this zip because {info['fail_reason']}\n"
-            continue
+    info_txt_contents += f"{iiif_url}: "
 
-        try:
-            file_response, file_url = get_file(
-                record['request_meta'], info['url_info'], iiif_url, info['metadata'])
-            handle_file_response_errors(file_response, file_url)
-        except ImmediateHttpResponse as e:
-            info_txt_contents += f"Not included in this zip because an error occurred " \
-                                 f"while getting it from the source system\n"
-            continue
-        except Exception:
-            log.exception(f"Exception while retrieving {iiif_url} from the source system.")
-            info_txt_contents += f"Not included in this zip because an error occurred " \
-                                 f"while getting it from the source system\n"
-            continue
+    if fail_reason:
+        info_txt_contents += f"Not included in this zip because {fail_reason}\n"
+        return info_txt_contents
 
-        # Save image file to tmp folder
-        zip_tools.save_file_to_folder(tmp_folder_path, info['url_info']['filename'], file_response.content)
-        info_txt_contents += "included\n"
+    try:
+        file_response, file_url = get_file(
+            request_meta, url_info, iiif_url, metadata)
+        handle_file_response_errors(file_response, file_url)
+    except ImmediateHttpResponse as e:
+        info_txt_contents += f"Not included in this zip because an error occurred " \
+                             f"while getting it from the source system\n"
+        return info_txt_contents
+    except Exception:
+        log.exception(f"Exception while retrieving {iiif_url} from the source system.")
+        info_txt_contents += f"Not included in this zip because an error occurred " \
+                             f"while getting it from the source system\n"
+        return info_txt_contents
 
-    return tmp_folder_path, info_txt_contents, zipjob_uuid
+    # Save image file to tmp folder
+    zip_tools.save_file_to_folder(tmp_folder_path, url_info['filename'], file_response.content)
+    info_txt_contents += "included\n"
+
+    return info_txt_contents

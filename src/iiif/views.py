@@ -20,7 +20,7 @@ def index(request, iiif_url):
         scope = authentication.get_max_scope(request, mail_jwt_token)
         url_info = parsing.get_url_info(iiif_url, tools.str_to_bool(request.GET.get('source_file')))
         authentication.check_wabo_for_mail_login(is_mail_login, url_info)
-        metadata = get_metadata(url_info, iiif_url, request.META.get('HTTP_AUTHORIZATION'))
+        metadata, _ = get_metadata(url_info, iiif_url, request.META.get('HTTP_AUTHORIZATION'), {})
         authentication.check_file_access_in_metadata(metadata, url_info, scope)
         file_response, file_url = cantaloupe.get_file(request.META, url_info, iiif_url, metadata)
         cantaloupe.handle_file_response_errors(file_response, file_url)

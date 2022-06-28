@@ -27,7 +27,13 @@ def do_metadata_request(url_info, keycloak_token):
     return requests.get(metadata_url, headers=headers)
 
 
-def get_metadata(url_info, iiif_url, keycloak_token):
+def get_metadata(url_info, iiif_url, keycloak_token, metadata_cache):
+    # Check whether the metadata is already in the cache
+    cache_key = f"{url_info['stadsdeel']}_{url_info['dossier']}"
+    metadata = metadata_cache.get(cache_key)
+    if metadata:
+        return metadata, metadata_cache
+
     # Get the image metadata from the metadata server
     try:
         meta_response = do_metadata_request(url_info, keycloak_token)
@@ -51,4 +57,8 @@ def get_metadata(url_info, iiif_url, keycloak_token):
         ))
     metadata = meta_response.json()
 
-    return metadata
+    # Store the metadata in the cache so that it can be used while getting many
+    # files for a zip
+    metadata_cache[cache_key] = metadata
+
+    return metadata, metadata_cache

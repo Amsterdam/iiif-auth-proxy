@@ -58,7 +58,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 'filename': relevant_url_part,  # The filename if this file needs to be stored on disc
             }
 
-        elif source == 'wabo':  # = pre-wabo
+        elif source == 'wabo':  # == wabo
             stadsdeel, dossier, olo_and_document = relevant_url_part.split('-', 2)
             olo, document_barcode = olo_and_document.split('_', 1)
             return {

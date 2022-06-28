@@ -1,15 +1,14 @@
 import json
 import logging
 import os
-from urllib.parse import parse_qs, urlparse
 
 from django.conf import settings
 from django.template.loader import render_to_string
 from ingress.consumer.base import BaseConsumer
 
-from iiif import (authentication, cantaloupe, mailing, metadata, object_store,
-                  parsing, tools, zip_tools)
-from iiif.tools import str_to_bool
+from iiif import (authentication, cantaloupe, mailing, object_store, tools,
+                  zip_tools)
+from iiif.metadata import get_metadata
 from main import settings
 
 log = logging.getLogger(__name__)
@@ -34,21 +33,34 @@ class ZipConsumer(BaseConsumer):
         try:
             record = json.loads(raw_data)
 
-            # Get metadata and check file access
+            # Prepare folder and report.txt file for downloads
+            zipjob_uuid, tmp_folder_path, info_txt_contents = cantaloupe.prepare_zip_downloads()
+
+            # Get metadata and files through cantaloupe
+            metadata_cache = {}
             for iiif_url, image_info in record['urls'].items():
                 fail_reason = None
-                url_metadata = metadata.get_metadata(image_info['url_info'], iiif_url, record['request_meta'].get('HTTP_AUTHORIZATION'))
+                metadata, metadata_cache = get_metadata(
+                    image_info['url_info'],
+                    iiif_url,
+                    record['request_meta'].get('HTTP_AUTHORIZATION'),
+                    metadata_cache
+                )
                 try:
-                    authentication.check_file_access_in_metadata(url_metadata, image_info['url_info'], record['scope'])
-                    authentication.check_restricted_file(url_metadata, image_info['url_info'])
+                    authentication.check_file_access_in_metadata(metadata, image_info['url_info'], record['scope'])
+                    authentication.check_restricted_file(metadata, image_info['url_info'])
                 except tools.ImmediateHttpResponse as e:
                     fail_reason = e.response.content.decode('utf-8')
-                record['urls'][iiif_url]['metadata'] = url_metadata
-                record['urls'][iiif_url]['fail_reason'] = fail_reason
 
-
-            # Download all the files from the source systems through cantaloupe
-            tmp_folder_path, info_txt_contents, zipjob_uuid = cantaloupe.download_files_for_zip(record)
+                info_txt_contents = cantaloupe.download_file_for_zip(
+                    iiif_url,
+                    info_txt_contents,
+                    image_info['url_info'],
+                    fail_reason,
+                    metadata,
+                    record['request_meta'],
+                    tmp_folder_path
+                )
 
             # Store the info_file_along_with_the_image_files
             zip_tools.save_file_to_folder(tmp_folder_path, 'report.txt', info_txt_contents)
