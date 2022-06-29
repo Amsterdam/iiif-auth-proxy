@@ -14,7 +14,7 @@ import jwt
 import pytz
 import time_machine
 from django.conf import settings
-from django.test import Client, override_settings
+from django.test import override_settings
 from ingress.models import FailedMessage, Message
 
 from iiif.authentication import (RESPONSE_CONTENT_COPYRIGHT,
@@ -58,22 +58,21 @@ class MockResponse:
 
 
 class TestFileRetrievalWithAuthz:
-    def setup_method(self):
+    def setup(self):
         self.url = '/iiif/'
-        self.c = Client()
 
-    def test_get_image_with_wrongly_formatted_url(self):
+    def test_get_image_with_wrongly_formatted_url(self, client):
         """ Test getting an image with a wrongly formatted url' """
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
-        response = self.c.get(self.url + "wrong_formatted_image_url.jpg", **header)
+        response = client.get(self.url + "wrong_formatted_image_url.jpg", **header)
         assert response.status_code == 400
         assert response.content.decode("utf-8") == "Invalid formatted url"
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_image_which_does_not_exist_in_metadata(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_image_which_does_not_exist_in_metadata(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -88,13 +87,13 @@ class TestFileRetrievalWithAuthz:
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
-        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
         assert response.status_code == 404
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_keycloak_token_is_sent_to_metadata_server(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_keycloak_token_is_sent_to_metadata_server(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -111,19 +110,19 @@ class TestFileRetrievalWithAuthz:
 
         mock_token = "Bearer " + create_authz_token([settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])
         header = {'HTTP_AUTHORIZATION': mock_token}
-        response = self.c.get(self.url + WABO_IMG_URL, **header)
+        response = client.get(self.url + WABO_IMG_URL, **header)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
         mock_do_metadata_request.assert_called_with(ANY, mock_token)
 
-    def test_get_image_when_metadata_server_is_not_available(self):
+    def test_get_image_when_metadata_server_is_not_available(self, client):
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
-        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
         assert response.status_code == 502
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
 
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_image_when_cantaloupe_server_is_not_available(self, mock_do_metadata_request):
+    def test_get_image_when_cantaloupe_server_is_not_available(self, mock_do_metadata_request, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -134,13 +133,13 @@ class TestFileRetrievalWithAuthz:
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
-        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
         assert response.status_code == 502
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_without_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_public_image_without_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -154,13 +153,13 @@ class TestFileRetrievalWithAuthz:
             content=IMAGE_BINARY_DATA
         )
 
-        response = self.c.get(self.url + PRE_WABO_IMG_URL)
+        response = client.get(self.url + PRE_WABO_IMG_URL)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_TOKEN
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_without_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_without_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -174,13 +173,13 @@ class TestFileRetrievalWithAuthz:
             content=IMAGE_BINARY_DATA
         )
 
-        response = self.c.get(self.url + PRE_WABO_IMG_URL)
+        response = client.get(self.url + PRE_WABO_IMG_URL)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_TOKEN
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_in_public_dossier_without_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_in_public_dossier_without_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -194,13 +193,13 @@ class TestFileRetrievalWithAuthz:
             content=IMAGE_BINARY_DATA
         )
 
-        response = self.c.get(self.url + PRE_WABO_IMG_URL)
+        response = client.get(self.url + PRE_WABO_IMG_URL)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_TOKEN
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_in_restricted_dossier_without_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_public_image_in_restricted_dossier_without_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -214,13 +213,13 @@ class TestFileRetrievalWithAuthz:
             content=IMAGE_BINARY_DATA
         )
 
-        response = self.c.get(self.url + PRE_WABO_IMG_URL)
+        response = client.get(self.url + PRE_WABO_IMG_URL)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_TOKEN
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_read_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_read_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -240,21 +239,21 @@ class TestFileRetrievalWithAuthz:
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
-        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
-        response = self.c.get(self.url + PRE_WABO_IMG_URL_X1, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL_X1, **header)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
-        response = self.c.get(self.url + PRE_WABO_IMG_URL_X2, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL_X2, **header)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_with_read_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_with_read_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -270,13 +269,13 @@ class TestFileRetrievalWithAuthz:
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
-        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_RESTRICTED
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_extended_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_extended_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -293,13 +292,13 @@ class TestFileRetrievalWithAuthz:
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
-        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_with_extended_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_with_extended_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -316,14 +315,14 @@ class TestFileRetrievalWithAuthz:
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
-        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
     def test_get_public_dossier_and_restricted_image_with_extended_scope(
-            self, mock_do_metadata_request, mock_get_image_from_iiif_server
+            self, mock_do_metadata_request, mock_get_image_from_iiif_server, client
     ):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
@@ -341,14 +340,14 @@ class TestFileRetrievalWithAuthz:
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
-        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
     def test_get_public_image_with_only_extended_scope_and_no_read_scope(
-            self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+            self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -364,14 +363,14 @@ class TestFileRetrievalWithAuthz:
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])}
-        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
     def test_get_restricted_image_with_only_extended_scope_and_no_read_scope(
-            self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+            self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -387,74 +386,73 @@ class TestFileRetrievalWithAuthz:
         )
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])}
-        response = self.c.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
 
 class TestFileRetrievalWithMailJWT:
-    def setup_method(self):
+    def setup(self):
         self.file_url = '/iiif/'
         self.login_link_url = '/iiif/login-link-to-email/'
-        self.c = Client()
         self.test_email_address = 'jwttest@amsterdam.nl'
         self.mail_login_token = create_mail_login_token(self.test_email_address, settings.SECRET_KEY)
 
     @patch('iiif.mailing.send_email')
-    def test_send_dataportaal_login_url_to_burger_email_address(self, mock_send_email):
+    def test_send_dataportaal_login_url_to_burger_email_address(self, mock_send_email, client):
         mock_send_email.return_value = None  # Prevent it from sending actual emails
         payload = {'email': 'burger@amsterdam.nl', 'origin_url': 'https://data.amsterdam.nl'}
-        response = self.c.post(self.login_link_url, json.dumps(payload), content_type="application/json")
+        response = client.post(self.login_link_url, json.dumps(payload), content_type="application/json")
         assert response.status_code == 200
 
-    def test_login_url_to_burger_fails_on_other_than_post(self):
-        response = self.c.get(self.login_link_url)
+    def test_login_url_to_burger_fails_on_other_than_post(self, client):
+        response = client.get(self.login_link_url)
         assert response.status_code == 405
-        response = self.c.put(self.login_link_url)
+        response = client.put(self.login_link_url)
         assert response.status_code == 405
-        response = self.c.delete(self.login_link_url)
+        response = client.delete(self.login_link_url)
         assert response.status_code == 405
 
-    def test_request_with_invalid_json_fails(self):
-        response = self.c.post(self.login_link_url, "invalid json", content_type="application/json")
+    def test_request_with_invalid_json_fails(self, client):
+        response = client.post(self.login_link_url, "invalid json", content_type="application/json")
         assert response.status_code == 400
 
-    def test_request_with_missing_email_address_field_fails(self):
-        response = self.c.post(self.login_link_url, json.dumps({'something': 'else'}), content_type="application/json")
+    def test_request_with_missing_email_address_field_fails(self, client):
+        response = client.post(self.login_link_url, json.dumps({'something': 'else'}), content_type="application/json")
         assert response.status_code == 400
 
-    def test_request_with_invalid_email_address_fails(self):
+    def test_request_with_invalid_email_address_fails(self, client):
         # Missing @
         payload = {'email': 'burgeramsterdam.nl'}
-        response = self.c.post(self.login_link_url, json.dumps(payload), content_type="application/json")
+        response = client.post(self.login_link_url, json.dumps(payload), content_type="application/json")
         assert response.status_code == 400
 
         # Missing dot
         payload = {'email': 'burger@amsterdamnl'}
-        response = self.c.post(self.login_link_url, json.dumps(payload), content_type="application/json")
+        response = client.post(self.login_link_url, json.dumps(payload), content_type="application/json")
         assert response.status_code == 400
 
-    def test_request_with_missing_origin_url_field_fails(self):
+    def test_request_with_missing_origin_url_field_fails(self, client):
         payload = json.dumps({'email': 'a@b.c'})
-        response = self.c.post(self.login_link_url, payload, content_type="application/json")
+        response = client.post(self.login_link_url, payload, content_type="application/json")
         assert response.status_code == 400
 
-    def test_request_with_origin_url_not_in_whitelist_fails(self):
+    def test_request_with_origin_url_not_in_whitelist_fails(self, client):
         payload = json.dumps({'email': 'a@b.c', 'origin_url': 'https://somethingelse.amsterdam.nl'})
-        response = self.c.post(self.login_link_url, payload, content_type="application/json")
+        response = client.post(self.login_link_url, payload, content_type="application/json")
         assert response.status_code == 400
 
     @override_settings(LOGIN_ORIGIN_URL_TLD_WHITELIST=['localhost'])
     @patch('iiif.mailing.send_email')
-    def test_request_with_localhost_and_port_in_origin_url_succeeds(self, mock_send_email):
+    def test_request_with_localhost_and_port_in_origin_url_succeeds(self, mock_send_email, client):
         mock_send_email.return_value = None  # Prevent it from sending actual emails
         payload = {'email': 'burger@amsterdam.nl', 'origin_url': 'https://localhost:8000/something'}
-        response = self.c.post(self.login_link_url, json.dumps(payload), content_type="application/json")
+        response = client.post(self.login_link_url, json.dumps(payload), content_type="application/json")
         assert response.status_code == 200
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_read_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_read_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -473,22 +471,22 @@ class TestFileRetrievalWithMailJWT:
             headers={'Content-Type': 'image/png'}
         )
 
-        response = self.c.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + self.mail_login_token)
+        response = client.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + self.mail_login_token)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
-        response = self.c.get(self.file_url + PRE_WABO_IMG_URL_X1 + '?auth=' + self.mail_login_token)
+        response = client.get(self.file_url + PRE_WABO_IMG_URL_X1 + '?auth=' + self.mail_login_token)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_COPYRIGHT
 
 
-        response = self.c.get(self.file_url + PRE_WABO_IMG_URL_X2 + '?auth=' + self.mail_login_token)
+        response = client.get(self.file_url + PRE_WABO_IMG_URL_X2 + '?auth=' + self.mail_login_token)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_with_read_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_restricted_image_with_read_scope(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -503,13 +501,13 @@ class TestFileRetrievalWithMailJWT:
             headers={'Content-Type': 'image/png'}
         )
 
-        response = self.c.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + self.mail_login_token)
+        response = client.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + self.mail_login_token)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_RESTRICTED
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_expired_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_expired_token(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -532,12 +530,12 @@ class TestFileRetrievalWithMailJWT:
         with time_machine.travel(datetime.now() - timedelta(days=2)):
             jwt_token = create_mail_login_token(self.test_email_address, settings.SECRET_KEY)
 
-        response = self.c.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + jwt_token)
+        response = client.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + jwt_token)
         assert response.status_code == 401
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_invalid_token_signature(self, mock_do_metadata_request, mock_get_image_from_iiif_server):
+    def test_get_public_image_with_invalid_token_signature(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
         # Setting up mocks
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -557,17 +555,17 @@ class TestFileRetrievalWithMailJWT:
         )
 
         mail_login_token = create_mail_login_token(self.test_email_address, 'invalid_key')
-        response = self.c.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + mail_login_token)
+        response = client.get(self.file_url + PRE_WABO_IMG_URL + '?auth=' + mail_login_token)
         assert response.status_code == 401
 
-    def test_get_wabo_image_with_mail_login_fails(self):
-        response = self.c.get(self.file_url + WABO_IMG_URL + '?auth=' + self.mail_login_token)
+    def test_get_wabo_image_with_mail_login_fails(self, client):
+        response = client.get(self.file_url + WABO_IMG_URL + '?auth=' + self.mail_login_token)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN
 
 
 class TestTools:
-    def setup_method(self):
+    def setup(self):
         self.test_email_address = 'toolstest@amsterdam.nl'
 
     def test_get_info_from_pre_wabo_url_vanilla(self):
@@ -898,9 +896,8 @@ class TestTools:
 @pytest.mark.django_db
 class TestZipEndpoint:
     @pytest.fixture(autouse=True)
-    def setup_method(self):
+    def setup(self):
         self.url = '/iiif/zip/'
-        self.c = Client()
         self.BASE_URL = 'https://images.data.amsterdam.nl/iiif/'
         self.test_email_address = 'zip@amsterdam.nl'
         self.mail_login_token = create_mail_login_token(self.test_email_address, settings.SECRET_KEY)
@@ -910,7 +907,7 @@ class TestZipEndpoint:
         call_man_command('enable_consumer', settings.ZIP_COLLECTION_NAME)
 
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_jwt_token(self, mock_do_metadata_request):
+    def test_get_public_image_with_jwt_token(self, mock_do_metadata_request, client):
         # Set up mock metadata response
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -924,7 +921,7 @@ class TestZipEndpoint:
             }
         )
         # Request two images
-        response = self.c.post(
+        response = client.post(
             self.url + '?auth=' + self.mail_login_token,
             json.dumps({
                 'urls': [
@@ -944,7 +941,7 @@ class TestZipEndpoint:
         assert 'request_meta' in data
 
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_public_image_with_authz_token(self, mock_do_metadata_request):
+    def test_get_public_image_with_authz_token(self, mock_do_metadata_request, client):
         # Set up mock metadata response
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -960,7 +957,7 @@ class TestZipEndpoint:
 
         # Request two images
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token([settings.BOUWDOSSIER_READ_SCOPE])}
-        response = self.c.post(
+        response = client.post(
             self.url + '?auth=' + self.mail_login_token,
             json.dumps({
                 'urls': [
@@ -980,16 +977,16 @@ class TestZipEndpoint:
         assert len(data['urls']) == 2
         assert 'request_meta' in data
 
-    def test_other_methods_than_post_fail(self):
-        response = self.c.get(self.url + '?auth=' + self.mail_login_token)
+    def test_other_methods_than_post_fail(self, client):
+        response = client.get(self.url + '?auth=' + self.mail_login_token)
         assert response.status_code == 405
-        response = self.c.put(self.url + '?auth=' + self.mail_login_token)
+        response = client.put(self.url + '?auth=' + self.mail_login_token)
         assert response.status_code == 405
-        response = self.c.delete(self.url + '?auth=' + self.mail_login_token)
+        response = client.delete(self.url + '?auth=' + self.mail_login_token)
         assert response.status_code == 405
 
-    def test_request_without_auth_fails(self):
-        response = self.c.post(
+    def test_request_without_auth_fails(self, client):
+        response = client.post(
             self.url,
             json.dumps({
                 'urls': [
@@ -1002,8 +999,8 @@ class TestZipEndpoint:
 
         assert response.status_code == 401
 
-    def test_request_with_invalid_json_fails(self):
-        response = self.c.post(
+    def test_request_with_invalid_json_fails(self, client):
+        response = client.post(
             self.url + '?auth=' + self.mail_login_token,
             "invalid json",
             content_type="application/json"
@@ -1011,8 +1008,8 @@ class TestZipEndpoint:
 
         assert response.status_code == 400
 
-    def test_request_with_missing_urls_in_json_fails(self):
-        response = self.c.post(
+    def test_request_with_missing_urls_in_json_fails(self, client):
+        response = client.post(
             self.url + '?auth=' + self.mail_login_token,
             json.dumps({'something': 'else'}),
             content_type="application/json"
@@ -1020,8 +1017,8 @@ class TestZipEndpoint:
 
         assert response.status_code == 400
 
-    def test_request_with_invalid_urls_in_json_fails(self):
-        response = self.c.post(
+    def test_request_with_invalid_urls_in_json_fails(self, client):
+        response = client.post(
             self.url + '?auth=' + self.mail_login_token,
             json.dumps({
                 'urls': [
@@ -1034,9 +1031,9 @@ class TestZipEndpoint:
 
         assert response.status_code == 400
 
-    def test_get_wabo_image_with_mail_login_fails(self):
+    def test_get_wabo_image_with_mail_login_fails(self, client):
         # Request two images of which one is a WABO image
-        response = self.c.post(
+        response = client.post(
             self.url + '?auth=' + self.mail_login_token,
             json.dumps({
                 'urls': [
@@ -1052,7 +1049,7 @@ class TestZipEndpoint:
         assert Message.objects.count() == 0
 
     @patch('iiif.metadata.do_metadata_request')
-    def test_request_restricted_image_with_read_scope_succeeds(self, mock_do_metadata_request):
+    def test_request_restricted_image_with_read_scope_succeeds(self, mock_do_metadata_request, client):
         """
         It is possible to request a restricted image with a read scope, but it should fail
         when the consumer is run. This is tested in the consumer tests below.
@@ -1072,7 +1069,7 @@ class TestZipEndpoint:
         )
 
         # Request two images
-        response = self.c.post(
+        response = client.post(
             self.url + '?auth=' + self.mail_login_token,
             json.dumps({
                 'urls': [
@@ -1087,7 +1084,7 @@ class TestZipEndpoint:
         assert Message.objects.count() == 1
 
     @patch('iiif.metadata.do_metadata_request')
-    def test_get_restricted_image_with_restricted_scope_succeeds(self, mock_do_metadata_request):
+    def test_get_restricted_image_with_restricted_scope_succeeds(self, mock_do_metadata_request, client):
         """
         Because we send the link to the zip file with sendgrid, we cannot send links to
         restricted files. Since checking the metadata for all requested files gives problems
@@ -1115,7 +1112,7 @@ class TestZipEndpoint:
         # Request two images with extended scope
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
-        response = self.c.post(
+        response = client.post(
             self.url,
             json.dumps({
                 'urls': [
@@ -1168,7 +1165,8 @@ class TestZipEndpoint:
             scope,
             second_image_access,
             expected_line_end,
-            expected_files
+            expected_files,
+            client
     ):
         # Setting up mocks
         mock_cleanup_local_files.return_value = None
@@ -1193,7 +1191,7 @@ class TestZipEndpoint:
 
         # Request some images in a zip
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token([scope])}
-        response = self.c.post(
+        response = client.post(
             self.url,
             json.dumps({
                 'urls': [
