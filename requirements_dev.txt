@@ -45,7 +45,7 @@ deprecated==1.2.13
     # via
     #   -r ./requirements.txt
     #   jwcrypto
-django==4.0.5
+django==4.0.6
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django

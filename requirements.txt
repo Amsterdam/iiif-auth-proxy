@@ -27,7 +27,7 @@ debtcollector==2.5.0
     #   python-keystoneclient
 deprecated==1.2.13
     # via jwcrypto
-django==4.0.5
+django==4.0.6
     # via
     #   -r requirements.in
     #   datapunt-authorization-django
