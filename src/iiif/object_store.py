@@ -8,6 +8,7 @@ from time import time
 from django.conf import settings
 from swiftclient import Connection
 from swiftclient.exceptions import ClientException
+from swiftclient.service import SwiftError, SwiftService, SwiftUploadObject
 
 log = logging.getLogger(__name__)
 
@@ -16,7 +17,7 @@ def get_object_store_connection():
     return Connection(**settings.OBJECT_STORE)
 
 
-def store_object_on_object_store(connection, local_zip_file_path, filename):
+def store_small_object_on_object_store(connection, local_zip_file_path, filename):
     with open(local_zip_file_path, 'rb') as local:
         connection.put_object(
             settings.OBJECT_STORE_CONTAINER_NAME,
@@ -24,6 +25,41 @@ def store_object_on_object_store(connection, local_zip_file_path, filename):
             contents=local,
             content_type='application/zip'
         )
+
+
+def store_large_object_on_object_store(local_zip_file_path, filename):
+    _opts = {'object_dd_threads': 20, 'segment_size': 262144000, 'use_slo': True}
+    with SwiftService(options=_opts) as swift:
+        try:
+            container = settings.OBJECT_STORE_CONTAINER_NAME
+            objects = [SwiftUploadObject(local_zip_file_path, object_name=filename)]
+            for r in swift.upload(container=container, objects=objects):
+                if r['success']:
+                    if 'for_object' in r:
+                        continue
+                    elif 'object' in r:
+                        return
+                else:
+                    if r['action'] == "create_container":
+                        log.warning(
+                            f"Warning: failed to create container {container} {r['error']}"
+                        )
+                    elif r['action'] == "upload_object":
+                        log.error(
+                            f"Failed to upload object %s to container {container}: {r['object']}, {r['error']}"
+                        )
+                    else:
+                        log.error(r['error'])
+        except SwiftError as e:
+            log.error(e.value)
+
+
+def store_object_on_object_store(connection, local_zip_file_path, filename):
+    file_size = os.path.getsize(local_zip_file_path)
+    if file_size < 5368709120:  # 5GB
+        store_small_object_on_object_store(connection, local_zip_file_path, filename)
+    else:
+        store_large_object_on_object_store(local_zip_file_path, filename)
 
 
 def create_object_store_temp_url(connection, file_name, expiry_minutes=0, expiry_hours=0, expiry_days=0):
