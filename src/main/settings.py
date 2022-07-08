@@ -84,31 +84,23 @@ DATAPUNT_AUTHZ = {
     'FORCED_ANONYMOUS_ROUTES': ['/status/health']
 }
 
-tenant_id = '9d078258c1a547c09e0b5f88834554f1'
-authurl = 'https://identity.stack.cloudvps.com/v2.0'
 OBJECT_STORE = {
     'auth_version': '2.0',
-    'authurl': authurl,
-    'user': os.getenv('OBJECT_STORE_USER', 'iiif'),
-    'key': os.getenv('OBJECT_STORE_PASSWORD', 'insecure'),
-    'tenant_name': os.getenv('OBJECT_STORE_TENANT_NAME', 'insecure'),
+    'authurl': os.getenv('OS_AUTH_URL'),
+    'user': os.getenv('OS_USERNAME', 'iiif'),
+    'key': os.getenv('OS_PASSWORD', 'insecure'),
+    'tenant_name': os.getenv('OS_TENANT_NAME', 'insecure'),
     'os_options': {
-        'tenant_id': tenant_id,
+        'tenant_id': os.getenv('OS_TENANT_ID'),
         'region_name': 'NL',
     }
 }
-OBJECT_STORE_CONTAINER_NAME = os.getenv('OBJECT_STORE_CONTAINER_NAME', 'downloads_acceptance')
-OBJECT_STORE_TEMP_URL_KEY = os.getenv('OBJECT_STORE_TEMP_URL_KEY', 'insecure')
-OBJECT_STORE_TLD = os.getenv('OBJECT_STORE_TLD', 'objectstore.eu')
+OS_CONTAINER_NAME = os.getenv('OS_CONTAINER_NAME', 'downloads_acceptance')
+OS_TEMP_URL_KEY = os.getenv('OS_TEMP_URL_KEY', 'insecure')
+OS_TLD = os.getenv('OS_TLD', 'objectstore.eu')
 TEMP_URL_EXPIRY_DAYS = 7
-
-# Set the following env vars to be used by the SwitfClient for large files
-os.environ['OS_USERNAME'] = os.getenv('OBJECT_STORE_USER', 'iiif')
-os.environ['OS_PASSWORD'] = os.getenv('OBJECT_STORE_PASSWORD', 'insecure')
-os.environ['OS_AUTH_URL'] = authurl
-os.environ['OS_TENANT_ID'] = tenant_id
-os.environ['OS_TENANT_NAME'] = os.getenv('OBJECT_STORE_TENANT_NAME', 'insecure')
-os.environ['OS_REGION_NAME'] = 'NL'
+OS_LARGE_FILE_SIZE = 5368709120  # 5GB
+OS_LARGE_FILE_OPTIONS = {'object_dd_threads': 20, 'segment_size': 262144000, 'use_slo': True}
 
 INGRESS_CONSUMER_CLASSES = [
     'iiif.ingress_zip_consumer.ZipConsumer',  # worker to zip files, upload to object store and email user
