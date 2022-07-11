@@ -137,7 +137,7 @@ stevedore==3.5.0
     #   keystoneauth1
     #   oslo-config
     #   python-keystoneclient
-urllib3==1.26.9
+urllib3==1.26.10
     # via
     #   requests
     #   sentry-sdk
