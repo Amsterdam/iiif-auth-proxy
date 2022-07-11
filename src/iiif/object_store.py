@@ -69,7 +69,7 @@ def create_object_store_temp_url(connection, file_name, expiry_minutes=0, expiry
     method = 'GET'
     duration_in_seconds = ((((expiry_days * 24) + expiry_hours) * 60) + expiry_minutes) * 60
     expires = int(time() + duration_in_seconds)
-    path = os.path.join(f'/{settings.OS_CONTAINER_NAME}', file_name)
+    path = os.path.join('/', '{settings.OS_CONTAINER_NAME}', file_name)
     hmac_body = f'{method}\n{expires}\n{path}'.encode('utf-8')
 
     # Create signature
