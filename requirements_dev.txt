@@ -231,7 +231,7 @@ tomli==2.0.1
     #   coverage
     #   pep517
     #   pytest
-urllib3==1.26.9
+urllib3==1.26.10
     # via
     #   -r ./requirements.txt
     #   requests
