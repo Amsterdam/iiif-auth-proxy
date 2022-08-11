@@ -10,10 +10,6 @@ asgiref==3.5.2
     #   django
 attrs==22.1.0
     # via pytest
-backports-zoneinfo==0.2.1
-    # via
-    #   -r ./requirements.txt
-    #   django
 build==0.8.0
     # via pip-tools
 certifi==2022.6.15
@@ -51,7 +47,7 @@ deprecated==1.2.13
     # via
     #   -r ./requirements.txt
     #   jwcrypto
-django==4.0.6
+django==4.0.7
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
