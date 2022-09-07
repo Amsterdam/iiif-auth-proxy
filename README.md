@@ -4,7 +4,7 @@ stadsarchief metadata server).
 
 ### Infrastructure overview
 
-![The infrastructure](iiif_infrastructure_v4.png)
+![The infrastructure](iiif_infrastructure_v5.png)
 
 ### Logic
 
