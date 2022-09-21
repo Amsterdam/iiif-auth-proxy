@@ -6,8 +6,6 @@
 #
 asgiref==3.5.2
     # via django
-backports-zoneinfo==0.2.1
-    # via django
 certifi==2022.6.15.1
     # via
     #   requests
@@ -48,7 +46,7 @@ iso8601==1.0.2
     # via
     #   keystoneauth1
     #   oslo-utils
-jwcrypto==1.3.1
+jwcrypto==1.4
     # via datapunt-authorization-django
 keystoneauth1==5.0.0
     # via python-keystoneclient
