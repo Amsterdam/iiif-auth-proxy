@@ -1,11 +1,10 @@
-import json
 import logging
 import re
 
 import requests
 from django.conf import settings
 from django.http import HttpResponse
-from requests.exceptions import RequestException
+from requests.exceptions import ConnectTimeout, ReadTimeout, RequestException
 
 from iiif import zip_tools
 from iiif.tools import ImmediateHttpResponse
@@ -13,6 +12,7 @@ from iiif.tools import ImmediateHttpResponse
 log = logging.getLogger(__name__)
 
 RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = "The iiif-image-server cannot be reached"
+RESPONSE_CONTENT_TIMEOUT_ERROR_FROM_CANTALOUPE = "The iiif-image-server gave a timeout error"
 
 
 def create_wabo_url(url_info, metadata):
@@ -77,7 +77,7 @@ def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
 
 
 def get_image_from_iiif_server(file_url, headers, cert, verify=True):
-    return requests.get(file_url, headers=headers, cert=cert, verify=verify)
+    return requests.get(file_url, headers=headers, cert=cert, verify=verify, timeout=(2, 20))
 
 
 def get_file(request_meta, url_info, iiif_url, metadata):
@@ -98,6 +98,12 @@ def get_file(request_meta, url_info, iiif_url, metadata):
             f"because of this error {e}"
         )
         raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE, status=502))
+    except (ConnectTimeout, ReadTimeout) as e:
+        log.error(
+            f"{RESPONSE_CONTENT_TIMEOUT_ERROR_FROM_CANTALOUPE} "
+            f"because of this error {e}"
+        )
+        raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_TIMEOUT_ERROR_FROM_CANTALOUPE, status=502))
 
     return file_response, file_url
 

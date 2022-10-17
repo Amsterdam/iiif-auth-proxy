@@ -62,7 +62,6 @@ class TestFileRetrievalWithAuthz:
         self.url = '/iiif/'
 
     def test_get_image_with_wrongly_formatted_url(self, client):
-        """ Test getting an image with a wrongly formatted url' """
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
