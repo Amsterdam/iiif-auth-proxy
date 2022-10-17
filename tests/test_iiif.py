@@ -9,13 +9,14 @@ from unittest.mock import ANY, patch
 from uuid import uuid4
 from zipfile import ZipFile
 
-import pytest
 import jwt
+import pytest
 import pytz
 import time_machine
 from django.conf import settings
 from django.test import override_settings
 from ingress.models import FailedMessage, Message
+from requests.exceptions import ConnectTimeout
 
 from iiif.authentication import (RESPONSE_CONTENT_COPYRIGHT,
                                  RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
@@ -34,7 +35,7 @@ from iiif.parsing import (InvalidIIIFUrlError, get_email_address,
                           get_info_from_iiif_url)
 from iiif.tools import ImmediateHttpResponse
 from iiif.zip_tools import create_local_zip_file
-from tests.tools_for_testing import call_man_command
+from tests.tools import call_man_command
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
@@ -62,7 +63,6 @@ class TestFileRetrievalWithAuthz:
         self.url = '/iiif/'
 
     def test_get_image_with_wrongly_formatted_url(self, client):
-        """ Test getting an image with a wrongly formatted url' """
 
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])}
@@ -135,7 +135,28 @@ class TestFileRetrievalWithAuthz:
         header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
         response = client.get(self.url + PRE_WABO_IMG_URL, **header)
         assert response.status_code == 502
-        assert response.content.decode("utf-8") == RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE
+        assert response.content.decode("utf-8") == RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE + ' ConnectionError'
+
+
+    @patch('iiif.cantaloupe.get_image_from_iiif_server')
+    @patch('iiif.metadata.do_metadata_request')
+    def test_get_image_when_cantaloupe_gives_ConnectTimeout(self, mock_do_metadata_request, mock_get_image_from_iiif_server, client):
+        # Setting up mocks
+        mock_do_metadata_request.return_value = MockResponse(
+            200,
+            json_content={
+                'access': settings.ACCESS_PUBLIC,
+                'documenten': [{'barcode': 'ST00000126', 'access': settings.ACCESS_PUBLIC}]
+            }
+        )
+        mock_get_image_from_iiif_server.side_effect = ConnectTimeout()
+
+        header = {'HTTP_AUTHORIZATION': "Bearer " + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)}
+        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
+        assert response.status_code == 502
+        assert response.content.decode("utf-8") == RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE + ' ConnectTimeout'
+
+
 
     @patch('iiif.cantaloupe.get_image_from_iiif_server')
     @patch('iiif.metadata.do_metadata_request')
