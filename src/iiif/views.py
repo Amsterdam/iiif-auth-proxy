@@ -23,7 +23,7 @@ def index(request, iiif_url):
         metadata, _ = get_metadata(url_info, iiif_url, request.META.get('HTTP_AUTHORIZATION'), {})
         authentication.check_file_access_in_metadata(metadata, url_info, scope)
         file_response, file_url = cantaloupe.get_file(request.META, url_info, iiif_url, metadata)
-        cantaloupe.handle_file_response_errors(file_response, file_url)
+        cantaloupe.handle_file_response_codes(file_response, file_url)
     except tools.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in index:")
         return e.response

@@ -11,8 +11,8 @@ from iiif.tools import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 
-RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = "The iiif-image-server cannot be reached"
-RESPONSE_CONTENT_TIMEOUT_ERROR_FROM_CANTALOUPE = "The iiif-image-server gave a timeout error"
+RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = "The iiif-image-server cannot be reached " \
+                                                  "because the following error occurred: "
 
 
 def create_wabo_url(url_info, metadata):
@@ -93,22 +93,14 @@ def get_file(request_meta, url_info, iiif_url, metadata):
     try:
         file_response = get_image_from_iiif_server(file_url, headers, cert, verify)
     except RequestException as e:
-        log.error(
-            f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE} "
-            f"because of this error {e}"
-        )
-        raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE, status=502))
-    except (ConnectTimeout, ReadTimeout) as e:
-        log.error(
-            f"{RESPONSE_CONTENT_TIMEOUT_ERROR_FROM_CANTALOUPE} "
-            f"because of this error {e}"
-        )
-        raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_TIMEOUT_ERROR_FROM_CANTALOUPE, status=502))
+        message = f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE} {e.__class__.__name__}"
+        log.error(message)
+        raise ImmediateHttpResponse(response=HttpResponse(message, status=502))
 
     return file_response, file_url
 
 
-def handle_file_response_errors(file_response, file_url):
+def handle_file_response_codes(file_response, file_url):
     if file_response.status_code == 404:
         raise ImmediateHttpResponse(
             response=HttpResponse(f"No source file could be found for internal url {file_url}", status=404))
@@ -147,7 +139,7 @@ def download_file_for_zip(iiif_url, info_txt_contents, url_info, fail_reason, me
     try:
         file_response, file_url = get_file(
             request_meta, url_info, iiif_url, metadata)
-        handle_file_response_errors(file_response, file_url)
+        handle_file_response_codes(file_response, file_url)
     except ImmediateHttpResponse as e:
         info_txt_contents += f"Not included in this zip because an error occurred " \
                              f"while getting it from the source system\n"
