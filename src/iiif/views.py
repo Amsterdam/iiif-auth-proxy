@@ -4,7 +4,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
-from ratelimit.decorators import ratelimit
+from django_ratelimit.decorators import ratelimit
 
 from iiif import authentication, cantaloupe, mailing, parsing, tools, zip_tools
 from iiif.metadata import get_metadata
@@ -33,7 +33,7 @@ def index(request, iiif_url):
 
 # TODO: limit to dataportaal urls
 @csrf_exempt
-@ratelimit(key='ip', rate='3/d')  # TODO: Check django cache settings for rate limiter to work across parallel docker containers
+@ratelimit(key='ip', rate='3/d', block=False )  # TODO: Check django cache settings for rate limiter to work across parallel docker containers
 def send_dataportaal_login_url_to_mail(request):
     try:
         # Some basic sanity checks
