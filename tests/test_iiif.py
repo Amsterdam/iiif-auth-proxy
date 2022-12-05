@@ -1189,6 +1189,9 @@ class TestZipEndpoint:
             expected_files,
             client
     ):
+        # Clean /tmp/ to avoid 
+        os.system('rm -rf /tmp/*')
+
         # Setting up mocks
         mock_cleanup_local_files.return_value = None
         mock_send_email.return_value = None
