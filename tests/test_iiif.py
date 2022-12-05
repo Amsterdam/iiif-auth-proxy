@@ -59,7 +59,7 @@ class MockResponse:
 
 
 class TestFileRetrievalWithAuthz:
-    def setup(self):
+    def setup_method(self):
         self.url = '/iiif/'
 
     def test_get_image_with_wrongly_formatted_url(self, client):
@@ -413,7 +413,7 @@ class TestFileRetrievalWithAuthz:
 
 
 class TestFileRetrievalWithMailJWT:
-    def setup(self):
+    def setup_method(self):
         self.file_url = '/iiif/'
         self.login_link_url = '/iiif/login-link-to-email/'
         self.test_email_address = 'jwttest@amsterdam.nl'
@@ -586,7 +586,7 @@ class TestFileRetrievalWithMailJWT:
 
 
 class TestTools:
-    def setup(self):
+    def setup_method(self):
         self.test_email_address = 'toolstest@amsterdam.nl'
 
     def test_get_info_from_pre_wabo_url_vanilla(self):
@@ -917,7 +917,7 @@ class TestTools:
 @pytest.mark.django_db
 class TestZipEndpoint:
     @pytest.fixture(autouse=True)
-    def setup(self):
+    def setup_method(self):
         self.url = '/iiif/zip/'
         self.BASE_URL = 'https://images.data.amsterdam.nl/iiif/'
         self.test_email_address = 'zip@amsterdam.nl'
