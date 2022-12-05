@@ -8,6 +8,8 @@ from zipfile import ZipFile
 from django.conf import settings
 from ingress.models import Collection, Message
 
+TMP_BOUWDOSSIER_ZIP_FOLDER = '/tmp/bouwdossier-zips/'
+
 
 def store_zip_job(zip_info):
     # There's a lot of things in the request_meta that is not JSON serializable.
@@ -23,8 +25,9 @@ def store_zip_job(zip_info):
 
 
 def create_tmp_folder():
+    os.makedirs(TMP_BOUWDOSSIER_ZIP_FOLDER, exist_ok=True)
     zipjob_uuid = uuid4()
-    tmp_folder_path = os.path.join('/tmp/', str(zipjob_uuid))
+    tmp_folder_path = os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, str(zipjob_uuid))
     os.mkdir(tmp_folder_path)
     return zipjob_uuid, tmp_folder_path
 
@@ -36,7 +39,7 @@ def save_file_to_folder(folder, filename, content):
         f.write(content)
 
 def create_local_zip_file(zipjob_uuid, folder_path):
-    zip_file_path = os.path.join('/tmp/', f'{zipjob_uuid}.zip')
+    zip_file_path = os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, f'{zipjob_uuid}.zip')
     with ZipFile(zip_file_path, 'w') as zip_obj:
         for file in Path(folder_path).glob("*"):
             zip_obj.write(file, arcname=os.path.join(str(zipjob_uuid), file.name))

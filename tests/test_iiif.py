@@ -34,7 +34,7 @@ from iiif.metadata import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
 from iiif.parsing import (InvalidIIIFUrlError, get_email_address,
                           get_info_from_iiif_url)
 from iiif.tools import ImmediateHttpResponse
-from iiif.zip_tools import create_local_zip_file
+from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER, create_local_zip_file
 from tests.tools import call_man_command
 
 log = logging.getLogger(__name__)
@@ -864,24 +864,24 @@ class TestTools:
     def test_create_local_zip_file(self):
         # First create some files
         uuid = str(uuid4())
-        folder_path = f'/tmp/{uuid}/'
+        folder_path = f'{TMP_BOUWDOSSIER_ZIP_FOLDER}{uuid}/'
         os.mkdir(folder_path)
         filenames = [f'content{i}.txt' for i in range(5)]
         for filename in filenames:
-            with open(f'/tmp/{uuid}/{filename}', 'w') as f:
+            with open(f'{TMP_BOUWDOSSIER_ZIP_FOLDER}{uuid}/{filename}', 'w') as f:
                 f.write('content')
 
         # Create the zip file
         create_local_zip_file(uuid, folder_path)
 
         # Check whether the newly created zip file exists
-        assert Path(f'/tmp/{uuid}.zip').is_file()
+        assert Path(f'{TMP_BOUWDOSSIER_ZIP_FOLDER}{uuid}.zip').is_file()
 
         # Unzip the file
         unzip_uuid = uuid4()
-        unzip_folder = f'/tmp/{unzip_uuid}/'
+        unzip_folder = f'{TMP_BOUWDOSSIER_ZIP_FOLDER}{unzip_uuid}/'
         os.mkdir(unzip_folder)
-        with ZipFile(f'/tmp/{uuid}.zip', 'r') as zip_ref:
+        with ZipFile(f'{TMP_BOUWDOSSIER_ZIP_FOLDER}{uuid}.zip', 'r') as zip_ref:
             zip_ref.extractall(unzip_folder)
 
         os.path.isdir(os.path.join(unzip_folder, uuid))
@@ -890,7 +890,7 @@ class TestTools:
 
         # Cleanup so that other tests are not influenced
         shutil.rmtree(folder_path)
-        os.remove(f'/tmp/{uuid}.zip')
+        os.remove(f'{TMP_BOUWDOSSIER_ZIP_FOLDER}{uuid}.zip')
         shutil.rmtree(unzip_folder)
 
     def test_get_email_address(self):
@@ -1189,9 +1189,6 @@ class TestZipEndpoint:
             expected_files,
             client
     ):
-        # Clean /tmp/ to avoid 
-        os.system('rm -rf /tmp/*')
-
         # Setting up mocks
         mock_cleanup_local_files.return_value = None
         mock_send_email.return_value = None
@@ -1242,20 +1239,19 @@ class TestZipEndpoint:
             assert ingress.consume_succeeded_at is not None
 
         # Check whether the newly created zip file exists
-        tmp_contents = sorted(os.listdir('/tmp/'))  # Sorting it so the first is the folder and the second the zip
+        tmp_contents = sorted(os.listdir(TMP_BOUWDOSSIER_ZIP_FOLDER))  # Sorting it so the first is the folder and the second the zip
         assert len(tmp_contents) == 2
-        assert os.path.isdir(os.path.join('/tmp/', tmp_contents[0]))
-        assert os.path.isfile(os.path.join('/tmp/', tmp_contents[1]))
+        assert os.path.isdir(os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, tmp_contents[0]))
+        assert os.path.isfile(os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, tmp_contents[1]))
         assert tmp_contents[0] + '.zip' == tmp_contents[1]
 
         # Check whether the zip contains the expected number of files
-        files = os.listdir(f'/tmp/{tmp_contents[0]}')
+        files = os.listdir(f'{TMP_BOUWDOSSIER_ZIP_FOLDER}{tmp_contents[0]}')
         assert len(files) == expected_files
 
         # Check whether the report.txt contains info about the missing restrictions
-        with open(f'/tmp/{tmp_contents[0]}/report.txt', 'r') as f:
+        with open(f'{TMP_BOUWDOSSIER_ZIP_FOLDER}{tmp_contents[0]}/report.txt', 'r') as f:
             assert f.readlines()[-1].endswith(expected_line_end + "\n")
 
         # Cleanup so that other tests are not influenced
-        shutil.rmtree(os.path.join('/tmp/', tmp_contents[0]))
-        os.remove(os.path.join('/tmp/', tmp_contents[1]))
+        os.system(f'rm -rf {TMP_BOUWDOSSIER_ZIP_FOLDER}*')
