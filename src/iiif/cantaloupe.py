@@ -112,7 +112,7 @@ def handle_file_response_codes(file_response, file_url):
         raise ImmediateHttpResponse(response=HttpResponse(
             f"We had a problem retrieving the image. We got status "
             f"code {file_response.status_code} for internal url {file_url}",
-            status=400
+            status=502
         ))
 
 
