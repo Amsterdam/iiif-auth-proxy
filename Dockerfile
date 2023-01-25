@@ -3,16 +3,18 @@ MAINTAINER datapunt@amsterdam.nl
 
 EXPOSE 8000
 
-ENV PYTHONUNBUFFERED 1 \
-    PIP_NO_CACHE_DIR=off
+ENV PYTHONUNBUFFERED 1
 ENV CONSUL_HOST=${CONSUL_HOST:-notset}
 ENV CONSUL_PORT=${CONSUL_PORT:-8500}
 ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
 RUN apt-get update \
  && apt-get dist-upgrade -y \
+ && apt-get install --no-install-recommends -y \
+        gdal-bin \
  && pip install --upgrade pip \
- && pip install uwsgi
+ && pip install uwsgi \
+ && useradd --user-group --system datapunt
 
 # Edit the openssl.cnf file to allow a lower security level.
 # This is needed to directly call the wabo data
