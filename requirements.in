@@ -13,3 +13,4 @@ psycopg2-binary
 python-swiftclient
 datapunt-data-ingress
 python-keystoneclient  # Although it is not directly imported anywhere, it is needed for the connection with the objectstore to work
+setuptools  # Needed to solve Trivy security risk

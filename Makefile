@@ -13,8 +13,10 @@ install: pip-tools                  ## Install requirements and sync venv with e
 	pip-sync requirements_dev.txt
 
 requirements: pip-tools             ## Upgrade requirements (in requirements.in) to latest versions and compile requirements.txt
-	pip-compile --upgrade --output-file requirements.txt requirements.in
-	pip-compile --upgrade --output-file requirements_dev.txt requirements_dev.in
+	## The --allow-unsafe flag should be used and will become the default behaviour of pip-compile in the future
+	## https://stackoverflow.com/questions/58843905
+	pip-compile --upgrade --output-file requirements.txt --allow-unsafe requirements.in
+	pip-compile --upgrade --output-file requirements_dev.txt --allow-unsafe requirements_dev.in
 
 upgrade: requirements install       ## Run 'requirements' and 'install' targets
 
@@ -50,3 +52,7 @@ bash:
 
 env:
 	env | sort
+
+trivy: 								## Detect image vulnerabilities
+	$(dc) build app
+	trivy image --ignore-unfixed docker-registry.data.amsterdam.nl/datapunt/iiif-auth-proxy
