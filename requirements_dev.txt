@@ -47,7 +47,7 @@ deprecated==1.2.13
     # via
     #   -r ./requirements.txt
     #   jwcrypto
-django==4.1.5
+django==4.1.7
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
@@ -62,8 +62,6 @@ djangorestframework==3.14.0
     # via
     #   -r ./requirements.txt
     #   datapunt-data-ingress
-exceptiongroup==1.1.0
-    # via pytest
 idna==3.4
     # via
     #   -r ./requirements.txt
@@ -220,11 +218,6 @@ stevedore==4.1.1
     #   python-keystoneclient
 time-machine==2.9.0
     # via -r requirements_dev.in
-tomli==2.0.1
-    # via
-    #   build
-    #   coverage
-    #   pytest
 urllib3==1.26.14
     # via
     #   -r ./requirements.txt
