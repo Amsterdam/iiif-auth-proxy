@@ -12,7 +12,8 @@ def health(request):
         log.exception("Debug mode not allowed in production")
         return HttpResponse(
             "Debug mode not allowed in production",
-            content_type="text/plain", status=500)
+            content_type="text/plain",
+            status=500,
+        )
 
-    return HttpResponse(
-        "Connectivity OK", content_type='text/plain', status=200)
+    return HttpResponse("Connectivity OK", content_type="text/plain", status=200)

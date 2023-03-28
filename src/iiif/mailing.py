@@ -22,10 +22,10 @@ def send_email(email_address, email_subject, email_body):
         return
 
     email = Mail(
-        from_email='noreply@amsterdam.nl',
+        from_email="noreply@amsterdam.nl",
         to_emails=[email_address],
         subject=email_subject,
-        html_content=email_body
+        html_content=email_body,
     )
 
     # Disable all sendgrid tracking
