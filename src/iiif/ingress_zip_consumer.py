@@ -4,10 +4,10 @@ import os
 
 from django.conf import settings
 from django.template.loader import render_to_string
-from iiif import (authentication, cantaloupe, mailing, object_store, tools,
-                  zip_tools)
-from iiif.metadata import get_metadata
 from ingress.consumer.base import BaseConsumer
+
+from iiif import authentication, cantaloupe, mailing, object_store, tools, zip_tools
+from iiif.metadata import get_metadata
 from main import settings
 
 log = logging.getLogger(__name__)

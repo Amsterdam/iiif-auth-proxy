@@ -4,9 +4,14 @@ import sendgrid
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from sendgrid.helpers.mail import (ClickTracking, Ganalytics, Mail,
-                                   OpenTracking, SubscriptionTracking,
-                                   TrackingSettings)
+from sendgrid.helpers.mail import (
+    ClickTracking,
+    Ganalytics,
+    Mail,
+    OpenTracking,
+    SubscriptionTracking,
+    TrackingSettings,
+)
 
 log = logging.getLogger(__name__)
 

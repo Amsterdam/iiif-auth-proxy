@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 import jwt
 from django.conf import settings
 from django.http import HttpResponse
+from jwt.exceptions import DecodeError, ExpiredSignatureError, InvalidSignatureError
+
 from iiif.tools import ImmediateHttpResponse
-from jwt.exceptions import (DecodeError, ExpiredSignatureError,
-                            InvalidSignatureError)
 
 log = logging.getLogger(__name__)
 

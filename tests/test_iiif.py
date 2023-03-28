@@ -15,26 +15,30 @@ import pytz
 import time_machine
 from django.conf import settings
 from django.test import override_settings
-from iiif.authentication import (RESPONSE_CONTENT_COPYRIGHT,
-                                 RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
-                                 RESPONSE_CONTENT_NO_TOKEN,
-                                 RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN,
-                                 RESPONSE_CONTENT_RESTRICTED,
-                                 RESPONSE_CONTENT_RESTRICTED_IN_ZIP,
-                                 create_mail_login_token,
-                                 img_is_public_copyright)
-from iiif.cantaloupe import (RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
-                             create_file_url_and_headers, create_wabo_url)
-from iiif.generate_token import create_authz_token
-from iiif.ingress_zip_consumer import ZipConsumer
-from iiif.metadata import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
-from iiif.parsing import (InvalidIIIFUrlError, get_email_address,
-                          get_info_from_iiif_url)
-from iiif.tools import ImmediateHttpResponse
-from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER, create_local_zip_file
 from ingress.models import FailedMessage, Message
 from requests.exceptions import ConnectTimeout
 
+from iiif.authentication import (
+    RESPONSE_CONTENT_COPYRIGHT,
+    RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
+    RESPONSE_CONTENT_NO_TOKEN,
+    RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN,
+    RESPONSE_CONTENT_RESTRICTED,
+    RESPONSE_CONTENT_RESTRICTED_IN_ZIP,
+    create_mail_login_token,
+    img_is_public_copyright,
+)
+from iiif.cantaloupe import (
+    RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE,
+    create_file_url_and_headers,
+    create_wabo_url,
+)
+from iiif.generate_token import create_authz_token
+from iiif.ingress_zip_consumer import ZipConsumer
+from iiif.metadata import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
+from iiif.parsing import InvalidIIIFUrlError, get_email_address, get_info_from_iiif_url
+from iiif.tools import ImmediateHttpResponse
+from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER, create_local_zip_file
 from tests.tools import call_man_command
 
 log = logging.getLogger(__name__)
