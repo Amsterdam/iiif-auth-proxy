@@ -47,7 +47,7 @@ BOUWDOSSIER_EXTENDED_SCOPE = "BD/X"  # BouwDossiers_eXtended. Access civil serva
 IIIF_BASE_URL = os.getenv("IIIF_BASE_URL", "http://iiif.service.consul")
 IIIF_PORT = os.getenv("IIIF_PORT", "8149")  # This port is static within the network
 EDEPOT_BASE_URL = os.getenv(
-    "EDEPOT_BASE_URL", "https://bwt.uitplaatsing.hcp-a.basis.lan/rest/"
+    "EDEPOT_BASE_URL", "https://bwt.uitplaatsing.shcp03.archivingondemand.nl/rest/"
 )
 WABO_BASE_URL = os.getenv(
     "WABO_BASE_URL", "https://conversiestraatwabo.amsterdam.nl/webDAV/"
