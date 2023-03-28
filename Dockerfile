@@ -53,6 +53,6 @@ CMD ["./manage.py", "runserver", "0.0.0.0:8000"]
 FROM dev as tests
 
 WORKDIR /tests
-
+COPY pyproject.toml /app/.
 ENV COVERAGE_FILE=/tmp/.coverage
 ENV PYTHONPATH=/src
