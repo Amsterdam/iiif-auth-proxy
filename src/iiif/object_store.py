@@ -18,12 +18,12 @@ def get_object_store_connection():
 
 
 def store_small_object_on_object_store(connection, local_zip_file_path, filename):
-    with open(local_zip_file_path, 'rb') as local:
+    with open(local_zip_file_path, "rb") as local:
         connection.put_object(
             settings.OS_CONTAINER_NAME,
             filename,
             contents=local,
-            content_type='application/zip'
+            content_type="application/zip",
         )
 
 
@@ -33,25 +33,25 @@ def store_large_object_on_object_store(local_zip_file_path, filename):
             container = settings.OS_CONTAINER_NAME
             objects = [SwiftUploadObject(local_zip_file_path, object_name=filename)]
             for r in swift.upload(container=container, objects=objects):
-                if r['success']:
-                    if 'for_object' in r:
+                if r["success"]:
+                    if "for_object" in r:
                         # A part of the object was uploaded, so we continue to the next part
                         continue
-                    elif 'object' in r:
+                    elif "object" in r:
                         # The final part of the object was uploaded to the Object Store,
                         # so here we can stop the process
                         return
                 else:
-                    if r['action'] == "create_container":
+                    if r["action"] == "create_container":
                         log.warning(
                             f"Warning: failed to create container {container} {r['error']}"
                         )
-                    elif r['action'] == "upload_object":
+                    elif r["action"] == "upload_object":
                         log.error(
                             f"Failed to upload object %s to container {container}: {r['object']}, {r['error']}"
                         )
                     else:
-                        log.error(r['error'])
+                        log.error(r["error"])
         except SwiftError as e:
             log.error(e.value)
 
@@ -64,21 +64,25 @@ def store_object_on_object_store(connection, local_zip_file_path, filename):
         store_large_object_on_object_store(local_zip_file_path, filename)
 
 
-def create_object_store_temp_url(connection, file_name, expiry_minutes=0, expiry_hours=0, expiry_days=0):
+def create_object_store_temp_url(
+    connection, file_name, expiry_minutes=0, expiry_hours=0, expiry_days=0
+):
     # Create signature body
-    method = 'GET'
-    duration_in_seconds = ((((expiry_days * 24) + expiry_hours) * 60) + expiry_minutes) * 60
+    method = "GET"
+    duration_in_seconds = (
+        (((expiry_days * 24) + expiry_hours) * 60) + expiry_minutes
+    ) * 60
     expires = int(time() + duration_in_seconds)
-    path = os.path.join('/', settings.OS_CONTAINER_NAME, file_name)
-    hmac_body = f'{method}\n{expires}\n{path}'.encode('utf-8')
+    path = os.path.join("/", settings.OS_CONTAINER_NAME, file_name)
+    hmac_body = f"{method}\n{expires}\n{path}".encode("utf-8")
 
     # Create signature
-    key = bytes(settings.OS_TEMP_URL_KEY, 'UTF-8')
+    key = bytes(settings.OS_TEMP_URL_KEY, "UTF-8")
     sig = hmac.new(key, hmac_body, sha1).hexdigest()
 
     # Create url
-    tenant_id = connection.os_options['tenant_id']
-    url = f'https://{tenant_id}.{settings.OS_TLD}{path}?temp_url_sig={sig}&temp_url_expires={expires}'
+    tenant_id = connection.os_options["tenant_id"]
+    url = f"https://{tenant_id}.{settings.OS_TLD}{path}?temp_url_sig={sig}&temp_url_expires={expires}"
 
     return url
 
@@ -97,16 +101,20 @@ def remove_old_zips_from_object_store(logger=None):
     removed_counter = 0
     failed_counter = 0
     for file in files:
-        file_age = datetime.now() - datetime.fromisoformat(file['last_modified'])
+        file_age = datetime.now() - datetime.fromisoformat(file["last_modified"])
         if file_age.days > settings.TEMP_URL_EXPIRY_DAYS:
             try:
-                conn.delete_object(settings.OS_CONTAINER_NAME, file['name'])
+                conn.delete_object(settings.OS_CONTAINER_NAME, file["name"])
                 logger.info(f"Removed {file['name']}")
                 removed_counter += 1
             except ClientException as e:
                 logger.error(f"Failed to remove {file['name']} with error: {e}")
                 failed_counter += 1
 
-    logger.info(f"\nSuccessfully removed {removed_counter} old files from the object store.\n")
+    logger.info(
+        f"\nSuccessfully removed {removed_counter} old files from the object store.\n"
+    )
     if failed_counter:
-        logger.info(f"\nFAILED removing {failed_counter} old files from the object store.\n")
+        logger.info(
+            f"\nFAILED removing {failed_counter} old files from the object store.\n"
+        )

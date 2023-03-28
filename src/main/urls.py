@@ -16,6 +16,6 @@ Including another URLconf
 from django.urls import include, path
 
 urlpatterns = [
-    path('iiif/', include('iiif.urls')),
-    path('status/', include('health.urls')),
+    path("iiif/", include("iiif.urls")),
+    path("status/", include("health.urls")),
 ]

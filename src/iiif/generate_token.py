@@ -24,22 +24,19 @@ def create_authz_token(scopes=None):
         scopes = [scopes]
 
     load_jwks(settings.JWKS_TEST_KEY)
-    key = next(iter(_keyset['keys']))
+    key = next(iter(_keyset["keys"]))
     now = int(time.time())
     header = {
-        'alg': 'ES256',
-        'kid': key.key_id
+        "alg": "ES256",
+        "kid": key.key_id
         # 'kid': 'abcd5678'
     }
     claims = {
-        'iat': now,
-        'exp': now + 3600,
-        'scopes': scopes,
-        'sub': 'authztest@amsterdam.nl',
+        "iat": now,
+        "exp": now + 3600,
+        "scopes": scopes,
+        "sub": "authztest@amsterdam.nl",
     }
-    token = JWT(
-        header=header,
-        claims=claims
-    )
+    token = JWT(header=header, claims=claims)
     token.make_signed_token(key)
     return token.serialize()

@@ -4,9 +4,14 @@ import sendgrid
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from sendgrid.helpers.mail import (ClickTracking, Ganalytics, Mail,
-                                   OpenTracking, SubscriptionTracking,
-                                   TrackingSettings)
+from sendgrid.helpers.mail import (
+    ClickTracking,
+    Ganalytics,
+    Mail,
+    OpenTracking,
+    SubscriptionTracking,
+    TrackingSettings,
+)
 
 log = logging.getLogger(__name__)
 
@@ -22,10 +27,10 @@ def send_email(email_address, email_subject, email_body):
         return
 
     email = Mail(
-        from_email='noreply@amsterdam.nl',
+        from_email="noreply@amsterdam.nl",
         to_emails=[email_address],
         subject=email_subject,
-        html_content=email_body
+        html_content=email_body,
     )
 
     # Disable all sendgrid tracking

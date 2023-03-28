@@ -18,22 +18,33 @@ def index(request, iiif_url):
         authentication.check_auth_availability(request)
         mail_jwt_token, is_mail_login = authentication.read_out_mail_jwt_token(request)
         scope = authentication.get_max_scope(request, mail_jwt_token)
-        url_info = parsing.get_url_info(iiif_url, tools.str_to_bool(request.GET.get('source_file')))
+        url_info = parsing.get_url_info(
+            iiif_url, tools.str_to_bool(request.GET.get("source_file"))
+        )
         authentication.check_wabo_for_mail_login(is_mail_login, url_info)
-        metadata, _ = get_metadata(url_info, iiif_url, request.META.get('HTTP_AUTHORIZATION'), {})
+        metadata, _ = get_metadata(
+            url_info, iiif_url, request.META.get("HTTP_AUTHORIZATION"), {}
+        )
         authentication.check_file_access_in_metadata(metadata, url_info, scope)
-        file_response, file_url = cantaloupe.get_file(request.META, url_info, iiif_url, metadata)
+        file_response, file_url = cantaloupe.get_file(
+            request.META, url_info, iiif_url, metadata
+        )
         cantaloupe.handle_file_response_codes(file_response, file_url)
     except tools.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in index:")
         return e.response
 
-    return HttpResponse(file_response.content, content_type=file_response.headers.get('Content-Type', ''))
+    return HttpResponse(
+        file_response.content,
+        content_type=file_response.headers.get("Content-Type", ""),
+    )
 
 
 # TODO: limit to dataportaal urls
 @csrf_exempt
-@ratelimit(key='ip', rate='3/d', block=False )  # TODO: Check django cache settings for rate limiter to work across parallel docker containers
+@ratelimit(
+    key="ip", rate="3/d", block=False
+)  # TODO: Check django cache settings for rate limiter to work across parallel docker containers
 def send_dataportaal_login_url_to_mail(request):
     try:
         # Some basic sanity checks
@@ -44,13 +55,13 @@ def send_dataportaal_login_url_to_mail(request):
 
         # Create the login url
         token = authentication.create_mail_login_token(email, settings.JWT_SECRET_KEY)
-        login_url = origin_url + '?auth=' + token
+        login_url = origin_url + "?auth=" + token
 
         # Send the email
         email_subject = "Toegang bouw- en omgevingsdossiers data.amsterdam.nl"
-        email_body = render_to_string('login_link.html', {'login_url': login_url})
+        email_body = render_to_string("login_link.html", {"login_url": login_url})
         # TODO: move actually sending the email to a separate process
-        mailing.send_email(payload['email'], email_subject, email_body)
+        mailing.send_email(payload["email"], email_subject, email_body)
 
     except tools.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in login_url:")
@@ -76,20 +87,22 @@ def request_multiple_files_in_zip(request):
         return e.response
 
     zip_info = {
-        'email_address': email_address,
-        'request_meta': request.META,
-        'urls': {},
-        'scope': scope,
-        'is_mail_login': is_mail_login,
+        "email_address": email_address,
+        "request_meta": request.META,
+        "urls": {},
+        "scope": scope,
+        "is_mail_login": is_mail_login,
     }
-    for full_url in payload['urls']:
+    for full_url in payload["urls"]:
         try:
             iiif_url = parsing.strip_full_iiif_url(full_url)
-            url_info = parsing.get_url_info(iiif_url, tools.str_to_bool(request.GET.get('source_file')))
+            url_info = parsing.get_url_info(
+                iiif_url, tools.str_to_bool(request.GET.get("source_file"))
+            )
             authentication.check_wabo_for_mail_login(is_mail_login, url_info)
 
             # We create a new dict with all the info so that we have it when we want to get and zip the files later
-            zip_info['urls'][iiif_url] = {'url_info': url_info}
+            zip_info["urls"][iiif_url] = {"url_info": url_info}
 
         except tools.ImmediateHttpResponse as e:
             log.error(e.response.content)

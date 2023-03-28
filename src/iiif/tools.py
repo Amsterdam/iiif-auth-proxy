@@ -10,6 +10,7 @@ class ImmediateHttpResponse(Exception):
     This exception is used to interrupt the flow of processing to immediately
     return a custom HttpResponse.
     """
+
     _response = HttpResponse("Nothing provided.")
 
     def __init__(self, response):
@@ -23,4 +24,4 @@ class ImmediateHttpResponse(Exception):
 def str_to_bool(boolstr):
     if not isinstance(boolstr, str):
         return False
-    return boolstr.lower() in ('1', 't', 'true')
+    return boolstr.lower() in ("1", "t", "true")
