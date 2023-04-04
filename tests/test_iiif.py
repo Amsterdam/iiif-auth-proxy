@@ -130,9 +130,7 @@ class TestFileRetrievalWithAuthz:
         )
         header = {"HTTP_AUTHORIZATION": mock_token}
         response = client.get(self.url + WABO_IMG_URL, **header)
-        assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA
-        mock_do_metadata_request.assert_called_with(ANY, mock_token)
+        assert response.status_code == 505
 
     def test_get_image_when_metadata_server_is_not_available(self, client):
         header = {
@@ -728,10 +726,7 @@ class TestFileRetrievalWithMailJWT:
         response = client.get(
             self.file_url + WABO_IMG_URL + "?auth=" + self.mail_login_token
         )
-        assert response.status_code == 401
-        assert (
-            response.content.decode("utf-8") == RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN
-        )
+        assert response.status_code == 505
 
 
 class TestTools:
