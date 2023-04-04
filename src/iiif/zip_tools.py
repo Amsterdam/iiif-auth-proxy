@@ -8,18 +8,19 @@ from zipfile import ZipFile
 from django.conf import settings
 from ingress.models import Collection, Message
 
-TMP_BOUWDOSSIER_ZIP_FOLDER = '/tmp/bouwdossier-zips/'
+TMP_BOUWDOSSIER_ZIP_FOLDER = "/tmp/bouwdossier-zips/"
 
 
 def store_zip_job(zip_info):
     # There's a lot of things in the request_meta that is not JSON serializable.
     # Since we just need some headers we simply remove all values that are not strings
-    zip_info['request_meta'] = {k: v for k, v in zip_info['request_meta'].items() if type(v) is str}
+    zip_info["request_meta"] = {
+        k: v for k, v in zip_info["request_meta"].items() if type(v) is str
+    }
 
     collection = Collection.objects.get(name=settings.ZIP_COLLECTION_NAME)
     message = Message.objects.create(
-        raw_data=json.dumps(zip_info),
-        collection=collection
+        raw_data=json.dumps(zip_info), collection=collection
     )
     return message
 
@@ -34,13 +35,14 @@ def create_tmp_folder():
 
 def save_file_to_folder(folder, filename, content):
     file_path = os.path.join(folder, filename)
-    open_mode = 'w' if isinstance(content, str) else 'wb'
+    open_mode = "w" if isinstance(content, str) else "wb"
     with open(file_path, open_mode) as f:
         f.write(content)
 
+
 def create_local_zip_file(zipjob_uuid, folder_path):
-    zip_file_path = os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, f'{zipjob_uuid}.zip')
-    with ZipFile(zip_file_path, 'w') as zip_obj:
+    zip_file_path = os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, f"{zipjob_uuid}.zip")
+    with ZipFile(zip_file_path, "w") as zip_obj:
         for file in Path(folder_path).glob("*"):
             zip_obj.write(file, arcname=os.path.join(str(zipjob_uuid), file.name))
     return zip_file_path
