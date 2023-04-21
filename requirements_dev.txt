@@ -66,8 +66,6 @@ djangorestframework==3.14.0
     # via
     #   -r ./requirements.txt
     #   datapunt-data-ingress
-exceptiongroup==1.1.1
-    # via pytest
 idna==3.4
     # via
     #   -r ./requirements.txt
@@ -146,8 +144,6 @@ pbr==5.11.1
     #   oslo-serialization
     #   python-keystoneclient
     #   stevedore
-pip==23.1
-    # via pip-tools
 pip-tools==6.13.0
     # via -r requirements_dev.in
 platformdirs==3.2.0
@@ -215,17 +211,13 @@ sendgrid==6.10.0
     # via -r ./requirements.txt
 sentry-sdk==1.19.1
     # via -r ./requirements.txt
-setuptools==67.6.1
-    # via
-    #   -r ./requirements.txt
-    #   pip-tools
 six==1.16.0
     # via
     #   -r ./requirements.txt
     #   keystoneauth1
     #   python-dateutil
     #   python-keystoneclient
-sqlparse==0.4.3
+sqlparse==0.4.4
     # via
     #   -r ./requirements.txt
     #   django
@@ -241,13 +233,6 @@ stevedore==5.0.0
     #   python-keystoneclient
 time-machine==2.9.0
     # via -r requirements_dev.in
-tomli==2.0.1
-    # via
-    #   autoflake
-    #   black
-    #   build
-    #   coverage
-    #   pytest
 urllib3==1.26.15
     # via
     #   -r ./requirements.txt
