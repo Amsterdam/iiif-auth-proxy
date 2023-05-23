@@ -8,6 +8,8 @@ ENV CONSUL_HOST=${CONSUL_HOST:-notset}
 ENV CONSUL_PORT=${CONSUL_PORT:-8500}
 ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
+COPY certs/* /usr/local/share/ca-certificates/extras/
+
 RUN apt-get update \
  && apt-get dist-upgrade -y \
  && apt-get install --no-install-recommends -y \
