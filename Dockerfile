@@ -9,6 +9,8 @@ ENV CONSUL_PORT=${CONSUL_PORT:-8500}
 ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
 COPY certs/* /usr/local/share/ca-certificates/extras/
+RUN chmod -R 644 /usr/local/share/ca-certificates/extras/ \
+       && update-ca-certificates
 
 RUN apt-get update \
  && apt-get dist-upgrade -y \
