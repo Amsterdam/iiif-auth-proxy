@@ -38,10 +38,10 @@ app:
 	$(dc) up app
 
 dev:
-	$(dc) run --service-ports dev
+	$(run) --service-ports dev
 
 test: lint
-	$(dc) run --rm test pytest $(ARGS)
+	$(run) test pytest $(ARGS)
 
 lintfix:             ## Execute lint fixes
 	$(run) test black /src/$(APP) /tests/$(APP)
@@ -54,13 +54,13 @@ lint:                               ## Execute lint checks
 	$(run) test isort --diff --check /src/$(APP) /tests/$(APP)
 
 pdb:
-	$(dc) run --rm test pytest --pdb $(ARGS)
+	$(run) test pytest --pdb $(ARGS)
 
 clean:
 	$(dc) down -v
 
 bash:
-	$(dc) run --rm dev bash
+	$(run) dev bash
 
 env:
 	env | sort

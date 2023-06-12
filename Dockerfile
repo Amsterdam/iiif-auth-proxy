@@ -1,4 +1,4 @@
-FROM python:3.8-buster as app
+FROM python:3.11-buster as app
 MAINTAINER datapunt@amsterdam.nl
 
 EXPOSE 8000
