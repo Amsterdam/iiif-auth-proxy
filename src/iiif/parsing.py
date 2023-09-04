@@ -36,8 +36,8 @@ def get_info_from_iiif_url(iiif_url, source_file):
     # SDZ-38657-4900487_628547=filename  SDZ=stadsdeel  38657=dossier  4900487=olo_liaan_nummer  628547=document_barcode
 
     # At the end of the url, this can be appended '?source_file=true', which means we'll bypass
-    # cantaloupe and go directly for the source file. This can be needed when the file is not an image, but for 
-    # example a txt, xls, zip or something else.
+    # all image related code and go directly for the source file. This can be needed when the file is
+    # not an image, but for example a txt, xls, zip or something else.
 
     try:
         source = iiif_url.split(":")[0].split("/")[1]  # "edepot" or "wabo"
