@@ -6,7 +6,7 @@ from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 from django_ratelimit.decorators import ratelimit
 
-from iiif import authentication, cantaloupe, mailing, parsing, tools, zip_tools
+from iiif import authentication, image_server, mailing, parsing, tools, zip_tools
 from iiif.image_formatting import scale_image
 from iiif.metadata import get_metadata
 
@@ -33,10 +33,10 @@ def index(request, iiif_url):
             url_info, iiif_url, request.META.get("HTTP_AUTHORIZATION"), {}
         )
         authentication.check_file_access_in_metadata(metadata, url_info, scope)
-        file_response, file_url = cantaloupe.get_file(
+        file_response, file_url = image_server.get_file(
             request.META, url_info, iiif_url, metadata
         )
-        cantaloupe.handle_file_response_codes(file_response, file_url)
+        image_server.handle_file_response_codes(file_response, file_url)
         # TODO: GET FILE FORMAT FROM THE REQUEST INSTEAD OF HARDCODING IT BELOW
         scaled_image = scale_image(file_response.content, url_info["scaling"], "JPEG")
     except tools.ImmediateHttpResponse as e:

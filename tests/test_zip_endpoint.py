@@ -294,7 +294,7 @@ class TestZipEndpoint:
         assert response.status_code == 200
         assert Message.objects.count() == 1
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     @patch("iiif.object_store.store_object_on_object_store")
     @patch("iiif.mailing.send_email")

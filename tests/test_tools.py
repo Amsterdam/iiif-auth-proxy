@@ -12,7 +12,7 @@ import pytz
 from django.conf import settings
 
 from iiif.authentication import create_mail_login_token, img_is_public_copyright
-from iiif.cantaloupe import create_file_url_and_headers, create_wabo_url
+from iiif.image_server import create_file_url_and_headers, create_wabo_url
 from iiif.parsing import InvalidIIIFUrlError, get_email_address, get_info_from_iiif_url
 from iiif.tools import ImmediateHttpResponse
 from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER, create_local_zip_file

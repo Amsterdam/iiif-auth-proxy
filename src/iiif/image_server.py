@@ -109,7 +109,7 @@ def download_file_for_zip(
     request_meta,
     tmp_folder_path,
 ):
-    # Tell cantaloupe we want the full image
+    # Tell image server we want the full image
     iiif_url += "/full/full/0/default.jpg"
 
     info_txt_contents += f"{iiif_url}: "

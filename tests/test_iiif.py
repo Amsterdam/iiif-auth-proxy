@@ -16,8 +16,8 @@ from iiif.authentication import (
     RESPONSE_CONTENT_RESTRICTED,
     create_mail_login_token,
 )
-from iiif.cantaloupe import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER
 from iiif.generate_token import create_authz_token
+from iiif.image_server import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER
 from iiif.metadata import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
 from tests.tools import MockResponse
 
@@ -61,7 +61,7 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 400
         assert response.content.decode("utf-8") == "Invalid formatted url"
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_image_which_does_not_exist_in_metadata(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -88,7 +88,7 @@ class TestFileRetrievalWithAuthz:
             response.content.decode("utf-8") == RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA
         )
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_keycloak_token_is_sent_to_metadata_server(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -152,7 +152,7 @@ class TestFileRetrievalWithAuthz:
             == RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER + " ConnectTimeout"
         )
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_image_when_image_server_gives_ConnectTimeout(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -180,7 +180,7 @@ class TestFileRetrievalWithAuthz:
             == RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER + " ConnectTimeout"
         )
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_without_token(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -203,7 +203,7 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_TOKEN
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_without_token(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -226,7 +226,7 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_TOKEN
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_in_public_dossier_without_token(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -249,7 +249,7 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_TOKEN
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_in_restricted_dossier_without_token(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -272,7 +272,7 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_TOKEN
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_read_scope(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -321,7 +321,7 @@ class TestFileRetrievalWithAuthz:
         assert response.content == IMAGE_BINARY_DATA
 
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_with_read_scope(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -348,7 +348,7 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_RESTRICTED
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_extended_scope(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -377,7 +377,7 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_with_extended_scope(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -406,7 +406,7 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_dossier_and_restricted_image_with_extended_scope(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -435,7 +435,7 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_only_extended_scope_and_no_read_scope(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -462,7 +462,7 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_with_only_extended_scope_and_no_read_scope(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -581,7 +581,7 @@ class TestFileRetrievalWithMailJWT:
         )
         assert response.status_code == 200
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_read_scope(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -625,7 +625,7 @@ class TestFileRetrievalWithMailJWT:
         # assert response.status_code == 200
         # assert response.content == IMAGE_BINARY_DATA
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_with_read_scope(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -650,7 +650,7 @@ class TestFileRetrievalWithMailJWT:
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_RESTRICTED
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_expired_token(
         self, mock_do_metadata_request, mock_get_image_from_server, client
@@ -680,7 +680,7 @@ class TestFileRetrievalWithMailJWT:
         response = client.get(self.file_url + PRE_WABO_IMG_URL + "?auth=" + jwt_token)
         assert response.status_code == 401
 
-    @patch("iiif.cantaloupe.get_image_from_server")
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_invalid_token_signature(
         self, mock_do_metadata_request, mock_get_image_from_server, client
