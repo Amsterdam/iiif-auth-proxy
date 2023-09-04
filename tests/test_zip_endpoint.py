@@ -20,15 +20,13 @@ from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER
 from tests.test_iiif import (
     IMAGE_BINARY_DATA,
     PRE_WABO_IMG_URL,
-    PRE_WABO_IMG_URL_X1,
+    PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
     WABO_IMG_URL,
-    MockResponse,
 )
 from tests.tools import MockResponse, call_man_command
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
-
 
 
 @pytest.mark.django_db
@@ -69,7 +67,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         self.BASE_URL + PRE_WABO_IMG_URL,
-                        self.BASE_URL + PRE_WABO_IMG_URL_X1,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
             ),
@@ -110,7 +108,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         self.BASE_URL + PRE_WABO_IMG_URL,
-                        self.BASE_URL + PRE_WABO_IMG_URL_X1,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
             ),
@@ -141,7 +139,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         self.BASE_URL + PRE_WABO_IMG_URL,
-                        self.BASE_URL + PRE_WABO_IMG_URL_X1,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
             ),
@@ -175,7 +173,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         PRE_WABO_IMG_URL,  # NO BASE URL HERE, SO IT'S MISFORMED
-                        self.BASE_URL + PRE_WABO_IMG_URL_X1,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
             ),
@@ -234,7 +232,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         self.BASE_URL + PRE_WABO_IMG_URL,
-                        self.BASE_URL + PRE_WABO_IMG_URL_X1,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
             ),
@@ -285,7 +283,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         self.BASE_URL + PRE_WABO_IMG_URL,
-                        self.BASE_URL + PRE_WABO_IMG_URL_X1,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
             ),
@@ -296,7 +294,7 @@ class TestZipEndpoint:
         assert response.status_code == 200
         assert Message.objects.count() == 1
 
-    @patch("iiif.cantaloupe.get_image_from_iiif_server")
+    @patch("iiif.cantaloupe.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     @patch("iiif.object_store.store_object_on_object_store")
     @patch("iiif.mailing.send_email")
@@ -330,7 +328,7 @@ class TestZipEndpoint:
         mock_send_email,
         mock_store_object_on_object_store,
         mock_do_metadata_request,
-        mock_get_image_from_iiif_server,
+        mock_get_image_from_server,
         scope,
         second_image_access,
         expected_line_end,
@@ -355,7 +353,7 @@ class TestZipEndpoint:
                 ],
             },
         )
-        mock_get_image_from_iiif_server.return_value = MockResponse(
+        mock_get_image_from_server.return_value = MockResponse(
             200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/png"}
         )
 
@@ -367,7 +365,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         self.BASE_URL + PRE_WABO_IMG_URL,
-                        self.BASE_URL + PRE_WABO_IMG_URL_X1,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
             ),

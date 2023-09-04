@@ -44,15 +44,15 @@ BOUWDOSSIER_READ_SCOPE = (
     "BD/R"  # BouwDossiers_Read. Access to civil servants of Amsterdam Municipality
 )
 BOUWDOSSIER_EXTENDED_SCOPE = "BD/X"  # BouwDossiers_eXtended. Access civil servants of Amsterdam Municipality with special rights.
-IIIF_BASE_URL = os.getenv("IIIF_BASE_URL", "http://iiif.service.consul")
-IIIF_PORT = os.getenv("IIIF_PORT", "8149")  # This port is static within the network
+# IIIF_BASE_URL = os.getenv("IIIF_BASE_URL", "http://iiif.service.consul")
+# IIIF_PORT = os.getenv("IIIF_PORT", "8149")  # This port is static within the network
 EDEPOT_BASE_URL = os.getenv(
     "EDEPOT_BASE_URL", "https://bwt.uitplaatsing.shcp03.archivingondemand.nl/rest/"
 )
 WABO_BASE_URL = os.getenv(
-    "WABO_BASE_URL", "https://conversiestraatwabo.amsterdam.nl/webDAV/"
+    "WABO_BASE_URL", "https://bwt.hs3-saa-bwt.shcp04.archivingondemand.nl/"
 )
-HCP_AUTHORIZATION = os.getenv("HCP_AUTHORIZATION")
+HCP_AUTHORIZATION = os.getenv("HCP_AUTHORIZATION", "dummy")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ALGORITHM = "HS256"
 SENDGRID_KEY = os.getenv("SENDGRID_KEY", "mock_key")
