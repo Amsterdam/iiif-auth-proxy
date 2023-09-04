@@ -42,7 +42,7 @@ PRE_WABO_INFO_JSON_URL = "2/edepot:SQ11426-SQ-file5BAIoi-SQ10092307_00001.jpg/in
 
 WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547/full/1000,900/0/default.jpg"
 
-with open("test-image.jpg", "rb") as file:
+with open("test-image-96x85.jpg", "rb") as file:
     IMAGE_BINARY_DATA = file.read()
 
 
