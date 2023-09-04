@@ -11,80 +11,35 @@ from iiif.tools import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 
-RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE = (
-    "The iiif-image-server cannot be reached " "because the following error occurred: "
+RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER = (
+    "The image-server cannot be reached " "because the following error occurred: "
 )
 
 
 def create_wabo_url(url_info, metadata):
     for document in metadata["documenten"]:
         if document["barcode"] == url_info["document_barcode"]:
-            filename = document["bestanden"][0]["filename"]
-            if url_info["source_file"]:
-                # This means that in order to avoid any file conversions we're bypassing cantaloupe
-                # and going directly to the source server to get the raw file and serve that
-                return f"{filename}"
-            else:
-                return f"2/{url_info['source']}:{filename.replace('/', '-')}/{url_info['formatting']}"
+            return document["bestanden"][0]["filename"]  # there is always only one filename per bestand
     # TODO: raise something in the unlikely event that nothing is found
 
 
 # TODO: split into two functions, one for url and one for headers
 def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
-    iiif_url = iiif_url.replace(" ", "%20")
-    headers = {}
-    if (
-        "HTTP_X_FORWARDED_PROTO" in request_meta
-        and "HTTP_X_FORWARDED_HOST" in request_meta
-    ):
-        # Make sure the iiif-image-server gets the protocol and the host of the initial request so that
-        # any other info urls in the response have the correct public url, instead of the
-        # local .service.consul url.
-        headers["X-Forwarded-Proto"] = request_meta["HTTP_X_FORWARDED_PROTO"]
-        headers["X-Forwarded-Host"] = request_meta["HTTP_X_FORWARDED_HOST"]
-    else:
-        # Added for local testing. If X-Forwarded-ID is present the iiif imageserver
-        # also needs to have the X-Forwarded-Host and or X-Forwarded-Port
-        # Otherwise the X-Forwarded-Id is used by iiif image server in the destination URI
-        http_host = request_meta.get("HTTP_HOST", "").split(":")
-        if len(http_host) >= 2:
-            headers["X-Forwarded-Host"] = http_host[0]
-            headers["X-Forwarded-Port"] = http_host[1]
-
     if url_info["source"] == "edepot":
-        if url_info["source_file"]:
-            # This means that in order to avoid any file conversions we're bypassing cantaloupe
-            # and going directly to the source server to get the raw file and serve that
-            url = settings.EDEPOT_BASE_URL + url_info["filename"].replace("-", "/")
-            return url, {"Authorization": settings.HCP_AUTHORIZATION}, ()
-        else:
-            # If the iiif url contains a reference to dossier like SQ1421 without - then
-            # this was added to ad reference to stadsdeel and dossiernumber and it should be removed
-            iiif_url_edepot = re.sub(r":[A-Z]+\d+-", ":", iiif_url)
-            if iiif_url_edepot != iiif_url:
-                headers["X-Forwarded-ID"] = iiif_url.split("/")[1]
-            iiif_image_url = (
-                f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{iiif_url_edepot}"
-            )
-            return iiif_image_url, headers, ()
+        # If the iiif url contains a reference to dossier like SQ1421 without a '-' between the letters
+        # and the numbers, then this was added as a reference to stadsdeel and dossiernumber and
+        # it should be removed.
+        iiif_url_edepot = re.sub(r"[A-Z]+\d+/", "", url_info["filename"])
+        iiif_image_url = f"{settings.EDEPOT_BASE_URL}{iiif_url_edepot}"
+        return iiif_image_url, {"Authorization": settings.HCP_AUTHORIZATION}, ()
     elif url_info["source"] == "wabo":
-        if url_info["source_file"]:
-            # This means that in order to avoid any file conversions we're bypassing cantaloupe
-            # and going directly to the source server to get the raw file and serve that
-            wabo_url = create_wabo_url(url_info, metadata)
-            iiif_image_url = f"{settings.WABO_BASE_URL}{wabo_url}"
-            cert = "/tmp/sw444v1912.pem"
-            return iiif_image_url, headers, cert
-        else:
-            headers["X-Forwarded-ID"] = iiif_url.split("/")[1]
-            wabo_url = create_wabo_url(url_info, metadata)
-            iiif_image_url = (
-                f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{wabo_url}"
-            )
-            return iiif_image_url, headers, ()
+        wabo_url = create_wabo_url(url_info, metadata)
+        iiif_image_url = f"{settings.WABO_BASE_URL}{wabo_url}"
+        cert = "/tmp/sw444v1912.pem"
+        return iiif_image_url, {}, cert
 
 
-def get_image_from_iiif_server(file_url, headers, cert, verify=True):
+def get_image_from_server(file_url, headers, cert, verify=True):
     return requests.get(
         file_url, headers=headers, cert=cert, verify=verify, timeout=(2, 20)
     )
@@ -103,10 +58,10 @@ def get_file(request_meta, url_info, iiif_url, metadata):
         request_meta, url_info, iiif_url, metadata
     )
     try:
-        file_response = get_image_from_iiif_server(file_url, headers, cert, verify)
+        file_response = get_image_from_server(file_url, headers, cert, verify)
     except RequestException as e:
         message = (
-            f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_CANTALOUPE} {e.__class__.__name__}"
+            f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {e.__class__.__name__}"
         )
         log.error(message)
         raise ImmediateHttpResponse(response=HttpResponse(message, status=502))
@@ -118,18 +73,18 @@ def handle_file_response_codes(file_response, file_url):
     if file_response.status_code == 404:
         raise ImmediateHttpResponse(
             response=HttpResponse(
-                f"No source file could be found for internal url {file_url}", status=404
+                f"No source file could be found for the url {file_url}", status=404
             )
         )
     elif file_response.status_code != 200:
         log.info(
             f"Got response code {file_response.status_code} while retrieving "
-            f"the image {file_url} from the iiif-image-server."
+            f"the image {file_url} from the image server."
         )
         raise ImmediateHttpResponse(
             response=HttpResponse(
                 f"We had a problem retrieving the image. We got status "
-                f"code {file_response.status_code} for internal url {file_url}",
+                f"code {file_response.status_code} for url {file_url}",
                 status=502,
             )
         )

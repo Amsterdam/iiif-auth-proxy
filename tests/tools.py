@@ -24,3 +24,7 @@ class MockResponse:
 
     def json(self):
         return self.json_content
+
+
+def filename_from_url(url):
+    return url.split(':')[1].split('/')[0].replace('-', '/')

@@ -18,14 +18,15 @@ from iiif.tools import ImmediateHttpResponse
 from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER, create_local_zip_file
 from tests.test_iiif import (
     PRE_WABO_IMG_URL,
-    PRE_WABO_IMG_URL_X1,
-    PRE_WABO_IMG_URL_X2,
+    PRE_WABO_IMG_URL_NO_SCALING,
+    PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+    PRE_WABO_INFO_JSON_URL,
     WABO_IMG_URL,
 )
+from tests.tools import filename_from_url
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
-
 
 
 class TestTools:
@@ -39,6 +40,7 @@ class TestTools:
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["file"] == "00001"
+        assert url_info["scaling"] == "1000,900"
         assert url_info["source_file"] == False
 
     def test_get_info_from_pre_wabo_url_with_source_file(self):
@@ -48,6 +50,17 @@ class TestTools:
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["file"] == "00001"
+        assert url_info["scaling"] == "1000,900"
+        assert url_info["source_file"] == True
+
+    def test_get_info_from_pre_wabo_url_with_no_scaling(self):
+        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_NO_SCALING, True)
+        assert url_info["source"] == "edepot"
+        assert url_info["stadsdeel"] == "ST"
+        assert url_info["dossier"] == "00015"
+        assert url_info["document_barcode"] == "ST00000126"
+        assert url_info["file"] == "00001"
+        assert url_info["scaling"] == "full"
         assert url_info["source_file"] == True
 
     def test_get_info_from_pre_wabo_url_wrong_formatted_url(self):
@@ -61,6 +74,7 @@ class TestTools:
         assert url_info["dossier"] == "38657"
         assert url_info["olo"] == "4900487"
         assert url_info["document_barcode"] == "628547"
+        assert url_info["scaling"] == "1000,900"
         assert url_info["source_file"] == False
 
     def test_get_info_from_wabo_url_with_source_file(self):
@@ -70,6 +84,7 @@ class TestTools:
         assert url_info["dossier"] == "38657"
         assert url_info["olo"] == "4900487"
         assert url_info["document_barcode"] == "628547"
+        assert url_info["scaling"] == "1000,900"
         assert url_info["source_file"] == True
 
     def test_get_info_from_wabo_url_with_underscores_in_barcode(self):
@@ -81,6 +96,7 @@ class TestTools:
         assert url_info["dossier"] == "10316333"
         assert url_info["olo"] == "3304"
         assert url_info["document_barcode"] == "ECS0000004420_000_000"
+        assert url_info["scaling"] == None
         assert url_info["source_file"] == False
 
     def test_get_info_from_wabo_url_with_underscores_and_hyphens_in_barcode(self):
@@ -92,6 +108,7 @@ class TestTools:
         assert url_info["dossier"] == "10316333"
         assert url_info["olo"] == "3304"
         assert url_info["document_barcode"] == "ECS0000004420-000_00-00"
+        assert url_info["scaling"] == None
         assert url_info["source_file"] == False
 
     def test_get_info_from_wabo_url_wrong_formatted_url(self):
@@ -110,7 +127,7 @@ class TestTools:
         }
 
         wabo_url = create_wabo_url(metadata=metadata, url_info=url_info)
-        assert wabo_url == "2/wabo:SDZ-UIT-COH-628547.PDF/full/1000,1000/0/default.jpg"
+        assert wabo_url == "SDZ/UIT/COH/628547.PDF"
 
     def test_create_wabo_url_source_file(self):
         url_info = get_info_from_iiif_url(WABO_IMG_URL, True)
@@ -138,56 +155,15 @@ class TestTools:
 
         # pre-wabo with no headers
         url, headers, cert = create_file_url_and_headers(
-            {}, {"source": "edepot", "source_file": False}, PRE_WABO_IMG_URL, metadata
+            {}, {"source": "edepot", "source_file": False, "filename": filename_from_url(PRE_WABO_IMG_URL)}, PRE_WABO_IMG_URL, metadata
         )
-        assert (
-            url
-            == f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL}"
-        )
-        assert headers == {}
-        assert cert == ()
 
-        # pre-wabo with one header (which we expect to not be used)
-        url, headers, cert = create_file_url_and_headers(
-            {"HTTP_X_FORWARDED_PROTO": "a"},
-            {"source": "edepot", "source_file": False},
-            PRE_WABO_IMG_URL,
-            metadata,
-        )
-        assert (
-            url
-            == f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL}"
-        )
-        assert headers == {}
-        assert cert == ()
 
-        # pre-wabo with one header (which we expect to not be used)
-        url, headers, cert = create_file_url_and_headers(
-            {"HTTP_X_FORWARDED_HOST": "a"},
-            {"source": "edepot", "source_file": False},
-            PRE_WABO_IMG_URL,
-            metadata,
-        )
         assert (
             url
-            == f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL}"
+            == f"{settings.EDEPOT_BASE_URL}{filename_from_url(PRE_WABO_IMG_URL)}"
         )
-        assert headers == {}
-        assert cert == ()
-
-        # pre-wabo with both forwarded headers (which we both expect to be used)
-        url, headers, cert = create_file_url_and_headers(
-            {"HTTP_X_FORWARDED_PROTO": "proto", "HTTP_X_FORWARDED_HOST": "host"},
-            {"source": "edepot", "source_file": False},
-            PRE_WABO_IMG_URL,
-            metadata,
-        )
-        assert (
-            url
-            == f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL}"
-        )
-        assert headers["X-Forwarded-Proto"] == "proto"
-        assert headers["X-Forwarded-Host"] == "host"
+        assert headers == {'Authorization': settings.HCP_AUTHORIZATION}
         assert cert == ()
 
         # pre-wabo with source_file set to true
@@ -196,39 +172,39 @@ class TestTools:
             {
                 "source": "edepot",
                 "source_file": True,
-                "filename": "ST-00015-ST00000126_00001.jpg",
+                "filename": filename_from_url(PRE_WABO_IMG_URL),
             },
             PRE_WABO_IMG_URL,
             metadata,
         )
-        assert url == f"{settings.EDEPOT_BASE_URL}ST/00015/ST00000126_00001.jpg"
-        assert headers["Authorization"] == settings.HCP_AUTHORIZATION
+        assert url == f"{settings.EDEPOT_BASE_URL}{filename_from_url(PRE_WABO_IMG_URL)}"
+        # assert headers["Authorization"] == settings.HCP_AUTHORIZATION
         assert cert == ()
 
-        # pre-wabo with other structure 1
+        # pre-wabo with added reference
         url, headers, cert = create_file_url_and_headers(
             {},
-            {"source": "edepot", "source_file": False},
-            PRE_WABO_IMG_URL_X1,
+            {"source": "edepot", "source_file": False, "filename": filename_from_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE)},
+            PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+            metadata,
+        )
+        # "2/edepot:SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg/full/1000,900/0/default.jpg"
+        assert (
+            url
+            == f"{settings.EDEPOT_BASE_URL}{filename_from_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE).replace('SQ1452/','')}"
+        )
+
+        # pre-wabo with json url
+        url, headers, cert = create_file_url_and_headers(
+            {},
+            {"source": "edepot", "source_file": False, "filename": filename_from_url(PRE_WABO_INFO_JSON_URL)},
+            PRE_WABO_INFO_JSON_URL,
             metadata,
         )
 
         assert (
             url
-            == f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL_X1.replace('SQ1452-','')}"
-        )
-
-        # pre-wabo with other structure 2
-        url, headers, cert = create_file_url_and_headers(
-            {},
-            {"source": "edepot", "source_file": False},
-            PRE_WABO_IMG_URL_X2,
-            metadata,
-        )
-
-        assert (
-            url
-            == f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/{PRE_WABO_IMG_URL_X2.replace('SQ11426-', '')}"
+            == f"{settings.EDEPOT_BASE_URL}{filename_from_url(PRE_WABO_INFO_JSON_URL).replace('SQ11426/', '')}"
         )
 
         # wabo with adjusted url and X-Forwarded-ID
@@ -243,12 +219,13 @@ class TestTools:
             WABO_IMG_URL,
             metadata,
         )
+        # WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547/full/1000,900/0/default.jpg"
         assert (
             url
-            == f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/2/wabo:SDZ-UIT-COH-628547.PDF/full/1000,1000/0/default.jpg"
+            == f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF"
         )
-        assert headers["X-Forwarded-ID"] == "wabo:SDZ-38657-4900487_628547"
-        assert cert == ()
+        # assert headers["X-Forwarded-ID"] == "wabo:SDZ-38657-4900487_628547"
+        assert cert == '/tmp/sw444v1912.pem'
 
         # wabo with adjusted url and X-Forwarded-ID and both forwarded headers
         url, headers, cert = create_file_url_and_headers(
@@ -264,13 +241,9 @@ class TestTools:
         )
         assert (
             url
-            == f"{settings.IIIF_BASE_URL}:{settings.IIIF_PORT}/iiif/2/wabo:SDZ-UIT-COH-628547.PDF/full/1000,1000/0/default.jpg"
+            == f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF"
         )
-        assert len(headers) == 3
-        assert headers["X-Forwarded-ID"] == "wabo:SDZ-38657-4900487_628547"
-        assert headers["X-Forwarded-Proto"] == "proto"
-        assert headers["X-Forwarded-Host"] == "host"
-        assert cert == ()
+        assert cert == '/tmp/sw444v1912.pem'
 
         # wabo with source_file
         url, headers, cert = create_file_url_and_headers(
