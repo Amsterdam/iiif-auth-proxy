@@ -16,11 +16,12 @@ class TestImageFormatting:
         assert parse_scaling_string("100,100") == (100, 100)
 
     def test_scale_image(self):
-        assert scale_image(self.img_96x85, "full", "image/jpeg") == self.img_96x85
-        assert scale_image(self.img_96x85, "100,100", "image/jpeg") == self.img_96x85
-        assert scale_image(self.img_96x85, "100,", "image/jpeg") == self.img_96x85
-        assert scale_image(self.img_96x85, ",100", "image/jpeg") == self.img_96x85
-        assert scale_image(self.img_96x85, "50,50", "image/jpeg") == self.img_50x44
-        assert scale_image(self.img_96x85, "50,", "image/jpeg") == self.img_50x44
-        assert scale_image(self.img_96x85, "60,44", "image/jpeg") == self.img_49x44
-        assert scale_image(self.img_96x85, ",44", "image/jpeg") == self.img_49x44
+        assert scale_image(self.img_96x85, False, "full", "image/jpeg") == self.img_96x85
+        assert scale_image(self.img_96x85, False, "100,100", "image/jpeg") == self.img_96x85
+        assert scale_image(self.img_96x85, False, "100,", "image/jpeg") == self.img_96x85
+        assert scale_image(self.img_96x85, False, ",100", "image/jpeg") == self.img_96x85
+        assert scale_image(self.img_96x85, True, "20,20", "image/jpeg") == self.img_96x85
+        assert scale_image(self.img_96x85, False, "50,50", "image/jpeg") == self.img_50x44
+        assert scale_image(self.img_96x85, False, "50,", "image/jpeg") == self.img_50x44
+        assert scale_image(self.img_96x85, False, "60,44", "image/jpeg") == self.img_49x44
+        assert scale_image(self.img_96x85, False, ",44", "image/jpeg") == self.img_49x44

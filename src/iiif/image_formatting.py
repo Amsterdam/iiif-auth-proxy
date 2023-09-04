@@ -31,16 +31,17 @@ def parse_scaling_string(scaling):
     return desired_width, desired_height
 
 
-def scale_image(content, scaling, content_type):
+def scale_image(content, source_file, scaling, content_type):
     """
     Scale the image to the desired size. Never scale up.
 
     :param content: The image data
+    :param source_file: Bool whether the raw source file should be returned without any scaling
     :param scaling: The scaling string from the url
     :param content_type: The content type of the image
     :return: The scaled image data
     """
-    if scaling.lower() == "full":
+    if source_file or scaling.lower() == "full":
         return content
 
     desired_width, desired_height = parse_scaling_string(scaling)
