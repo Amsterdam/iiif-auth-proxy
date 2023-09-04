@@ -37,8 +37,7 @@ def index(request, iiif_url):
             request.META, url_info, iiif_url, metadata
         )
         image_server.handle_file_response_codes(file_response, file_url)
-        # TODO: GET FILE FORMAT FROM THE REQUEST INSTEAD OF HARDCODING IT BELOW
-        scaled_image = scale_image(file_response.content, url_info["scaling"], "JPEG")
+        scaled_image = scale_image(file_response.content, url_info["scaling"], file_response.headers.get("Content-Type", "image/jpeg"))
     except tools.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in index:")
         return e.response
