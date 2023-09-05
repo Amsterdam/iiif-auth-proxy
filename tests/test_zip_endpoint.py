@@ -19,8 +19,8 @@ from iiif.ingress_zip_consumer import ZipConsumer
 from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER
 from tests.test_iiif import (
     IMAGE_BINARY_DATA,
-    PRE_WABO_IMG_URL,
     PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+    PRE_WABO_IMG_URL_WITH_SCALING,
     WABO_IMG_URL,
 )
 from tests.tools import MockResponse, call_man_command
@@ -66,7 +66,7 @@ class TestZipEndpoint:
             json.dumps(
                 {
                     "urls": [
-                        self.BASE_URL + PRE_WABO_IMG_URL,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
@@ -107,7 +107,7 @@ class TestZipEndpoint:
             json.dumps(
                 {
                     "urls": [
-                        self.BASE_URL + PRE_WABO_IMG_URL,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
@@ -138,7 +138,7 @@ class TestZipEndpoint:
             json.dumps(
                 {
                     "urls": [
-                        self.BASE_URL + PRE_WABO_IMG_URL,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
@@ -172,7 +172,7 @@ class TestZipEndpoint:
             json.dumps(
                 {
                     "urls": [
-                        PRE_WABO_IMG_URL,  # NO BASE URL HERE, SO IT'S MISFORMED
+                        PRE_WABO_IMG_URL_WITH_SCALING,  # NO BASE URL HERE, SO IT'S MISFORMED
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
@@ -190,7 +190,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         self.BASE_URL + WABO_IMG_URL,
-                        self.BASE_URL + PRE_WABO_IMG_URL,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
                     ]
                 }
             ),
@@ -231,7 +231,7 @@ class TestZipEndpoint:
             json.dumps(
                 {
                     "urls": [
-                        self.BASE_URL + PRE_WABO_IMG_URL,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
@@ -282,7 +282,7 @@ class TestZipEndpoint:
             json.dumps(
                 {
                     "urls": [
-                        self.BASE_URL + PRE_WABO_IMG_URL,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }
@@ -364,7 +364,7 @@ class TestZipEndpoint:
             json.dumps(
                 {
                     "urls": [
-                        self.BASE_URL + PRE_WABO_IMG_URL,
+                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
                 }

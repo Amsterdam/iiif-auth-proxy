@@ -27,8 +27,8 @@ timezone = pytz.timezone("UTC")
 def filename_from_url(url):
     return url.split(':')[1].split('/')[0].replace('-', '/')
 
-PRE_WABO_IMG_URL = "2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,900/0/default.jpg"
-PRE_WABO_FILE_NAME = filename_from_url(PRE_WABO_IMG_URL)
+PRE_WABO_IMG_URL_WITH_SCALING = "2/edepot:ST-00015-ST00000126_00001.jpg/full/50,50/0/default.jpg"
+PRE_WABO_FILE_NAME_WITH_SCALING = filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)
 
 PRE_WABO_IMG_URL_NO_SCALING = "2/edepot:ST-00015-ST00000126_00001.jpg/full/full/0/default.jpg"
 PRE_WABO_FILE_NAME_NO_SCALING = filename_from_url(PRE_WABO_IMG_URL_NO_SCALING)
@@ -42,8 +42,11 @@ PRE_WABO_INFO_JSON_URL = "2/edepot:SQ11426-SQ-file5BAIoi-SQ10092307_00001.jpg/in
 
 WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547/full/1000,900/0/default.jpg"
 
-with open("test-image-96x85.jpg", "rb") as file:
+with open("test-images/test-image-96x85.jpg", "rb") as file:
     IMAGE_BINARY_DATA = file.read()
+with open("test-images/test-image-50x44.jpg", "rb") as file:
+    IMAGE_BINARY_DATA_50x44 = file.read()
+
 
 
 class TestFileRetrievalWithAuthz:
@@ -82,7 +85,7 @@ class TestFileRetrievalWithAuthz:
             "HTTP_AUTHORIZATION": "Bearer "
             + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)
         }
-        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING, **header)
         assert response.status_code == 404
         assert (
             response.content.decode("utf-8") == RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA
@@ -119,7 +122,7 @@ class TestFileRetrievalWithAuthz:
             "HTTP_AUTHORIZATION": "Bearer "
             + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)
         }
-        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING, **header)
         assert response.status_code == 502
         assert (
             response.content.decode("utf-8")
@@ -145,7 +148,7 @@ class TestFileRetrievalWithAuthz:
             "HTTP_AUTHORIZATION": "Bearer "
             + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)
         }
-        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING, **header)
         assert response.status_code == 502
         assert (
             response.content.decode("utf-8")
@@ -173,7 +176,7 @@ class TestFileRetrievalWithAuthz:
             "HTTP_AUTHORIZATION": "Bearer "
             + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)
         }
-        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING, **header)
         assert response.status_code == 502
         assert (
             response.content.decode("utf-8")
@@ -199,7 +202,7 @@ class TestFileRetrievalWithAuthz:
             200, content=IMAGE_BINARY_DATA
         )
 
-        response = client.get(self.url + PRE_WABO_IMG_URL)
+        response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_TOKEN
 
@@ -222,7 +225,7 @@ class TestFileRetrievalWithAuthz:
             200, content=IMAGE_BINARY_DATA
         )
 
-        response = client.get(self.url + PRE_WABO_IMG_URL)
+        response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_TOKEN
 
@@ -245,7 +248,7 @@ class TestFileRetrievalWithAuthz:
             200, content=IMAGE_BINARY_DATA
         )
 
-        response = client.get(self.url + PRE_WABO_IMG_URL)
+        response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_TOKEN
 
@@ -268,7 +271,7 @@ class TestFileRetrievalWithAuthz:
             200, content=IMAGE_BINARY_DATA
         )
 
-        response = client.get(self.url + PRE_WABO_IMG_URL)
+        response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_TOKEN
 
@@ -344,7 +347,7 @@ class TestFileRetrievalWithAuthz:
             "HTTP_AUTHORIZATION": "Bearer "
             + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)
         }
-        response = client.get(self.url + PRE_WABO_IMG_URL, **header)
+        response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING, **header)
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_RESTRICTED
 
@@ -488,6 +491,44 @@ class TestFileRetrievalWithAuthz:
         response = client.get(self.url + PRE_WABO_IMG_URL_NO_SCALING, **header)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
+
+    @patch("iiif.image_server.get_image_from_server")
+    @patch("iiif.metadata.do_metadata_request")
+    def test_get_resized_image(
+        self, mock_do_metadata_request, mock_get_image_from_server, client
+    ):
+        # Setting up mocks
+        mock_do_metadata_request.return_value = MockResponse(
+            200,
+            json_content={
+                "access": settings.ACCESS_PUBLIC,
+                "documenten": [
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_PUBLIC,
+                        "copyright": settings.COPYRIGHT_YES,
+                    },
+                    {
+                        "barcode": "SQ10079651",
+                        "access": settings.ACCESS_PUBLIC,
+                        "copyright": settings.COPYRIGHT_NO,
+                    },
+                    {"barcode": "SQ10092307", "access": settings.ACCESS_PUBLIC},
+                ],
+            },
+        )
+        mock_get_image_from_server.return_value = MockResponse(
+            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+        )
+
+        header = {
+            "HTTP_AUTHORIZATION": "Bearer "
+            + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)
+        }
+
+        response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING, **header)
+        assert response.status_code == 200
+        assert response.content == IMAGE_BINARY_DATA_50x44
 
 
 class TestFileRetrievalWithMailJWT:
@@ -645,7 +686,7 @@ class TestFileRetrievalWithMailJWT:
         )
 
         response = client.get(
-            self.file_url + PRE_WABO_IMG_URL + "?auth=" + self.mail_login_token
+            self.file_url + PRE_WABO_IMG_URL_WITH_SCALING + "?auth=" + self.mail_login_token
         )
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_RESTRICTED
@@ -677,7 +718,7 @@ class TestFileRetrievalWithMailJWT:
                 self.test_email_address, settings.SECRET_KEY
             )
 
-        response = client.get(self.file_url + PRE_WABO_IMG_URL + "?auth=" + jwt_token)
+        response = client.get(self.file_url + PRE_WABO_IMG_URL_WITH_SCALING + "?auth=" + jwt_token)
         assert response.status_code == 401
 
     @patch("iiif.image_server.get_image_from_server")
@@ -705,7 +746,7 @@ class TestFileRetrievalWithMailJWT:
             self.test_email_address, "invalid_key"
         )
         response = client.get(
-            self.file_url + PRE_WABO_IMG_URL + "?auth=" + mail_login_token
+            self.file_url + PRE_WABO_IMG_URL_WITH_SCALING + "?auth=" + mail_login_token
         )
         assert response.status_code == 401
 
