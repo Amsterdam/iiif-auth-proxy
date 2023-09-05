@@ -17,9 +17,9 @@ from iiif.parsing import InvalidIIIFUrlError, get_email_address, get_info_from_i
 from iiif.tools import ImmediateHttpResponse
 from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER, create_local_zip_file
 from tests.test_iiif import (
-    PRE_WABO_IMG_URL,
     PRE_WABO_IMG_URL_NO_SCALING,
     PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+    PRE_WABO_IMG_URL_WITH_SCALING,
     PRE_WABO_INFO_JSON_URL,
     WABO_IMG_URL,
 )
@@ -34,23 +34,23 @@ class TestTools:
         self.test_email_address = "toolstest@amsterdam.nl"
 
     def test_get_info_from_pre_wabo_url_vanilla(self):
-        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL, False)
+        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_SCALING, False)
         assert url_info["source"] == "edepot"
         assert url_info["stadsdeel"] == "ST"
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["file"] == "00001"
-        assert url_info["scaling"] == "1000,900"
+        assert url_info["scaling"] == "50,50"
         assert url_info["source_file"] == False
 
     def test_get_info_from_pre_wabo_url_with_source_file(self):
-        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL, True)
+        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_SCALING, True)
         assert url_info["source"] == "edepot"
         assert url_info["stadsdeel"] == "ST"
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["file"] == "00001"
-        assert url_info["scaling"] == "1000,900"
+        assert url_info["scaling"] == "50,50"
         assert url_info["source_file"] == True
 
     def test_get_info_from_pre_wabo_url_with_no_scaling(self):
@@ -155,13 +155,13 @@ class TestTools:
 
         # pre-wabo with no headers
         url, headers, cert = create_file_url_and_headers(
-            {}, {"source": "edepot", "source_file": False, "filename": filename_from_url(PRE_WABO_IMG_URL)}, PRE_WABO_IMG_URL, metadata
+            {}, {"source": "edepot", "source_file": False, "filename": filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)}, PRE_WABO_IMG_URL_WITH_SCALING, metadata
         )
 
 
         assert (
             url
-            == f"{settings.EDEPOT_BASE_URL}{filename_from_url(PRE_WABO_IMG_URL)}"
+            == f"{settings.EDEPOT_BASE_URL}{filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)}"
         )
         assert headers == {'Authorization': settings.HCP_AUTHORIZATION}
         assert cert == ()
@@ -172,12 +172,12 @@ class TestTools:
             {
                 "source": "edepot",
                 "source_file": True,
-                "filename": filename_from_url(PRE_WABO_IMG_URL),
+                "filename": filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING),
             },
-            PRE_WABO_IMG_URL,
+            PRE_WABO_IMG_URL_WITH_SCALING,
             metadata,
         )
-        assert url == f"{settings.EDEPOT_BASE_URL}{filename_from_url(PRE_WABO_IMG_URL)}"
+        assert url == f"{settings.EDEPOT_BASE_URL}{filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)}"
         # assert headers["Authorization"] == settings.HCP_AUTHORIZATION
         assert cert == ()
 
