@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django_ratelimit.decorators import ratelimit
 
 from iiif import authentication, image_server, mailing, parsing, tools, zip_tools
-from iiif.image_formatting import scale_image
+from iiif.image_handling import generate_info_json, scale_image
 from iiif.metadata import get_metadata
 
 log = logging.getLogger(__name__)
@@ -37,19 +37,28 @@ def index(request, iiif_url):
             request.META, url_info, iiif_url, metadata
         )
         image_server.handle_file_response_codes(file_response, file_url)
-        scaled_image = scale_image(
-            file_response.content, 
-            url_info["source_file"], 
-            url_info["scaling"], 
-            file_response.headers.get("Content-Type", "image/jpeg")
-        )
+
+        if url_info["info_json"]:
+            response_content = generate_info_json(
+                file_response.content,
+                file_response.headers.get("Content-Type")
+            )
+            content_type = "application/json"
+        else:
+            response_content = scale_image(
+                file_response.content,
+                url_info["source_file"],
+                url_info["scaling"],
+                file_response.headers.get("Content-Type")
+            )
+            content_type = file_response.headers.get("Content-Type")
     except tools.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in index:")
         return e.response
 
     return HttpResponse(
-        scaled_image,
-        content_type=file_response.headers.get("Content-Type", ""),
+        response_content,
+        content_type=file_response.headers.get("Content-Type", content_type),
     )
 
 

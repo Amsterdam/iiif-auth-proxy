@@ -1,4 +1,4 @@
-from iiif.image_formatting import parse_scaling_string, scale_image
+from iiif.image_handling import parse_scaling_string, scale_image
 
 
 class TestImageFormatting:
