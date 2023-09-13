@@ -1,8 +1,9 @@
 #!groovy
 
 def PROJECT_NAME = "iiif-auth-proxy"
+def SLACK_CHANNEL = '#opdrachten-deployments'  // TODO: Change to a more generic deployment channel
 def PLAYBOOK = 'deploy.yml'
-def SLACK_CHANNEL = '#waarnemingen-deployments'  // TODO: Change to a more generic deployment channel
+def CMDB_ID = 'app_iiif-auth-proxy'
 def SLACK_MESSAGE = [
     "title_link": BUILD_URL,
     "fields": [
@@ -68,7 +69,7 @@ pipeline {
                             string(name: 'INVENTORY', value: "acceptance"),
                             string(
                                 name: 'PLAYBOOKPARAMS',
-                                value: "-e 'deployversion=${VERSION} cmdb_id=app_iiif-auth-proxy'"
+                                value: "-e 'deployversion=${VERSION} cmdb_id=${CMDB_ID}'"
                             )
                         ], wait: true
                     }
@@ -83,7 +84,7 @@ pipeline {
                             string(name: 'INVENTORY', value: "production"),
                             string(
                                 name: 'PLAYBOOKPARAMS',
-                                value: "-e 'deployversion=${VERSION} cmdb_id=app_iiif-auth-proxy'"
+                                value: "-e 'deployversion=${VERSION} cmdb_id=${CMDB_ID}'"
                             )
                         ], wait: true
                     }
