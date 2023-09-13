@@ -33,6 +33,19 @@ class TestTools:
     def setup_method(self):
         self.test_email_address = "toolstest@amsterdam.nl"
 
+    def test_get_info_json_from_pre_wabo_url(self):
+        """ 2/edepot:ST-00015-ST00000126_00001.jpg/ """
+        url_info = get_info_from_iiif_url(PRE_WABO_INFO_JSON_URL, False)
+        assert url_info["source"] == "edepot"
+        assert url_info["stadsdeel"] == "ST"
+        assert url_info["dossier"] == "00015"
+        assert url_info["document_barcode"] == "ST00000126"
+        assert url_info["file"] == "00001"
+        assert url_info["scaling"] == None
+        assert url_info["source_file"] == False
+        assert url_info["formatting"] == None
+        assert url_info["info_json"] == True
+
     def test_get_info_from_pre_wabo_url_vanilla(self):
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_SCALING, False)
         assert url_info["source"] == "edepot"
@@ -42,6 +55,7 @@ class TestTools:
         assert url_info["file"] == "00001"
         assert url_info["scaling"] == "50,50"
         assert url_info["source_file"] == False
+        assert url_info["info_json"] == False
 
     def test_get_info_from_pre_wabo_url_with_source_file(self):
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_SCALING, True)
@@ -52,6 +66,7 @@ class TestTools:
         assert url_info["file"] == "00001"
         assert url_info["scaling"] == "50,50"
         assert url_info["source_file"] == True
+        assert url_info["info_json"] == False
 
     def test_get_info_from_pre_wabo_url_with_no_scaling(self):
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_NO_SCALING, True)
@@ -62,6 +77,7 @@ class TestTools:
         assert url_info["file"] == "00001"
         assert url_info["scaling"] == "full"
         assert url_info["source_file"] == True
+        assert url_info["info_json"] == False
 
     def test_get_info_from_pre_wabo_url_wrong_formatted_url(self):
         with pytest.raises(InvalidIIIFUrlError):
@@ -76,6 +92,7 @@ class TestTools:
         assert url_info["document_barcode"] == "628547"
         assert url_info["scaling"] == "1000,900"
         assert url_info["source_file"] == False
+        assert url_info["info_json"] == False
 
     def test_get_info_from_wabo_url_with_source_file(self):
         url_info = get_info_from_iiif_url(WABO_IMG_URL, True)
@@ -86,6 +103,7 @@ class TestTools:
         assert url_info["document_barcode"] == "628547"
         assert url_info["scaling"] == "1000,900"
         assert url_info["source_file"] == True
+        assert url_info["info_json"] == False
 
     def test_get_info_from_wabo_url_with_underscores_in_barcode(self):
         url_info = get_info_from_iiif_url(
@@ -98,6 +116,7 @@ class TestTools:
         assert url_info["document_barcode"] == "ECS0000004420_000_000"
         assert url_info["scaling"] == None
         assert url_info["source_file"] == False
+        assert url_info["info_json"] == True
 
     def test_get_info_from_wabo_url_with_underscores_and_hyphens_in_barcode(self):
         url_info = get_info_from_iiif_url(
@@ -110,6 +129,7 @@ class TestTools:
         assert url_info["document_barcode"] == "ECS0000004420-000_00-00"
         assert url_info["scaling"] == None
         assert url_info["source_file"] == False
+        assert url_info["info_json"] == True
 
     def test_get_info_from_wabo_url_wrong_formatted_url(self):
         with pytest.raises(InvalidIIIFUrlError):
