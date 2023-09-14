@@ -1,7 +1,7 @@
 import json
 import logging
 from datetime import datetime, timedelta
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 import pytz
 import time_machine
@@ -13,6 +13,7 @@ from iiif.authentication import (
     RESPONSE_CONTENT_COPYRIGHT,
     RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
     RESPONSE_CONTENT_NO_TOKEN,
+    RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN,
     RESPONSE_CONTENT_RESTRICTED,
     create_mail_login_token,
 )
@@ -115,7 +116,9 @@ class TestFileRetrievalWithAuthz:
         )
         header = {"HTTP_AUTHORIZATION": mock_token}
         response = client.get(self.url + WABO_IMG_URL, **header)
-        assert response.status_code == 505
+        assert response.status_code == 200
+        assert response.content == IMAGE_BINARY_DATA
+        mock_do_metadata_request.assert_called_with(ANY, mock_token)
 
     def test_get_image_when_metadata_server_is_not_available(self, client):
         header = {
@@ -770,4 +773,7 @@ class TestFileRetrievalWithMailJWT:
         response = client.get(
             self.file_url + WABO_IMG_URL + "?auth=" + self.mail_login_token
         )
-        assert response.status_code == 505
+        assert response.status_code == 401
+        assert (
+                response.content.decode("utf-8") == RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN
+        )
