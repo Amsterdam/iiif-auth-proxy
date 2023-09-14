@@ -29,16 +29,6 @@ BASE_INFO_JSON = {
     ]
 }
 
-# TODO: To fill in
-# width
-# height
-# sizes
-# profile["formats"]  # contained only "jpg" in the original
-
-def content_type_to_format(content_type):
-    # breakpoint()
-    return content_type.split("/")[1]
-
 
 def generate_info_json(content, content_type):
     img = Image.open(BytesIO(content))
@@ -50,6 +40,7 @@ def generate_info_json(content, content_type):
     info_json["profile"][1]["formats"] = [content_type_to_format(content_type).replace("jpeg", "jpg")]
 
     return json.dumps(info_json)
+
 
 def parse_scaling_string(scaling):
     """
@@ -70,6 +61,11 @@ def parse_scaling_string(scaling):
         raise tools.ImmediateHttpResponse(response=HttpResponse(MALFORMED_SCALING_PARAMETER, status=400))
 
     return desired_width, desired_height
+
+
+def content_type_to_format(content_type):
+    # breakpoint()
+    return content_type.split("/")[1]
 
 
 def scale_image(content, source_file, scaling, content_type):
