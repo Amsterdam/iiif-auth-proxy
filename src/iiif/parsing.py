@@ -21,27 +21,55 @@ def check_for_post(request):
 
 
 def get_info_from_iiif_url(iiif_url, source_file):
-    ## PRE-WABO
-    # iiif_url = \
-    # "https://acc.images.data.amsterdam.nl/iiif/2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,1000/0/default.jpg"
-    # ST-00015-ST00000126_00001.jpg=filename  ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
+    """
+    # PRE-WABO
 
-    ## WABO
-    # iiif_url = \
-    # "https://acc.images.data.amsterdam.nl/iiif/2/wabo:SDZ-38657-4900487_628547/full/full/0/default.jpg""
-    # SDZ-38657-4900487_628547=filename  SDZ=stadsdeel  38657=dossier  4900487=olo_liaan_nummer  628547=document_barcode
+    "https://acc.images.data.amsterdam.nl/iiif/2/edepot:ST-00015-ST00000126_00001.jpg/info.json"
 
-    # At the end of the url, this can be appended '?source_file=true', which means we'll bypass
-    # cantaloupe and go directly for the source file
+    For the url above it means they request just the info.json, nothing else. More info about the rest
+    of this url see the explanation below.
+
+    "https://acc.images.data.amsterdam.nl/iiif/2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,900/0/default.jpg"
+
+    For the url above, the following information can be extracted:
+    - ST-00015-ST00000126_00001.jpg=filename  ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
+    - full: no cropping
+    - 1000,900: scaling the image to fit within a 1000x900 (1000 width, 900 height) pixel bounding box, preserving its aspect ratio
+    - 0: rotation angle in degrees
+    - default.jpg: default quality, meaning the original quality
+
+    # WABO
+
+    "https://acc.images.data.amsterdam.nl/iiif/2/wabo:SDZ-38657-4900487_628547/full/full/0/default.jpg""
+    - SDZ-38657-4900487_628547=filename
+    - SDZ=stadsdeel
+    - 38657=dossier
+    4900487=olo_liaan_nummer
+    628547=document_barcode
+
+    At the end of the url, this can be appended '?source_file=true', which means we'll bypass
+    all image related code and go directly for the source file. This can be needed when the file is
+    not an image, but for example a txt, xls, zip or something else.
+    """
 
     try:
         source = iiif_url.split(":")[0].split("/")[1]  # "edepot" or "wabo"
-        relevant_url_part = iiif_url.split(":")[1].split("/")[0]
+        relevant_url_part = iiif_url.split(":")[1].split("/")[0].replace(" ", "%20")
         formatting = (
             iiif_url.split(":")[1].split("/", 1)[1].split("?")[0]
             if "/" in iiif_url.split(":")[1]
             else ""
         )
+
+        info_json = False
+        scaling = None
+        if formatting == "info.json":
+            info_json = True
+            formatting = None
+        elif '/' in formatting:
+            scaling = formatting.split('/')[1]
+        else:
+            raise InvalidIIIFUrlError(f"No formatting or info.json provided in iiif url: {iiif_url}")
 
         if source == "edepot":  # == pre-wabo
             m = re.match(r"^([A-Z]+)-?(\d+)-(.+)$", relevant_url_part)
@@ -60,8 +88,10 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "document_barcode": document_barcode,
                 "file": file.split(".")[0],  # The file in the dossier
                 "formatting": formatting,
+                "scaling": scaling,
                 "source_file": source_file,
                 "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
+                "info_json": info_json,
             }
 
         elif source == "wabo":  # == wabo
@@ -74,8 +104,10 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "olo": olo,
                 "document_barcode": document_barcode,
                 "formatting": formatting,
+                "scaling": scaling,
                 "source_file": source_file,
                 "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
+                "info_json": info_json,
             }
 
         raise InvalidIIIFUrlError(f"Invalid iiif url (no valid source): {iiif_url}")
