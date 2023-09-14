@@ -7,7 +7,7 @@ import pytz
 import time_machine
 from django.conf import settings
 from django.test import override_settings
-from requests.exceptions import ConnectTimeout
+from requests.exceptions import ConnectTimeout, RequestException
 
 from iiif.authentication import (
     RESPONSE_CONTENT_COPYRIGHT,
@@ -132,9 +132,10 @@ class TestFileRetrievalWithAuthz:
             == RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
         )
 
+    @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_image_when_image_server_is_not_available(
-        self, mock_do_metadata_request, client
+        self, mock_do_metadata_request, mock_get_image_from_server, client
     ):
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -145,6 +146,7 @@ class TestFileRetrievalWithAuthz:
                 ],
             },
         )
+        mock_get_image_from_server.side_effect = RequestException()
 
         header = {
             "HTTP_AUTHORIZATION": "Bearer "
@@ -154,7 +156,7 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 502
         assert (
             response.content.decode("utf-8")
-            == RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER + " ConnectTimeout"
+            == RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER + " RequestException"
         )
 
     @patch("iiif.image_server.get_image_from_server")
