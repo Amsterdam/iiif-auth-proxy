@@ -50,7 +50,7 @@ def get_file(request_meta, url_info, iiif_url, metadata):
     # certificate checks because the wildcard cert doesn't include the host name.
     # TODO: remove this once the cert is fixed
     verify = True
-    if url_info["source"] == "edepot" and url_info["source_file"]:
+    if url_info["source"] == "edepot":
         verify = False
 
     # Get the file itself
