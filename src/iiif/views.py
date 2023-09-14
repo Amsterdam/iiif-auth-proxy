@@ -23,11 +23,6 @@ def index(request, iiif_url):
             iiif_url, tools.str_to_bool(request.GET.get("source_file"))
         )
 
-        # TEMPORARY INTERRUPTION to avoid connecting with the tussenbestand
-        # This may be removed when the ssl connection with the tussenbestand has been fixed
-        if url_info['source'] == 'wabo':
-            return HttpResponse("Upstream server needs an upgraded ssl connection.", status=505)
-
         authentication.check_wabo_for_mail_login(is_mail_login, url_info)
         metadata, _ = get_metadata(
             url_info, iiif_url, request.META.get("HTTP_AUTHORIZATION"), {}
