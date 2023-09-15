@@ -10,9 +10,9 @@ asgiref==3.7.2
     #   django
 autoflake==2.2.1
     # via -r requirements_dev.in
-black==23.7.0
+black==23.9.1
     # via -r requirements_dev.in
-build==1.0.0
+build==1.0.3
     # via pip-tools
 certifi==2023.7.22
     # via
@@ -31,7 +31,7 @@ click==8.1.7
     # via
     #   black
     #   pip-tools
-coverage[toml]==7.3.0
+coverage[toml]==7.3.1
     # via pytest-cov
 cryptography==41.0.3
     # via
@@ -170,7 +170,7 @@ pyparsing==3.1.1
     #   oslo-utils
 pyproject-hooks==1.0.0
     # via build
-pytest==7.4.1
+pytest==7.4.2
     # via
     #   -r requirements_dev.in
     #   pytest-cov
@@ -185,11 +185,11 @@ python-http-client==3.3.7
     # via
     #   -r ./requirements.txt
     #   sendgrid
-python-keystoneclient==5.1.0
+python-keystoneclient==5.2.0
     # via -r ./requirements.txt
 python-swiftclient==4.4.0
     # via -r ./requirements.txt
-pytz==2023.3
+pytz==2023.3.post1
     # via
     #   -r ./requirements.txt
     #   djangorestframework
@@ -213,7 +213,7 @@ rfc3986==2.0.0
     #   oslo-config
 sendgrid==6.10.0
     # via -r ./requirements.txt
-sentry-sdk==1.30.0
+sentry-sdk==1.31.0
     # via -r ./requirements.txt
 six==1.16.0
     # via
@@ -249,6 +249,7 @@ typing-extensions==4.7.1
     # via
     #   -r ./requirements.txt
     #   asgiref
+    #   black
 tzdata==2023.3
     # via
     #   -r ./requirements.txt
@@ -270,7 +271,7 @@ wrapt==1.15.0
 # The following packages are considered to be unsafe in a requirements file:
 pip==23.2.1
     # via pip-tools
-setuptools==68.1.2
+setuptools==68.2.2
     # via
     #   -r ./requirements.txt
     #   pip-tools
