@@ -26,12 +26,15 @@ def create_wabo_url(url_info, metadata):
 # TODO: split into two functions, one for url and one for headers
 def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
     if url_info["source"] == "edepot":
-        # If the iiif url contains a reference to dossier like SQ1421 without a '-' between the letters
+
+        # If the iiif url contains a reference to dossier like SQ1421 without a '-' or '/' between the letters
         # and the numbers, then this was added as a reference to stadsdeel and dossiernumber and
-        # it should be removed.
-        iiif_url_edepot = re.sub(r"[A-Z]+\d+/", "", url_info["filename"])
+        # it should be removed. The line below does exactly that.
+        iiif_url_edepot = re.sub(r"[A-Z]+\d+/", "", url_info["source_filename"])
+
         iiif_image_url = f"{settings.EDEPOT_BASE_URL}{iiif_url_edepot}"
         return iiif_image_url, {"Authorization": settings.HCP_AUTHORIZATION}, ()
+
     elif url_info["source"] == "wabo":
         wabo_url = create_wabo_url(url_info, metadata)
         iiif_image_url = f"{settings.WABO_BASE_URL}{wabo_url}"
