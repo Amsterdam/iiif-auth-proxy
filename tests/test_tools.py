@@ -23,7 +23,7 @@ from tests.test_iiif import (
     PRE_WABO_INFO_JSON_URL,
     WABO_IMG_URL,
 )
-from tests.tools import filename_from_url
+from tests.tools import filename_from_url, source_filename_from_url
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
@@ -41,10 +41,12 @@ class TestTools:
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["file"] == "00001"
-        assert url_info["scaling"] == None
-        assert url_info["source_file"] == False
-        assert url_info["formatting"] == None
-        assert url_info["info_json"] == True
+        assert url_info["scaling"] is None
+        assert url_info["source_file"] is False
+        assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
+        assert url_info["filename"] == "ST-00015-ST00000126_00001.jpg"
+        assert url_info["formatting"] is None
+        assert url_info["info_json"] is True
 
     def test_get_info_from_pre_wabo_url_vanilla(self):
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_SCALING, False)
@@ -54,8 +56,11 @@ class TestTools:
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["file"] == "00001"
         assert url_info["scaling"] == "50,50"
-        assert url_info["source_file"] == False
-        assert url_info["info_json"] == False
+        assert url_info["source_file"] is False
+        assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
+        assert url_info["filename"] == "ST-00015-ST00000126_00001.jpg"
+        assert url_info["formatting"] == "full/50,50/0/default.jpg"
+        assert url_info["info_json"] is False
 
     def test_get_info_from_pre_wabo_url_with_source_file(self):
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_SCALING, True)
@@ -65,8 +70,11 @@ class TestTools:
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["file"] == "00001"
         assert url_info["scaling"] == "50,50"
-        assert url_info["source_file"] == True
-        assert url_info["info_json"] == False
+        assert url_info["source_file"] is True
+        assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
+        assert url_info["filename"] == "ST-00015-ST00000126_00001.jpg"
+        assert url_info["formatting"] == "full/50,50/0/default.jpg"
+        assert url_info["info_json"] is False
 
     def test_get_info_from_pre_wabo_url_with_no_scaling(self):
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_NO_SCALING, True)
@@ -76,8 +84,11 @@ class TestTools:
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["file"] == "00001"
         assert url_info["scaling"] == "full"
-        assert url_info["source_file"] == True
-        assert url_info["info_json"] == False
+        assert url_info["source_file"] is True
+        assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
+        assert url_info["filename"] == "ST-00015-ST00000126_00001.jpg"
+        assert url_info["formatting"] == "full/full/0/default.jpg"
+        assert url_info["info_json"] is False
 
     def test_get_info_from_pre_wabo_url_wrong_formatted_url(self):
         with pytest.raises(InvalidIIIFUrlError):
@@ -91,8 +102,11 @@ class TestTools:
         assert url_info["olo"] == "4900487"
         assert url_info["document_barcode"] == "628547"
         assert url_info["scaling"] == "1000,900"
-        assert url_info["source_file"] == False
-        assert url_info["info_json"] == False
+        assert url_info["source_file"] is False
+        assert url_info["source_filename"] == "SDZ/38657/4900487_628547"
+        assert url_info["filename"] == "SDZ-38657-4900487_628547"
+        assert url_info["formatting"] == "full/1000,900/0/default.jpg"
+        assert url_info["info_json"] is False
 
     def test_get_info_from_wabo_url_with_source_file(self):
         url_info = get_info_from_iiif_url(WABO_IMG_URL, True)
@@ -102,8 +116,11 @@ class TestTools:
         assert url_info["olo"] == "4900487"
         assert url_info["document_barcode"] == "628547"
         assert url_info["scaling"] == "1000,900"
-        assert url_info["source_file"] == True
-        assert url_info["info_json"] == False
+        assert url_info["source_file"] is True
+        assert url_info["source_filename"] == "SDZ/38657/4900487_628547"
+        assert url_info["filename"] == "SDZ-38657-4900487_628547"
+        assert url_info["formatting"] == "full/1000,900/0/default.jpg"
+        assert url_info["info_json"] is False
 
     def test_get_info_from_wabo_url_with_underscores_in_barcode(self):
         url_info = get_info_from_iiif_url(
@@ -114,9 +131,12 @@ class TestTools:
         assert url_info["dossier"] == "10316333"
         assert url_info["olo"] == "3304"
         assert url_info["document_barcode"] == "ECS0000004420_000_000"
-        assert url_info["scaling"] == None
-        assert url_info["source_file"] == False
-        assert url_info["info_json"] == True
+        assert url_info["scaling"] is None
+        assert url_info["source_file"] is False
+        assert url_info["source_filename"] == "SDO/10316333/3304_ECS0000004420_000_000"
+        assert url_info["filename"] == "SDO-10316333-3304_ECS0000004420_000_000"
+        assert url_info["formatting"] is None
+        assert url_info["info_json"] is True
 
     def test_get_info_from_wabo_url_with_underscores_and_hyphens_in_barcode(self):
         url_info = get_info_from_iiif_url(
@@ -127,9 +147,12 @@ class TestTools:
         assert url_info["dossier"] == "10316333"
         assert url_info["olo"] == "3304"
         assert url_info["document_barcode"] == "ECS0000004420-000_00-00"
-        assert url_info["scaling"] == None
-        assert url_info["source_file"] == False
-        assert url_info["info_json"] == True
+        assert url_info["scaling"] is None
+        assert url_info["source_file"] is False
+        assert url_info["source_filename"] == "SDO/10316333/3304_ECS0000004420-000_00-00"
+        assert url_info["filename"] == "SDO-10316333-3304_ECS0000004420-000_00-00"
+        assert url_info["formatting"] is None
+        assert url_info["info_json"] is True
 
     def test_get_info_from_wabo_url_wrong_formatted_url(self):
         with pytest.raises(InvalidIIIFUrlError):
@@ -175,13 +198,20 @@ class TestTools:
 
         # pre-wabo with no headers
         url, headers, cert = create_file_url_and_headers(
-            {}, {"source": "edepot", "source_file": False, "filename": filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)}, PRE_WABO_IMG_URL_WITH_SCALING, metadata
+            {},
+            {
+                "source": "edepot",
+                "source_file": False,
+                "source_filename": source_filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING),
+                "filename": filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)},
+            PRE_WABO_IMG_URL_WITH_SCALING,
+            metadata
         )
 
 
         assert (
             url
-            == f"{settings.EDEPOT_BASE_URL}{filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)}"
+            == f"{settings.EDEPOT_BASE_URL}{source_filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)}"
         )
         assert headers == {'Authorization': settings.HCP_AUTHORIZATION}
         assert cert == ()
@@ -192,39 +222,49 @@ class TestTools:
             {
                 "source": "edepot",
                 "source_file": True,
+                "source_filename": source_filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING),
                 "filename": filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING),
             },
             PRE_WABO_IMG_URL_WITH_SCALING,
             metadata,
         )
-        assert url == f"{settings.EDEPOT_BASE_URL}{filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)}"
+        assert url == f"{settings.EDEPOT_BASE_URL}{source_filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)}"
         # assert headers["Authorization"] == settings.HCP_AUTHORIZATION
         assert cert == ()
 
         # pre-wabo with added reference
         url, headers, cert = create_file_url_and_headers(
             {},
-            {"source": "edepot", "source_file": False, "filename": filename_from_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE)},
+            {
+                "source": "edepot",
+                "source_file": False,
+                "source_filename": source_filename_from_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE),
+                "filename": filename_from_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE)},
             PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
             metadata,
         )
         # "2/edepot:SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg/full/1000,900/0/default.jpg"
         assert (
             url
-            == f"{settings.EDEPOT_BASE_URL}{filename_from_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE).replace('SQ1452/','')}"
+            == f"{settings.EDEPOT_BASE_URL}{source_filename_from_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE).replace('SQ1452/', '')}"
         )
 
         # pre-wabo with json url
         url, headers, cert = create_file_url_and_headers(
             {},
-            {"source": "edepot", "source_file": False, "filename": filename_from_url(PRE_WABO_INFO_JSON_URL)},
+            {
+                "source": "edepot",
+                "source_file": False,
+                "source_filename": source_filename_from_url(PRE_WABO_INFO_JSON_URL),
+                "filename": filename_from_url(PRE_WABO_INFO_JSON_URL)
+            },
             PRE_WABO_INFO_JSON_URL,
             metadata,
         )
 
         assert (
             url
-            == f"{settings.EDEPOT_BASE_URL}{filename_from_url(PRE_WABO_INFO_JSON_URL).replace('SQ11426/', '')}"
+            == f"{settings.EDEPOT_BASE_URL}{source_filename_from_url(PRE_WABO_INFO_JSON_URL).replace('SQ11426/', '')}"
         )
 
         # wabo with adjusted url and X-Forwarded-ID
@@ -299,8 +339,8 @@ class TestTools:
             "documenten": [{"barcode": "ST00000126", "access": settings.ACCESS_PUBLIC}],
         }
         public, has_copyright = img_is_public_copyright(metadata, "ST00000126")
-        assert public == True
-        assert has_copyright == False
+        assert public is True
+        assert has_copyright is False
 
         # Although this should not happen if on bouwdossier level access is restricted
         # and on document level it is public, the result shoulb be not public
@@ -309,8 +349,8 @@ class TestTools:
             "documenten": [{"barcode": "ST00000126", "access": settings.ACCESS_PUBLIC}],
         }
         public, has_copyright = img_is_public_copyright(metadata, "ST00000126")
-        assert public == False
-        assert has_copyright == None
+        assert public is False
+        assert has_copyright is None
 
         metadata = {
             "access": settings.ACCESS_PUBLIC,
@@ -319,8 +359,8 @@ class TestTools:
             ],
         }
         public, has_copyright = img_is_public_copyright(metadata, "ST00000126")
-        assert public == False
-        assert has_copyright == None
+        assert public is False
+        assert has_copyright is None
 
         metadata = {
             "access": settings.ACCESS_PUBLIC,
@@ -333,8 +373,8 @@ class TestTools:
             ],
         }
         public, has_copyright = img_is_public_copyright(metadata, "ST00000126")
-        assert public == True
-        assert has_copyright == True
+        assert public is True
+        assert has_copyright is True
 
     def test_create_local_zip_file(self):
         # First create some files

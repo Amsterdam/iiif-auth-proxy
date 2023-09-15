@@ -55,6 +55,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
     try:
         source = iiif_url.split(":")[0].split("/")[1]  # "edepot" or "wabo"
         relevant_url_part = iiif_url.split(":")[1].split("/")[0].replace(" ", "%20")
+        source_filename = relevant_url_part.replace("-", "/", 2)
         formatting = (
             iiif_url.split(":")[1].split("/", 1)[1].split("?")[0]
             if "/" in iiif_url.split(":")[1]
@@ -89,7 +90,8 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "file": file.split(".")[0],  # The file in the dossier
                 "formatting": formatting,
                 "scaling": scaling,
-                "source_file": source_file,
+                "source_file": source_file,  # Bool whether the file should be served without image processing (pdf/xls)
+                "source_filename": source_filename,  # The filename on the source system
                 "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
                 "info_json": info_json,
             }
@@ -105,7 +107,8 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "document_barcode": document_barcode,
                 "formatting": formatting,
                 "scaling": scaling,
-                "source_file": source_file,
+                "source_file": source_file,  # Bool whether the file should be served without image processing (pdf/xls)
+                "source_filename": source_filename,  # The filename on the source system
                 "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
                 "info_json": info_json,
             }
