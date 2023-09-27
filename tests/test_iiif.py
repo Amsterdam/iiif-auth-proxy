@@ -683,13 +683,6 @@ class TestFileRetrievalWithMailJWT:
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_COPYRIGHT
 
-        # TODO: Enable the info.json
-        # response = client.get(
-        #     self.file_url + PRE_WABO_INFO_JSON_URL + "?auth=" + self.mail_login_token
-        # )
-        # assert response.status_code == 200
-        # assert response.content == IMAGE_BINARY_DATA
-
     @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_with_read_scope(

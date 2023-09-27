@@ -229,7 +229,7 @@ class TestTools:
             metadata,
         )
         assert url == f"{settings.EDEPOT_BASE_URL}{source_filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)}"
-        # assert headers["Authorization"] == settings.HCP_AUTHORIZATION
+        assert headers["Authorization"] == settings.HCP_AUTHORIZATION
         assert cert == ()
 
         # pre-wabo with added reference
@@ -284,7 +284,6 @@ class TestTools:
             url
             == f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF"
         )
-        # assert headers["X-Forwarded-ID"] == "wabo:SDZ-38657-4900487_628547"
         assert cert == '/tmp/sw444v1912.pem'
 
         # wabo with adjusted url and X-Forwarded-ID and both forwarded headers
