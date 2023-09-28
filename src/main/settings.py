@@ -61,6 +61,15 @@ LOGIN_ORIGIN_URL_TLD_WHITELIST = ["data.amsterdam.nl", "acc.data.amsterdam.nl", 
 if strtobool(os.getenv("ALLOW_LOCALHOST_LOGIN_URL", "false")):
     LOGIN_ORIGIN_URL_TLD_WHITELIST += ["localhost", "127.0.0.1"]
 
+# SMTP email settings using Secure Mail Relay
+EMAIL_HOST = os.getenv("EMAIL_HOST", "localhost")
+EMAIL_PORT = os.getenv("EMAIL_PORT", "587")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_FROM_EMAIL_ADDRESS = os.getenv("EMAIL_FROM_EMAIL_ADDRESS", "bouwdossiers@amsterdam.nl")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
+EMAIL_TIMEOUT = 5
+
 
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
 # This is a test public/private key def and added for testing .
