@@ -1,0 +1,127 @@
+image:
+  registry: saks01weuacrpgpgo5qvmwo.azurecr.io
+  repository: opdrachten/iiif-auth-proxy
+  tag: latest
+
+labels:
+  app: iiif-auth-proxy
+
+network:
+  allow-ingress:
+    annotations:
+      helm.sh/hook-weight: "-5"
+    selector: app == 'iiif-auth-proxy'
+    ingress:
+      - action: Allow
+    egress:
+      - action: Allow
+
+secrets:
+  certificate:
+    type: keyvault
+    tls: iiif-auth-proxy
+
+  vault:
+    type: keyvault
+    annotations:
+      helm.sh/hook-weight: "-5"
+    secrets:
+      - secret-key
+      - use-jwks-test-key
+      - stadsarchief-meta-server-base-url
+      - stadsarchief-meta-server-port
+      - hcp-authorization
+      - jwt-secret-key
+      - login-origin-url-tld-whitelist
+      - pub-jwks      
+      - applicationinsights-connection-string
+
+jobs:
+  migrate:
+    annotations:
+      helm.sh/hook: post-install,post-upgrade
+      helm.sh/hook-weight: "-5"
+    volumes:
+      - name: tmp
+        spec:
+          emptyDir: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: "256Mi"
+      limits:
+        cpu: 2
+        memory: "512Mi"
+    containers:
+      - name: main
+        volumes:
+          - name: tmp
+            mountPath: /tmp
+        secrets:
+          - database
+          - vault
+        command:
+          - python
+          - manage.py
+          - migrate
+
+  certificate-init:
+    secrets:
+      - certificate
+    annotations:
+      helm.sh/hook: post-install,post-upgrade
+    containers:
+      - name: main
+        command:
+          - sleep
+        args:
+          - "1"
+
+deployments:
+  app:
+    selectorLabels:
+      component: app
+    autoscale:
+      cpu: 70
+    resources:
+      requests:
+        cpu: 100m
+        memory: "128Mi"
+      limits:
+        cpu: 200m
+        memory: "256Mi"
+    volumes:
+      - name: tmp
+        spec:
+          emptyDir: {}
+    containers:
+      - name: main
+        secrets:
+          - database
+          - vault
+        volumes:
+          - name: tmp
+            mountPath: /tmp
+        ports:
+          - port: 8000
+            name: http
+        securityContext:
+          runAsUser: 1001
+
+services:
+  app:
+    ports:
+      - name: http
+        port: 80
+        targetPort: 8000
+    selector:
+      component: app
+
+ingress:
+  app:
+    paths:
+    - path: /
+      service: app
+      port: 80
+    className: nginx
+    tls: certificate

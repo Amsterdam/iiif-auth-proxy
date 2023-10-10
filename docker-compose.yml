@@ -40,7 +40,8 @@ services:
     build:
       context: .
       target: app
-    image: docker-registry.data.amsterdam.nl/datapunt/iiif-auth-proxy:${VERSION:-latest}
+    # image: docker-registry.data.amsterdam.nl/datapunt/iiif-auth-proxy:${VERSION:-latest}
+    image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-opdrachten/iiif-auth-proxy}:${VERSION:-latest}
     command: /deploy/docker-run.sh
 
   test:
