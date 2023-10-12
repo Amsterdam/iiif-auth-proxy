@@ -11,9 +11,8 @@ from iiif.tools import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 
-RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER = (
-    "The image-server cannot be reached " "because the following error occurred: "
-)
+RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER = \
+    "The image-server cannot be reached because the following error occurred: "
 
 
 def create_wabo_url(url_info, metadata):
@@ -44,7 +43,7 @@ def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
 
 def get_image_from_server(file_url, headers, cert, verify=True):
     return requests.get(
-        file_url, headers=headers, cert=cert, verify=verify, timeout=(2, 20)
+        file_url, headers=headers, cert=cert, verify=verify, timeout=(15, 25)
     )
 
 
