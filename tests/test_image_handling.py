@@ -4,7 +4,7 @@ from iiif.image_handling import parse_scaling_string, scale_image
 class TestImageFormatting:
     def setup_method(self):
         with open("test-images/test-image-96x85.jpg", "rb") as f:
-            self.img_96x85 = f.read()  # 96x85
+            self.img_96x85 = f.read()
         with open("test-images/test-image-50x44.jpg", "rb") as f:
             self.img_50x44 = f.read()
         with open("test-images/test-image-49x44.jpg", "rb") as f:

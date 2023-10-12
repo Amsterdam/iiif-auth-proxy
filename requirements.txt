@@ -34,7 +34,7 @@ django==4.1.12
     #   datapunt-data-ingress
     #   django-cors-headers
     #   djangorestframework
-django-cors-headers==4.2.0
+django-cors-headers==4.3.0
     # via -r requirements.in
 django-ratelimit==4.1.0
     # via -r requirements.in
@@ -85,7 +85,7 @@ pbr==5.11.1
     #   oslo-serialization
     #   python-keystoneclient
     #   stevedore
-pillow==10.0.1
+pillow-simd==9.0.0.post1
     # via -r requirements.in
 psycopg2-binary==2.9.9
     # via -r requirements.in
@@ -115,7 +115,7 @@ requests==2.31.0
     #   python-swiftclient
 rfc3986==2.0.0
     # via oslo-config
-sentry-sdk==1.31.0
+sentry-sdk==1.32.0
     # via -r requirements.in
 six==1.16.0
     # via

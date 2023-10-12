@@ -64,7 +64,6 @@ def parse_scaling_string(scaling):
 
 
 def content_type_to_format(content_type):
-    # breakpoint()
     return content_type.split("/")[1]
 
 
@@ -115,15 +114,3 @@ def scale_image(content, source_file, scaling, content_type):
     scaled_image_data = image_stream.getvalue()
 
     return scaled_image_data
-
-# from io import BytesIO
-# from PIL import Image
-#
-# with Image.open("test-images/test-image-96x85.jpg") as img:
-#     img.load()
-#
-# img.save("image.jpg", format="jpg")
-# img.save("image.jpeg", format="jpeg")
-# img.save("image.JPG", format="JPG")
-# img.save("image.JPEG", format="JPEG")
-
