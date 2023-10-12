@@ -6,6 +6,7 @@ datapunt-authorization-django
 sentry-sdk
 django-cors-headers
 pyjwt
+Pillow
 django-ratelimit
 six # Needed by jwcrypto, which mistakenly doesn't include it. PR with fix here: https://github.com/latchset/jwcrypto/pull/202
 psycopg2-binary

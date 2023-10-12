@@ -19,11 +19,11 @@ certifi==2023.7.22
     #   -r ./requirements.txt
     #   requests
     #   sentry-sdk
-cffi==1.15.1
+cffi==1.16.0
     # via
     #   -r ./requirements.txt
     #   cryptography
-charset-normalizer==3.2.0
+charset-normalizer==3.3.0
     # via
     #   -r ./requirements.txt
     #   requests
@@ -31,7 +31,7 @@ click==8.1.7
     # via
     #   black
     #   pip-tools
-coverage[toml]==7.3.1
+coverage[toml]==7.3.2
     # via pytest-cov
 cryptography==41.0.4
     # via
@@ -51,7 +51,7 @@ deprecated==1.2.14
     # via
     #   -r ./requirements.txt
     #   jwcrypto
-django==4.1.11
+django==4.1.12
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
@@ -74,7 +74,7 @@ idna==3.4
     #   requests
 iniconfig==2.0.0
     # via pytest
-iso8601==2.0.0
+iso8601==2.1.0
     # via
     #   -r ./requirements.txt
     #   keystoneauth1
@@ -89,7 +89,7 @@ keystoneauth1==5.3.0
     # via
     #   -r ./requirements.txt
     #   python-keystoneclient
-msgpack==1.0.6
+msgpack==1.0.7
     # via
     #   -r ./requirements.txt
     #   oslo-serialization
@@ -127,7 +127,7 @@ oslo-utils==6.2.1
     #   -r ./requirements.txt
     #   oslo-serialization
     #   python-keystoneclient
-packaging==23.1
+packaging==23.2
     # via
     #   -r ./requirements.txt
     #   black
@@ -146,13 +146,15 @@ pbr==5.11.1
     #   oslo-serialization
     #   python-keystoneclient
     #   stevedore
+pillow==10.0.1
+    # via -r ./requirements.txt
 pip-tools==7.3.0
     # via -r requirements_dev.in
-platformdirs==3.10.0
+platformdirs==3.11.0
     # via black
 pluggy==1.3.0
     # via pytest
-psycopg2-binary==2.9.7
+psycopg2-binary==2.9.9
     # via -r ./requirements.txt
 pycparser==2.21
     # via
@@ -243,7 +245,7 @@ tzdata==2023.3
     #   -r ./requirements.txt
     #   oslo-serialization
     #   oslo-utils
-urllib3==2.0.5
+urllib3==2.0.6
     # via
     #   -r ./requirements.txt
     #   requests

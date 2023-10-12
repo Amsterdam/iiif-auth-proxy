@@ -13,3 +13,22 @@ def call_man_command(command, *args, **kwargs):
         **kwargs,
     )
     return out.getvalue()
+
+
+class MockResponse:
+    def __init__(self, status_code, json_content=None, content=None, headers=None):
+        self.status_code = status_code
+        self.json_content = json_content
+        self.content = content
+        self.headers = headers
+
+    def json(self):
+        return self.json_content
+
+
+def filename_from_url(url):
+    return url.split(':')[1].split('/')[0]
+
+
+def source_filename_from_url(url):
+    return filename_from_url(url).replace('-', '/')
