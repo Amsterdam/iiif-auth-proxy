@@ -14,7 +14,7 @@ MALFORMED_SCALING_PARAMETER = "The scaling parameter is malformed. It should eit
 
 BASE_INFO_JSON = {
     "@context": "http://iiif.io/api/image/2/context.json",
-    "@id": "https://images.data.amsterdam.nl/iiif/2/edepot:SJ-00093-SJ10000463_00001.jpg",
+    "@id":  None,
     "protocol": "http://iiif.io/api/image",
     "width": None,
     "height": None,
@@ -30,10 +30,19 @@ BASE_INFO_JSON = {
 }
 
 
-def generate_info_json(content, content_type):
+def generate_info_json(image_base_url, content, content_type):
+    """
+    Generate the info.json for the image
+
+    :param image_base_url: The base url of the image
+    :param content: The image data
+    :param content_type: The content type of the image
+    :return: The info.json
+    """
     img = Image.open(BytesIO(content))
 
     info_json = deepcopy(BASE_INFO_JSON)
+    info_json["@id"] = image_base_url
     info_json["width"] = img.width
     info_json["height"] = img.height
     info_json["sizes"] = [{"width": img.width, "height": img.height}]
