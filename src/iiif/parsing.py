@@ -72,7 +72,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
         else:
             raise InvalidIIIFUrlError(f"No formatting or info.json provided in iiif url: {iiif_url}")
 
-        if source == "edepot":  # == pre-wabo
+        if source == "edepot":  # aka pre-wabo
             m = re.match(r"^([A-Z]+)-?(\d+)-(.+)$", relevant_url_part)
             if not m:
                 raise InvalidIIIFUrlError(
@@ -93,10 +93,10 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "source_file": source_file,  # Bool whether the file should be served without image processing (pdf/xls)
                 "source_filename": source_filename,  # The filename on the source system
                 "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
-                "info_json": info_json,
+                "info_json": info_json,  # Whether the info.json is requested instead of the image itself
             }
 
-        elif source == "wabo":  # == wabo
+        elif source == "wabo":
             stadsdeel, dossier, olo_and_document = relevant_url_part.split("-", 2)
             olo, document_barcode = olo_and_document.split("_", 1)
             return {
