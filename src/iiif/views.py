@@ -54,7 +54,7 @@ def index(request, iiif_url):
 
     return HttpResponse(
         response_content,
-        content_type=file_response.headers.get("Content-Type", content_type),
+        content_type,
     )
 
 
