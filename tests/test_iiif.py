@@ -220,6 +220,8 @@ class TestFileRetrievalWithAuthz:
 
         response = client.get(self.url + PRE_WABO_INFO_JSON_URL, **header)
         assert response.status_code == 200
+        assert response.headers['Content-Type'] == 'application/json'
+
         response_dict = json.loads(response.content)
         assert response_dict["width"] == 96
         assert response_dict["height"] == 85
