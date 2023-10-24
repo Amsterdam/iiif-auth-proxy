@@ -34,7 +34,7 @@ class TestZipEndpoint:
     @pytest.fixture(autouse=True)
     def setup_method(self):
         self.url = "/iiif/zip/"
-        self.BASE_URL = "https://images.data.amsterdam.nl/iiif/"
+        self.BASE_URL = "https://bouwdossiers.amsterdam.nl/iiif/"
         self.test_email_address = "zip@amsterdam.nl"
         self.mail_login_token = create_mail_login_token(
             self.test_email_address, settings.SECRET_KEY

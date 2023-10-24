@@ -11,7 +11,7 @@ stadsarchief metadata server).
 Below is an example url which can be used to call an image. Note that where the urls used to have dollar signs, it 
 now uses hyphens instead. 
 
-    https://acc.images.data.amsterdam.nl/iiif/2/edepot:ST-00001-ST0001_00001.jpg/full/400,/0/default.png
+    https://acc.bouwdossiers.amsterdam.nl/iiif/2/edepot:ST-00001-ST0001_00001.jpg/full/400,/0/default.png
 
 In case the user is allowed to view the image and there are no other problems, the image is served in a normal 200.
 In case the user is NOT allowed to view the image, the user is served a `401` and an empty messge body.

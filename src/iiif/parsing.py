@@ -24,12 +24,12 @@ def get_info_from_iiif_url(iiif_url, source_file):
     """
     # PRE-WABO
 
-    "https://acc.images.data.amsterdam.nl/iiif/2/edepot:ST-00015-ST00000126_00001.jpg/info.json"
+    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/edepot:ST-00015-ST00000126_00001.jpg/info.json"
 
     For the url above it means they request just the info.json, nothing else. More info about the rest
     of this url see the explanation below.
 
-    "https://acc.images.data.amsterdam.nl/iiif/2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,900/0/default.jpg"
+    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,900/0/default.jpg"
 
     For the url above, the following information can be extracted:
     - ST-00015-ST00000126_00001.jpg=filename  ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
@@ -40,7 +40,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
 
     # WABO
 
-    "https://acc.images.data.amsterdam.nl/iiif/2/wabo:SDZ-38657-4900487_628547/full/full/0/default.jpg""
+    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/wabo:SDZ-38657-4900487_628547/full/full/0/default.jpg""
     - SDZ-38657-4900487_628547=filename
     - SDZ=stadsdeel
     - 38657=dossier
