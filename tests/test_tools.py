@@ -19,6 +19,7 @@ from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER, create_local_zip_file
 from tests.test_iiif import (
     PRE_WABO_IMG_URL_NO_SCALING,
     PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+    PRE_WABO_IMG_URL_WITH_REGION,
     PRE_WABO_IMG_URL_WITH_SCALING,
     PRE_WABO_INFO_JSON_URL,
     WABO_IMG_URL,
@@ -41,6 +42,7 @@ class TestTools:
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["file"] == "00001"
+        assert url_info["region"] is None
         assert url_info["scaling"] is None
         assert url_info["source_file"] is False
         assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
@@ -55,6 +57,7 @@ class TestTools:
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["file"] == "00001"
+        assert url_info["region"] == "full"
         assert url_info["scaling"] == "50,50"
         assert url_info["source_file"] is False
         assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
@@ -69,6 +72,7 @@ class TestTools:
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["file"] == "00001"
+        assert url_info["region"] == "full"
         assert url_info["scaling"] == "50,50"
         assert url_info["source_file"] is True
         assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
@@ -83,11 +87,27 @@ class TestTools:
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["file"] == "00001"
+        assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
         assert url_info["source_file"] is True
         assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
         assert url_info["filename"] == "ST-00015-ST00000126_00001.jpg"
         assert url_info["formatting"] == "full/full/0/default.jpg"
+        assert url_info["info_json"] is False
+    
+    def test_get_info_from_pre_wabo_url_with_cropping(self):
+        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_REGION, True)
+        assert url_info["source"] == "edepot"
+        assert url_info["stadsdeel"] == "ST"
+        assert url_info["dossier"] == "00015"
+        assert url_info["document_barcode"] == "ST00000126"
+        assert url_info["file"] == "00001"
+        assert url_info["region"] == "24,24,48,48"
+        assert url_info["scaling"] == "full"
+        assert url_info["source_file"] is True
+        assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
+        assert url_info["filename"] == "ST-00015-ST00000126_00001.jpg"
+        assert url_info["formatting"] == "24,24,48,48/full/0/default.jpg"
         assert url_info["info_json"] is False
 
     def test_get_info_from_pre_wabo_url_wrong_formatted_url(self):
@@ -101,6 +121,7 @@ class TestTools:
         assert url_info["dossier"] == "38657"
         assert url_info["olo"] == "4900487"
         assert url_info["document_barcode"] == "628547"
+        assert url_info["region"] == "full"
         assert url_info["scaling"] == "1000,900"
         assert url_info["source_file"] is False
         assert url_info["source_filename"] == "SDZ/38657/4900487_628547"
@@ -115,6 +136,7 @@ class TestTools:
         assert url_info["dossier"] == "38657"
         assert url_info["olo"] == "4900487"
         assert url_info["document_barcode"] == "628547"
+        assert url_info["region"] == "full"
         assert url_info["scaling"] == "1000,900"
         assert url_info["source_file"] is True
         assert url_info["source_filename"] == "SDZ/38657/4900487_628547"
@@ -131,6 +153,7 @@ class TestTools:
         assert url_info["dossier"] == "10316333"
         assert url_info["olo"] == "3304"
         assert url_info["document_barcode"] == "ECS0000004420_000_000"
+        assert url_info["region"] is None
         assert url_info["scaling"] is None
         assert url_info["source_file"] is False
         assert url_info["source_filename"] == "SDO/10316333/3304_ECS0000004420_000_000"
@@ -147,6 +170,7 @@ class TestTools:
         assert url_info["dossier"] == "10316333"
         assert url_info["olo"] == "3304"
         assert url_info["document_barcode"] == "ECS0000004420-000_00-00"
+        assert url_info["region"] is None
         assert url_info["scaling"] is None
         assert url_info["source_file"] is False
         assert url_info["source_filename"] == "SDO/10316333/3304_ECS0000004420-000_00-00"
