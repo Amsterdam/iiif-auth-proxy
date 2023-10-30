@@ -26,7 +26,7 @@ BASE_INFO_JSON = {
         {
             "formats": [],
             "qualities": ["default"],
-            "supports": ["sizeByW", "sizeByH", "sizeByWh"],
+            "supports": ["sizeByW", "sizeByH", "sizeByWh", "regionByPx"],
         },
     ],
 }
