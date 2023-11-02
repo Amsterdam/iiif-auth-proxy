@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django_ratelimit.decorators import ratelimit
 
 from iiif import authentication, image_server, mailing, parsing, tools, zip_tools
-from iiif.image_handling import generate_info_json, scale_image
+from iiif.image_handling import crop_image, generate_info_json, scale_image
 from iiif.metadata import get_metadata
 
 log = logging.getLogger(__name__)
@@ -41,8 +41,14 @@ def index(request, iiif_url):
             )
             content_type = "application/json"
         else:
-            response_content = scale_image(
+            cropped_content = crop_image(
                 file_response.content,
+                url_info["source_file"],
+                url_info["region"],
+                file_response.headers.get("Content-Type")
+            )
+            response_content = scale_image(
+                cropped_content,
                 url_info["source_file"],
                 url_info["scaling"],
                 file_response.headers.get("Content-Type")

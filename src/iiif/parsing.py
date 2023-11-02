@@ -61,13 +61,15 @@ def get_info_from_iiif_url(iiif_url, source_file):
             if "/" in iiif_url.split(":")[1]
             else ""
         )
-
+        
         info_json = False
         scaling = None
+        region = None
         if formatting == "info.json":
             info_json = True
             formatting = None
         elif '/' in formatting:
+            region = formatting.split('/')[0]
             scaling = formatting.split('/')[1]
         else:
             raise InvalidIIIFUrlError(f"No formatting or info.json provided in iiif url: {iiif_url}")
@@ -89,6 +91,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "document_barcode": document_barcode,
                 "file": file.split(".")[0],  # The file in the dossier
                 "formatting": formatting,
+                "region": region,
                 "scaling": scaling,
                 "source_file": source_file,  # Bool whether the file should be served without image processing (pdf/xls)
                 "source_filename": source_filename,  # The filename on the source system
@@ -106,13 +109,14 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "olo": olo,
                 "document_barcode": document_barcode,
                 "formatting": formatting,
+                "region": region,
                 "scaling": scaling,
                 "source_file": source_file,  # Bool whether the file should be served without image processing (pdf/xls)
                 "source_filename": source_filename,  # The filename on the source system
                 "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
                 "info_json": info_json,
             }
-
+        
         raise InvalidIIIFUrlError(f"Invalid iiif url (no valid source): {iiif_url}")
 
     except Exception as e:
