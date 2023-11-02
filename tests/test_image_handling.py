@@ -26,6 +26,8 @@ class TestImageFormatting:
             self.img_24x24x72x72 = f.read()
         with open("test-images/test-image-cropped-48x0x48x85.jpg", "rb") as f:
             self.img_48x0x48x85 = f.read()
+        with open("test-images/test-image-cropped-85x85.jpg", "rb") as f:
+            self.img_85x85 = f.read()
 
     @pytest.mark.parametrize("param", [None, "", ",", "w,h"])
     def test_parse_invalid_scaling_string_raises(self, param):
@@ -59,6 +61,7 @@ class TestImageFormatting:
 
     def test_crop_image(self):
         assert crop_image(self.img_96x85, False, "full", "image/jpeg") == self.img_96x85
+        assert crop_image(self.img_96x85, False, "square", "image/jpeg") == self.img_85x85
         assert crop_image(self.img_96x85, False, "0,0,100,100", "image/jpeg") == self.img_96x85
         assert crop_image(self.img_96x85, True, "0,0,50,44", "image/jpeg") == self.img_96x85
         assert crop_image(self.img_96x85, False, "0,0,50,44", "image/jpeg") == self.img_0x0x50x44

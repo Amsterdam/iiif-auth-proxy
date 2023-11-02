@@ -140,7 +140,7 @@ def scale_image(content, source_file, scaling, content_type):
 # TODO: Support percentage string: pct:x,y,w,h
 def parse_region_string(region):
     """
-    Parse the region string from the url (either 'full' or 'x,y,w,h' in pixels)
+    Parse the region string from the url (either 'full', 'square' or 'x,y,w,h' in pixels)
 
     :param region: The region string from the url
     :return: Tuple containing the desired x, y, width and height.
@@ -185,13 +185,22 @@ def crop_image(content, source_file, region, content_type):
     :param content_type: The content type of the image
     :return: The cropped image data
     """
-    if source_file or region.lower() == "full":
+    if source_file:
         return content
 
-    desired_x, desired_y, desired_width, desired_height = parse_region_string(region)
-    
     img = Image.open(BytesIO(content))
 
+    match region.lower():
+        case 'full':
+            return content
+        case 'square':
+            shortest_side = min(img.width, img.height)
+            desired_width = desired_height = shortest_side
+            desired_x = (img.width - desired_width) / 2
+            desired_y = (img.height - desired_height) / 2
+        case _:
+            desired_x, desired_y, desired_width, desired_height = parse_region_string(region)
+    
     region_has_no_width = desired_width <= 0 or desired_width == None
     region_has_no_height = desired_height <= 0 or desired_height == None
     if region_has_no_width or region_has_no_height:
