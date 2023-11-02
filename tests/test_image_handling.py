@@ -43,11 +43,12 @@ class TestImageFormatting:
         assert scale_image(self.img_96x85, False, ",44", "image/jpeg") == self.img_49x44
 
     #TODO: Specifiy exception
-    def test_parse_region_string(self):
+    @pytest.mark.parametrize("param", [None, "", ",,,", "x,y,w,h"])
+    def test_parse_invalid_region_string_raises(self, param):
         with pytest.raises(Exception):
-            parse_region_string("x,y,w,h")
-            parse_region_string("")
-            parse_region_string(",,,")
+            parse_region_string(param)
+
+    def test_parse_region_string(self):
         assert parse_region_string("-50,-56,100,100") == (-50, -56, 100, 100)
         assert parse_region_string("0,0,50,44") == (0, 0, 50, 44)
 
