@@ -13,6 +13,7 @@ log = logging.getLogger(__name__)
 MALFORMED_SCALING_PARAMETER = "The scaling parameter is malformed. It should either be 'full' or in the form of '100,50'."
 MALFORMED_REGION_PARAMETER = "The region parameter is malformed. It should either be 'full' or in the form of '50,50,100,100' (x,y,w,h)."
 NON_OVERLAPPING_REGION_PARAMETER = "The region parameter should overlap with the image."
+NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER = "The region parameter should have a positive width and height value"
 
 BASE_INFO_JSON = {
     "@context": "http://iiif.io/api/image/2/context.json",
@@ -182,7 +183,7 @@ def crop_image(content, source_file, region, content_type):
     region_has_no_height = desired_height <= 0 or desired_height == None
     if region_has_no_width or region_has_no_height:
         raise tools.ImmediateHttpResponse(
-            response=HttpResponse(NON_OVERLAPPING_REGION_PARAMETER, status=400)
+            response=HttpResponse(NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER, status=400)
         )
 
     region_has_no_overlap_with_img = (
