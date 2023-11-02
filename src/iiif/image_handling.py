@@ -11,7 +11,9 @@ from iiif import tools
 log = logging.getLogger(__name__)
 
 MALFORMED_SCALING_PARAMETER = "The scaling parameter is malformed. It should either be 'full' or in the form of '100,50'."
+MISSING_SCALING_PARAMETER = "The scaling parameter is missing. It should either be 'full' or in the form of '100,50'."
 MALFORMED_REGION_PARAMETER = "The region parameter is malformed. It should either be 'full' or in the form of '50,50,100,100' (x,y,w,h)."
+MISSING_REGION_PARAMETER = "The region parameter is missing. It should either be 'full' or in the form of '50,50,100,100' (x,y,w,h)."
 NON_OVERLAPPING_REGION_PARAMETER = "The region parameter should overlap with the image."
 NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER = "The region parameter should have a positive width and height value"
 
@@ -66,12 +68,19 @@ def parse_scaling_string(scaling):
         parts = scaling.split(",")
         if len(parts) != 2:
             raise ValueError("Invalid format for scaling")
+        
+        if not (parts[0] or parts[1]):
+            raise ValueError('Invalid format for scaling. Width or height value required.')
 
         desired_width = int(parts[0]) if parts[0] else None
         desired_height = int(parts[1]) if parts[1] else None
     except ValueError:
         raise tools.ImmediateHttpResponse(
             response=HttpResponse(MALFORMED_SCALING_PARAMETER, status=400)
+        )
+    except AttributeError:
+        raise tools.ImmediateHttpResponse(
+            response=HttpResponse(MISSING_SCALING_PARAMETER, status=400)
         )
 
     return desired_width, desired_height
@@ -141,8 +150,8 @@ def parse_region_string(region):
         if len(parts) != 4:
             raise ValueError("Invalid format for region")
         
-        if not (parts[0] or parts[1] or parts[2] or parts[3]):
-            raise ValueError('Invalid format for region')
+        if not (parts[0] and parts[1] and parts[2] and parts[3]):
+            raise ValueError('Invalid format for region. x, y, width and height values required.')
 
         desired_x = int(parts[0])
         desired_y = int(parts[1])
@@ -151,6 +160,10 @@ def parse_region_string(region):
     except ValueError:
         raise tools.ImmediateHttpResponse(
             response=HttpResponse(MALFORMED_REGION_PARAMETER, status=400)
+        )
+    except AttributeError:
+        raise tools.ImmediateHttpResponse(
+            response=HttpResponse(MISSING_REGION_PARAMETER, status=400)
         )
 
     return desired_x, desired_y, desired_width, desired_height

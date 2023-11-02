@@ -7,6 +7,7 @@ from iiif.image_handling import (
     parse_scaling_string,
     scale_image,
 )
+from iiif.tools import ImmediateHttpResponse
 
 
 class TestImageFormatting:
@@ -26,6 +27,11 @@ class TestImageFormatting:
         with open("test-images/test-image-cropped-48x0x48x85.jpg", "rb") as f:
             self.img_48x0x48x85 = f.read()
 
+    @pytest.mark.parametrize("param", [None, "", ",", "w,h"])
+    def test_parse_invalid_scaling_string_raises(self, param):
+        with pytest.raises(ImmediateHttpResponse):
+            parse_scaling_string(param)
+
     def test_parse_scaling_string(self):
         assert parse_scaling_string("100,") == (100, None)
         assert parse_scaling_string(",100") == (None, 100)
@@ -42,10 +48,9 @@ class TestImageFormatting:
         assert scale_image(self.img_96x85, False, "60,44", "image/jpeg") == self.img_49x44
         assert scale_image(self.img_96x85, False, ",44", "image/jpeg") == self.img_49x44
 
-    #TODO: Specifiy exception
-    @pytest.mark.parametrize("param", [None, "", ",,,", "x,y,w,h"])
+    @pytest.mark.parametrize("param", [None, "", ",,,", "x,y,w,h", "50,50,,"])
     def test_parse_invalid_region_string_raises(self, param):
-        with pytest.raises(Exception):
+        with pytest.raises(ImmediateHttpResponse):
             parse_region_string(param)
 
     def test_parse_region_string(self):
@@ -62,12 +67,10 @@ class TestImageFormatting:
         assert crop_image(self.img_96x85, False, "48,0,96,85", "image/jpeg") == self.img_48x0x48x85
         assert crop_image(self.img_96x85, False, "-50,-56,100,100", "image/jpeg") == self.img_0x0x50x44
 
-    #TODO: Specifiy exception
     def test_crop_image_no_size(self):
-         with pytest.raises(Exception):
+         with pytest.raises(ImmediateHttpResponse):
             crop_image(self.img_96x85, False, "0,0,0,0", "image/jpeg")
 
-    #TODO: Specifiy exception
     def test_crop_outside_image(self):
-         with pytest.raises(Exception):
+         with pytest.raises(ImmediateHttpResponse):
             crop_image(self.img_96x85, False, "100,100,50,50", "image/jpeg")
