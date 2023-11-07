@@ -71,6 +71,8 @@ def get_info_from_iiif_url(iiif_url, source_file):
         elif '/' in formatting:
             region = formatting.split('/')[0]
             scaling = formatting.split('/')[1]
+        elif source_file:
+            pass
         else:
             raise InvalidIIIFUrlError(f"No formatting or info.json provided in iiif url: {iiif_url}")
 
