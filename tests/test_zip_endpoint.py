@@ -19,6 +19,7 @@ from iiif.ingress_zip_consumer import ZipConsumer
 from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER
 from tests.test_iiif import (
     IMAGE_BINARY_DATA,
+    PRE_WABO_IMG_URL_BASE,
     PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
     PRE_WABO_IMG_URL_WITH_SCALING,
     WABO_IMG_URL,
@@ -66,6 +67,7 @@ class TestZipEndpoint:
             json.dumps(
                 {
                     "urls": [
+                        self.BASE_URL + PRE_WABO_IMG_URL_BASE,
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
@@ -79,7 +81,7 @@ class TestZipEndpoint:
         message = Message.objects.first()
         data = json.loads(message.raw_data)
         assert data["email_address"] == "zip@amsterdam.nl"
-        assert len(data["urls"]) == 2
+        assert len(data["urls"]) == 3
         assert "request_meta" in data
 
     @patch("iiif.metadata.do_metadata_request")
@@ -107,6 +109,7 @@ class TestZipEndpoint:
             json.dumps(
                 {
                     "urls": [
+                        self.BASE_URL + PRE_WABO_IMG_URL_BASE,
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
                     ]
@@ -121,7 +124,7 @@ class TestZipEndpoint:
         message = Message.objects.first()
         data = json.loads(message.raw_data)
         assert data["email_address"] == "authztest@amsterdam.nl"
-        assert len(data["urls"]) == 2
+        assert len(data["urls"]) == 3
         assert "request_meta" in data
 
     def test_other_methods_than_post_fail(self, client):

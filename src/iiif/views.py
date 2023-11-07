@@ -120,9 +120,7 @@ def request_multiple_files_in_zip(request):
     for full_url in payload["urls"]:
         try:
             iiif_url = parsing.strip_full_iiif_url(full_url)
-            url_info = parsing.get_url_info(
-                iiif_url, tools.str_to_bool(request.GET.get("source_file"))
-            )
+            url_info = parsing.get_url_info(iiif_url, True)
             authentication.check_wabo_for_mail_login(is_mail_login, url_info)
 
             # We create a new dict with all the info so that we have it when we want to get and zip the files later
