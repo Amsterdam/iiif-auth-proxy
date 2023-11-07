@@ -19,4 +19,4 @@ jobs:
       production_pipeline: "https://ci.data.amsterdam.nl/job/opdrachten-team/job/iiif-auth-proxy/job/Deployments/view/tags/"
       acceptance_urls: "https://acc.bouwdossiers.amsterdam.nl/iiif-metadata/bouwdossier/"
       production_urls: "https://bouwdossiers.amsterdam.nl/iiif-metadata/bouwdossier/"
-      release_stop: true
+      release_stop: false
