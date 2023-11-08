@@ -1,4 +1,4 @@
-host: iiif-auth-proxy
+host: localhost
 
 jobs:
   certificate-init:
