@@ -181,7 +181,7 @@ WSGI_APPLICATION = "main.wsgi.application"
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 
-DATABASE_HOST = os.getenv("DATABASE_HOST", "database")
+DATABASE_HOST = os.getenv("DATABASE_HOST", "database-iiif-auth-proxy")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "dev")
 DATABASE_OPTIONS = {"sslmode": "allow", "connect_timeout": 5}
 if "azure.com" in DATABASE_HOST:
@@ -191,7 +191,7 @@ if "azure.com" in DATABASE_HOST:
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv("DATABASE_NAME", "iiif_auth_proxy"),
+        "NAME": os.getenv("DATABASE_NAME", "dev"),
         "USER": os.getenv("DATABASE_USER", "dev"),
         "PASSWORD": DATABASE_PASSWORD,
         "HOST": DATABASE_HOST,
