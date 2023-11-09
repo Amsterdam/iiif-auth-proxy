@@ -27,14 +27,9 @@ secrets:
       helm.sh/hook-weight: "-5"
     secrets:
       - secret-key
-      - use-jwks-test-key
-      - stadsarchief-meta-server-base-url
-      - stadsarchief-meta-server-port
       - hcp-authorization
       - jwt-secret-key
-      - login-origin-url-tld-whitelist
-      - pub-jwks      
-      - applicationinsights-connection-string
+      - pub-jwks
 
 jobs:
   migrate:
