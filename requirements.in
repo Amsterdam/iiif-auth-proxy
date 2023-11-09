@@ -16,19 +16,15 @@ django<4.2  # Django 4.2 does not support Postgres 11 anymore
 django-cors-headers
 django-ratelimit
 
-# Sentry
-sentry-sdk
-raven
-
-# # Azure
-# azure-cli
-# azure-core
-# azure-identity
-# azure-storage-blob
-# azure-keyvault
-# azure-keyvault-secrets
-# opencensus-ext-django
-# opencensus-ext-azure
-# opencensus-ext-postgresql
-# opencensus-ext-logging
-# opencensus-ext-requests
+# Azure
+azure-cli
+azure-core
+azure-identity
+azure-storage-blob
+azure-keyvault
+azure-keyvault-secrets
+opencensus-ext-django
+opencensus-ext-azure
+opencensus-ext-postgresql
+opencensus-ext-logging
+opencensus-ext-requests
