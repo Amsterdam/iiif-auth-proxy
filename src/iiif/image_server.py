@@ -86,7 +86,7 @@ def handle_file_response_codes(file_response, file_url):
         raise ImmediateHttpResponse(
             response=HttpResponse(
                 f"We had a problem retrieving the image. We got status "
-                f"code {file_response.status_code} for url {file_url}",
+                f"code {file_response.status_code} for url {file_url}.",
                 status=502,
             )
         )
@@ -121,7 +121,7 @@ def download_file_for_zip(
         file_response, file_url = get_file(request_meta, url_info, iiif_url, metadata)
         handle_file_response_codes(file_response, file_url)
     except ImmediateHttpResponse as e:
-        log.exception(f"HTTP Exception while retrieving {iiif_url} from the source system: ({e.response})")
+        log.exception(f"HTTP Exception while retrieving {iiif_url} from the source system: ({e.response.content})")
         info_txt_contents += (
             f"Not included in this zip because an error occurred "
             f"while getting it from the source system\n"
