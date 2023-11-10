@@ -111,9 +111,6 @@ def download_file_for_zip(
     request_meta,
     tmp_folder_path,
 ):
-    # Tell image server we want the full image
-    iiif_url += "/full/full/0/default.jpg"
-
     info_txt_contents += f"{iiif_url}: "
 
     if fail_reason:
@@ -123,14 +120,15 @@ def download_file_for_zip(
     try:
         file_response, file_url = get_file(request_meta, url_info, iiif_url, metadata)
         handle_file_response_codes(file_response, file_url)
-    except ImmediateHttpResponse:
+    except ImmediateHttpResponse as e:
+        log.exception(f"HTTP Exception while retrieving {iiif_url} from the source system: ({e.response})")
         info_txt_contents += (
             f"Not included in this zip because an error occurred "
             f"while getting it from the source system\n"
         )
         return info_txt_contents
-    except Exception:
-        log.exception(f"Exception while retrieving {iiif_url} from the source system.")
+    except Exception as e:
+        log.exception(f"Exception while retrieving {iiif_url} from the source system: ({e}).")
         info_txt_contents += (
             f"Not included in this zip because an error occurred "
             f"while getting it from the source system\n"
