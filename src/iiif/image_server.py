@@ -121,14 +121,14 @@ def download_file_for_zip(
         file_response, file_url = get_file(request_meta, url_info, iiif_url, metadata)
         handle_file_response_codes(file_response, file_url)
     except ImmediateHttpResponse as e:
-        log.exception(f"HTTP Exception while retrieving {iiif_url} from the source system ({e}).")
+        log.exception(f"HTTP Exception while retrieving {iiif_url} from the source system: ({e.response})")
         info_txt_contents += (
             f"Not included in this zip because an error occurred "
             f"while getting it from the source system\n"
         )
         return info_txt_contents
     except Exception as e:
-        log.exception(f"Exception while retrieving {iiif_url} from the source system ({e}).")
+        log.exception(f"Exception while retrieving {iiif_url} from the source system: ({e}).")
         info_txt_contents += (
             f"Not included in this zip because an error occurred "
             f"while getting it from the source system\n"
