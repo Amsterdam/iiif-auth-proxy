@@ -19,7 +19,7 @@ network:
 secrets:
   certificate:
     type: keyvault
-    tls: iiif-auth-proxy
+    tls: bouwdossiers
 
   vault:
     type: keyvault
