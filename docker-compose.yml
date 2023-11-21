@@ -5,7 +5,7 @@ x-app: &base-app
     context: .
     target: app
   depends_on:
-    - database
+    - database-iiif-auth-proxy
   volumes:
     - ./src:/src
     - ./tests:/tests
@@ -21,10 +21,10 @@ x-app: &base-app
     IIIF_IMAGE_SERVER_WABO_CERT: dGhlIGNvbnRlbnRzIG9mIHRoZSBjZXJ0IGZpbGU=  # This says "the contents of the cert file"
 
 services:
-  database:
+  database-iiif-auth-proxy:
     image: amsterdam/postgres11
     environment:
-      POSTGRES_DB: iiif_auth_proxy
+      POSTGRES_DB: dev
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: dev
 
@@ -40,7 +40,7 @@ services:
     build:
       context: .
       target: app
-    image: docker-registry.data.amsterdam.nl/datapunt/iiif-auth-proxy:${VERSION:-latest}
+    image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-opdrachten/iiif-auth-proxy}:${VERSION:-latest}
     command: /deploy/docker-run.sh
 
   test:

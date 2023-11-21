@@ -1,0 +1,91 @@
+host: localhost
+
+jobs:
+  certificate-init:
+    enabled: false
+
+ingress:
+  app:
+    tls: null
+
+secrets:
+  certificate:
+    enabled: false
+  
+  database:
+    type: opaque
+    secrets:
+      database-host: database-iiif-auth-proxy
+      database-name: dev
+      database-user: dev
+
+  vault:
+    type: opaque
+    secrets:
+      secret-key: dev
+      stadsarchief-meta-server-base-url: dev
+      # sentry-dsn: dev
+      # sentry-environment: dev
+      # pub-jwks: dev
+      use-jwks-test-key: "true"
+      keycloak-jwks-url: dev
+      hcp-authorization: dev
+      iiif-image-server-wabo-cert: ZGV2
+      start-stunnel: "true"
+      jwt-secret-key: dev
+      os-username: bouwdossiers
+      os-password: dev
+      os-auth-url: https://identity.stack.cloudvps.com/v2.0
+      os-tenant-name: BGE000081 Bouwdossier
+      os-tenant-id: 9d078258c1a547c09e0b5f88834554f1
+      os-container-name: downloads_acceptance
+      os-temp-url-key: dev
+      allow-localhost-login-url: "true"
+      email-host: smr.amsterdam.nl
+      email-host-user: Srvc_Bouwdossiers@amsterdam.nl
+      email-host-password: dev
+
+persistentVolumeClaims:
+  data:
+    resources:
+      requests:
+        storage: 1Gi
+
+deployments:
+  database:
+    labels:
+      component: database
+    image:
+      registry: null
+      repository: postgis/postgis
+      tag: 14-3.3
+    securityContext:
+      runAsNonRoot: false
+      runAsUser: null
+    env:
+      POSTGRES_DB: dev
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      PGDATA: /data
+    volumes:
+      - name: data
+        persistentVolumeClaim: data
+    containers:
+      - name: main
+        securityContext:
+          readOnlyRootFilesystem: false
+        volumes:
+          - name: data
+            mountPath: /data
+
+services:
+  database:
+    selector:
+      component: database
+    ports:
+      - port: 5432
+        targetPort: 5432
+
+network:
+  allow-ingress:
+    enabled: false

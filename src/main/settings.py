@@ -13,8 +13,9 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 from distutils.util import strtobool
 
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
+from .azure_settings import Azure
+
+azure = Azure()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -55,9 +56,8 @@ WABO_BASE_URL = os.getenv(
 HCP_AUTHORIZATION = os.getenv("HCP_AUTHORIZATION", "dummy")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ALGORITHM = "HS256"
-SENDGRID_KEY = os.getenv("SENDGRID_KEY", "mock_key")
 ZIP_COLLECTION_NAME = "zip_queue"
-LOGIN_ORIGIN_URL_TLD_WHITELIST = ["data.amsterdam.nl", "acc.data.amsterdam.nl", "acc.dataportaal.amsterdam.nl"]
+LOGIN_ORIGIN_URL_TLD_WHITELIST = ["data.amsterdam.nl", "acc.dataportaal.amsterdam.nl"]
 if strtobool(os.getenv("ALLOW_LOCALHOST_LOGIN_URL", "false")):
     LOGIN_ORIGIN_URL_TLD_WHITELIST += ["localhost", "127.0.0.1"]
 
@@ -180,15 +180,24 @@ WSGI_APPLICATION = "main.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+
+DATABASE_HOST = os.getenv("DATABASE_HOST", "database-iiif-auth-proxy")
+DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "dev")
+DATABASE_OPTIONS = {"sslmode": "allow", "connect_timeout": 5}
+if "azure.com" in DATABASE_HOST:
+    DATABASE_PASSWORD = azure.auth.db_password
+    DATABASE_OPTIONS["sslmode"] = "require"
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv("DATABASE_NAME", "iiif_auth_proxy"),
+        "NAME": os.getenv("DATABASE_NAME", "dev"),
         "USER": os.getenv("DATABASE_USER", "dev"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD", "dev"),
-        "HOST": os.getenv("DATABASE_HOST", "database"),
+        "PASSWORD": DATABASE_PASSWORD,
+        "HOST": DATABASE_HOST,
         "CONN_MAX_AGE": 20,
         "PORT": os.getenv("DATABASE_PORT", "5432"),
+        "OPTIONS": DATABASE_OPTIONS,
     },
 }
 
@@ -220,11 +229,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = "/static/"
-
-SENTRY_DSN = os.getenv("SENTRY_DSN")
-if SENTRY_DSN:
-    sentry_sdk.init(
-        dsn=SENTRY_DSN,
-        integrations=[DjangoIntegration()],
-        ignore_errors=["ExpiredSignatureError"],
-    )
