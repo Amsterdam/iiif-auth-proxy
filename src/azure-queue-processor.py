@@ -1,16 +1,17 @@
 # pip install azure-identity
 # pip install azure-storage-queue
+import errno
+import functools
+import logging
+import os
+import signal
 import time
 
 from azure.core.exceptions import ResourceExistsError
-from azure.storage.queue import QueueClient, QueueServiceClient
+
 # use azure workload identity to login to queue
 from azure.identity import DefaultAzureCredential, WorkloadIdentityCredential
-import logging
-import errno
-import os
-import signal
-import functools
+from azure.storage.queue import QueueClient, QueueServiceClient
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
