@@ -17,5 +17,5 @@ from django.urls import include, path
 
 urlpatterns = [
     path("iiif/", include("iiif.urls")),
-    path("status/", include("health.urls")),
+    path("", include("health.urls")),
 ]
