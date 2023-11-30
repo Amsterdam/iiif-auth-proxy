@@ -25,8 +25,10 @@ from tests.tools import MockResponse
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
 
+
 def filename_from_url(url):
-    return url.split(':')[1].split('/')[0].replace('-', '/')
+    return url.split(":")[1].split("/")[0].replace("-", "/")
+
 
 PRE_WABO_IMG_URL_BASE = "2/edepot:ST-00015-ST00000126_00001.jpg/"
 
@@ -37,15 +39,21 @@ PRE_WABO_IMG_URL_WITH_EMPTY_SCALING = PRE_WABO_IMG_URL_BASE + "full//0/default.j
 PRE_WABO_FILE_NAME_WITH_SCALING = filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)
 
 PRE_WABO_IMG_URL_WITH_REGION = PRE_WABO_IMG_URL_BASE + "24,24,48,48/full/0/default.jpg"
-PRE_WABO_IMG_URL_WITH_REGION_NON_OVERLAPPING = PRE_WABO_IMG_URL_BASE + "10000,10000,48,48/full/0/default.jpg"
+PRE_WABO_IMG_URL_WITH_REGION_NON_OVERLAPPING = (
+    PRE_WABO_IMG_URL_BASE + "10000,10000,48,48/full/0/default.jpg"
+)
 
-PRE_WABO_IMG_URL_NO_SCALING = "2/edepot:ST-00015-ST00000126_00001.jpg/full/full/0/default.jpg"
+PRE_WABO_IMG_URL_NO_SCALING = (
+    "2/edepot:ST-00015-ST00000126_00001.jpg/full/full/0/default.jpg"
+)
 PRE_WABO_FILE_NAME_NO_SCALING = filename_from_url(PRE_WABO_IMG_URL_NO_SCALING)
 
 PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE = (
     "2/edepot:SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg/full/full/0/default.jpg"
 )
-PRE_WABO_IMG_FILE_NAME_WITH_EXTRA_REFERENCE = filename_from_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE)
+PRE_WABO_IMG_FILE_NAME_WITH_EXTRA_REFERENCE = filename_from_url(
+    PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE
+)
 
 WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547/full/1000,900/0/default.jpg"
 
@@ -55,7 +63,6 @@ with open("test-images/test-image-50x44.jpg", "rb") as file:
     IMAGE_BINARY_DATA_50x44 = file.read()
 with open("test-images/test-image-cropped-24x24x72x72.jpg", "rb") as file:
     IMAGE_BINARY_DATA_24x24x72x72 = file.read()
-
 
 
 class TestFileRetrievalWithAuthz:
@@ -194,7 +201,9 @@ class TestFileRetrievalWithAuthz:
 
     @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
-    def test_get_info_json(self, mock_do_metadata_request, mock_get_image_from_server, client):
+    def test_get_info_json(
+        self, mock_do_metadata_request, mock_get_image_from_server, client
+    ):
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -217,16 +226,15 @@ class TestFileRetrievalWithAuthz:
         mock_get_image_from_server.return_value = MockResponse(
             200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
         )
-        
+
         header = {
             "HTTP_AUTHORIZATION": "Bearer "
             + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)
         }
-        
 
         response = client.get(self.url + PRE_WABO_INFO_JSON_URL, **header)
         assert response.status_code == 200
-        assert response.headers['Content-Type'] == 'application/json'
+        assert response.headers["Content-Type"] == "application/json"
 
         response_dict = json.loads(response.content)
         assert response_dict["width"] == 96
@@ -359,10 +367,11 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
-        response = client.get(self.url + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE, **header)
+        response = client.get(
+            self.url + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE, **header
+        )
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
-
 
     @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
@@ -599,7 +608,6 @@ class TestFileRetrievalWithAuthz:
         response = client.get(self.url + PRE_WABO_IMG_URL_WITH_EMPTY_SCALING, **header)
         assert response.status_code == 400
 
-
     @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_cropped_image(
@@ -636,7 +644,7 @@ class TestFileRetrievalWithAuthz:
         response = client.get(self.url + PRE_WABO_IMG_URL_WITH_REGION, **header)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA_24x24x72x72
-    
+
     @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_cropped_image_outside_image_region_returns_400(
@@ -670,7 +678,9 @@ class TestFileRetrievalWithAuthz:
             + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)
         }
 
-        response = client.get(self.url + PRE_WABO_IMG_URL_WITH_REGION_NON_OVERLAPPING, **header)
+        response = client.get(
+            self.url + PRE_WABO_IMG_URL_WITH_REGION_NON_OVERLAPPING, **header
+        )
         assert response.status_code == 400
 
 
@@ -790,13 +800,19 @@ class TestFileRetrievalWithMailJWT:
         )
 
         response = client.get(
-            self.file_url + PRE_WABO_IMG_URL_NO_SCALING + "?auth=" + self.mail_login_token
+            self.file_url
+            + PRE_WABO_IMG_URL_NO_SCALING
+            + "?auth="
+            + self.mail_login_token
         )
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
         response = client.get(
-            self.file_url + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE + "?auth=" + self.mail_login_token
+            self.file_url
+            + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE
+            + "?auth="
+            + self.mail_login_token
         )
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_COPYRIGHT
@@ -820,7 +836,10 @@ class TestFileRetrievalWithMailJWT:
         )
 
         response = client.get(
-            self.file_url + PRE_WABO_IMG_URL_WITH_SCALING + "?auth=" + self.mail_login_token
+            self.file_url
+            + PRE_WABO_IMG_URL_WITH_SCALING
+            + "?auth="
+            + self.mail_login_token
         )
         assert response.status_code == 401
         assert response.content.decode("utf-8") == RESPONSE_CONTENT_RESTRICTED
@@ -851,7 +870,9 @@ class TestFileRetrievalWithMailJWT:
                 self.test_email_address, settings.SECRET_KEY
             )
 
-        response = client.get(self.file_url + PRE_WABO_IMG_URL_WITH_SCALING + "?auth=" + jwt_token)
+        response = client.get(
+            self.file_url + PRE_WABO_IMG_URL_WITH_SCALING + "?auth=" + jwt_token
+        )
         assert response.status_code == 401
 
     @patch("iiif.image_server.get_image_from_server")
@@ -888,5 +909,5 @@ class TestFileRetrievalWithMailJWT:
         )
         assert response.status_code == 401
         assert (
-                response.content.decode("utf-8") == RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN
+            response.content.decode("utf-8") == RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN
         )

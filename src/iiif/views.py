@@ -37,7 +37,7 @@ def index(request, iiif_url):
             response_content = generate_info_json(
                 request.build_absolute_uri().replace("/info.json", ""),
                 file_response.content,
-                file_response.headers.get("Content-Type")
+                file_response.headers.get("Content-Type"),
             )
             content_type = "application/json"
         else:
@@ -45,13 +45,13 @@ def index(request, iiif_url):
                 file_response.content,
                 url_info["source_file"],
                 url_info["region"],
-                file_response.headers.get("Content-Type")
+                file_response.headers.get("Content-Type"),
             )
             response_content = scale_image(
                 cropped_content,
                 url_info["source_file"],
                 url_info["scaling"],
-                file_response.headers.get("Content-Type")
+                file_response.headers.get("Content-Type"),
             )
             content_type = file_response.headers.get("Content-Type")
     except tools.ImmediateHttpResponse as e:

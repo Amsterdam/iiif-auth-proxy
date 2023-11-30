@@ -8,7 +8,7 @@ adal==1.2.7
     # via
     #   -r ./requirements.txt
     #   msrestazure
-antlr4-python3-runtime==4.9.3
+antlr4-python3-runtime==4.13.1
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -16,7 +16,7 @@ applicationinsights==0.11.10
     # via
     #   -r ./requirements.txt
     #   azure-cli-telemetry
-argcomplete==3.1.4
+argcomplete==3.1.6
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
@@ -25,6 +25,7 @@ asgiref==3.7.2
     # via
     #   -r ./requirements.txt
     #   django
+    #   django-cors-headers
 autoflake==2.2.1
     # via -r requirements_dev.in
 azure-appconfiguration==1.1.1
@@ -35,9 +36,9 @@ azure-batch==14.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-cli==2.53.1
+azure-cli==2.54.0
     # via -r ./requirements.txt
-azure-cli-core==2.53.1
+azure-cli-core==2.54.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -136,6 +137,7 @@ azure-core==1.29.5
     #   azure-mgmt-core
     #   azure-multiapi-storage
     #   azure-storage-blob
+    #   azure-storage-queue
     #   azure-synapse-accesscontrol
     #   azure-synapse-managedprivateendpoints
     #   azure-synapse-spark
@@ -157,13 +159,13 @@ azure-graphrbac==0.60.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-identity==1.14.1
+azure-identity==1.14.0
     # via
     #   -r ./requirements.txt
     #   opencensus-ext-azure
 azure-keyvault==4.2.0
     # via -r ./requirements.txt
-azure-keyvault-administration==4.3.0
+azure-keyvault-administration==4.4.0b2
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -172,7 +174,7 @@ azure-keyvault-certificates==4.7.0
     #   -r ./requirements.txt
     #   azure-cli
     #   azure-keyvault
-azure-keyvault-keys==4.8.0b2
+azure-keyvault-keys==4.9.0b3
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -234,7 +236,7 @@ azure-mgmt-cognitiveservices==13.5.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-compute==30.0.0
+azure-mgmt-compute==30.3.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -246,7 +248,7 @@ azure-mgmt-containerregistry==10.1.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-containerservice==26.0.0
+azure-mgmt-containerservice==27.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -313,7 +315,7 @@ azure-mgmt-core==1.4.0
     #   azure-mgmt-trafficmanager
     #   azure-mgmt-web
     #   azure-synapse-artifacts
-azure-mgmt-cosmosdb==9.2.0
+azure-mgmt-cosmosdb==9.3.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -365,7 +367,7 @@ azure-mgmt-iotcentral==10.0.0b2
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-iothub==2.3.0
+azure-mgmt-iothub==3.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -373,7 +375,7 @@ azure-mgmt-iothubprovisioningservices==1.1.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-keyvault==10.2.3
+azure-mgmt-keyvault==10.3.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -429,7 +431,7 @@ azure-mgmt-privatedns==1.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-rdbms==10.2.0b11
+azure-mgmt-rdbms==10.2.0b12
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -441,7 +443,7 @@ azure-mgmt-recoveryservicesbackup==7.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-redhatopenshift==1.3.0
+azure-mgmt-redhatopenshift==1.4.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -477,7 +479,7 @@ azure-mgmt-servicelinker==1.2.0b1
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-signalr==1.1.0
+azure-mgmt-signalr==2.0.0b1
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -489,7 +491,7 @@ azure-mgmt-sqlvirtualmachine==1.0.0b5
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-storage==21.0.0
+azure-mgmt-storage==21.1.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -519,6 +521,8 @@ azure-storage-common==1.4.2
     # via
     #   -r ./requirements.txt
     #   azure-cli
+azure-storage-queue==12.8.0
+    # via -r ./requirements.txt
 azure-synapse-accesscontrol==0.5.0
     # via
     #   -r ./requirements.txt
@@ -547,12 +551,11 @@ cachetools==5.3.2
     # via
     #   -r ./requirements.txt
     #   google-auth
-certifi==2023.7.22
+certifi==2023.11.17
     # via
     #   -r ./requirements.txt
     #   msrest
     #   requests
-    #   sentry-sdk
 cffi==1.16.0
     # via
     #   -r ./requirements.txt
@@ -576,9 +579,7 @@ colorama==0.4.6
     #   -r ./requirements.txt
     #   azure-cli
 coverage[toml]==7.3.2
-    # via
-    #   coverage
-    #   pytest-cov
+    # via pytest-cov
 cryptography==41.0.5
     # via
     #   -r ./requirements.txt
@@ -589,6 +590,7 @@ cryptography==41.0.5
     #   azure-multiapi-storage
     #   azure-storage-blob
     #   azure-storage-common
+    #   azure-storage-queue
     #   jwcrypto
     #   msal
     #   paramiko
@@ -609,11 +611,6 @@ deprecated==1.2.14
     #   -r ./requirements.txt
     #   jwcrypto
     #   pygithub
-distro==1.8.0
-    # via
-    #   -r ./requirements.txt
-    #   azure-cli
-    #   azure-cli-core
 django==4.1.13
     # via
     #   -r ./requirements.txt
@@ -622,7 +619,7 @@ django==4.1.13
     #   django-cors-headers
     #   djangorestframework
     #   opencensus-ext-django
-django-cors-headers==4.3.0
+django-cors-headers==4.3.1
     # via -r ./requirements.txt
 django-ratelimit==4.1.0
     # via -r ./requirements.txt
@@ -630,13 +627,13 @@ djangorestframework==3.14.0
     # via
     #   -r ./requirements.txt
     #   datapunt-data-ingress
-exceptiongroup==1.1.3
+exceptiongroup==1.2.0
     # via pytest
 fabric==2.7.1
     # via
     #   -r ./requirements.txt
     #   azure-cli
-google-api-core==2.13.0
+google-api-core==2.14.0
     # via
     #   -r ./requirements.txt
     #   opencensus
@@ -683,6 +680,7 @@ isodate==0.6.1
     #   azure-mgmt-containerservice
     #   azure-mgmt-cosmosdb
     #   azure-mgmt-imagebuilder
+    #   azure-mgmt-iothub
     #   azure-mgmt-keyvault
     #   azure-mgmt-netapp
     #   azure-mgmt-rdbms
@@ -692,8 +690,11 @@ isodate==0.6.1
     #   azure-mgmt-resource
     #   azure-mgmt-search
     #   azure-mgmt-security
+    #   azure-mgmt-signalr
     #   azure-mgmt-sql
+    #   azure-mgmt-storage
     #   azure-storage-blob
+    #   azure-storage-queue
     #   azure-synapse-artifacts
     #   msrest
 isort==5.12.0
@@ -715,7 +716,7 @@ jwcrypto==1.5.0
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
-keystoneauth1==5.3.0
+keystoneauth1==5.4.0
     # via
     #   -r ./requirements.txt
     #   python-keystoneclient
@@ -729,7 +730,6 @@ msal[broker]==1.24.0b2
     #   azure-cli-core
     #   azure-datalake-store
     #   azure-identity
-    #   msal
     #   msal-extensions
 msal-extensions==1.0.0
     # via
@@ -765,7 +765,6 @@ msrest==0.7.1
     #   azure-mgmt-extendedlocation
     #   azure-mgmt-hdinsight
     #   azure-mgmt-iotcentral
-    #   azure-mgmt-iothub
     #   azure-mgmt-iothubprovisioningservices
     #   azure-mgmt-kusto
     #   azure-mgmt-loganalytics
@@ -783,9 +782,7 @@ msrest==0.7.1
     #   azure-mgmt-servicefabric
     #   azure-mgmt-servicefabricmanagedclusters
     #   azure-mgmt-servicelinker
-    #   azure-mgmt-signalr
     #   azure-mgmt-sqlvirtualmachine
-    #   azure-mgmt-storage
     #   azure-mgmt-synapse
     #   azure-mgmt-trafficmanager
     #   azure-mgmt-web
@@ -849,7 +846,7 @@ oslo-config==9.2.0
     # via
     #   -r ./requirements.txt
     #   python-keystoneclient
-oslo-i18n==6.1.0
+oslo-i18n==6.2.0
     # via
     #   -r ./requirements.txt
     #   oslo-config
@@ -859,7 +856,7 @@ oslo-serialization==5.2.0
     # via
     #   -r ./requirements.txt
     #   python-keystoneclient
-oslo-utils==6.2.1
+oslo-utils==6.3.0
     # via
     #   -r ./requirements.txt
     #   oslo-serialization
@@ -899,13 +896,15 @@ pbr==6.0.0
     #   stevedore
 pillow-simd==9.0.0.post1
     # via -r ./requirements.txt
+pip==23.3.1
+    # via pip-tools
 pip-tools==7.3.0
     # via -r requirements_dev.in
 pkginfo==1.9.6
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
-platformdirs==3.11.0
+platformdirs==4.0.0
     # via black
 pluggy==1.3.0
     # via pytest
@@ -914,7 +913,7 @@ portalocker==2.8.2
     #   -r ./requirements.txt
     #   azure-cli-telemetry
     #   msal-extensions
-protobuf==4.25.0
+protobuf==4.25.1
     # via
     #   -r ./requirements.txt
     #   google-api-core
@@ -928,7 +927,7 @@ psycopg2-binary==2.9.9
     # via
     #   -r ./requirements.txt
     #   opencensus-ext-postgresql
-pyasn1==0.5.0
+pyasn1==0.5.1
     # via
     #   -r ./requirements.txt
     #   pyasn1-modules
@@ -951,7 +950,7 @@ pygithub==1.59.1
     # via
     #   -r ./requirements.txt
     #   azure-cli
-pygments==2.16.1
+pygments==2.17.2
     # via
     #   -r ./requirements.txt
     #   knack
@@ -962,7 +961,6 @@ pyjwt[crypto]==2.8.0
     #   azure-cli-core
     #   msal
     #   pygithub
-    #   pyjwt
 pynacl==1.5.0
     # via
     #   -r ./requirements.txt
@@ -1014,9 +1012,8 @@ pyyaml==6.0.1
     #   -r ./requirements.txt
     #   knack
     #   oslo-config
+    #   oslo-utils
     #   pycomposefile
-raven==6.10.0
-    # via -r ./requirements.txt
 requests[socks]==2.31.0
     # via
     #   -r ./requirements.txt
@@ -1038,7 +1035,6 @@ requests[socks]==2.31.0
     #   pygithub
     #   python-keystoneclient
     #   python-swiftclient
-    #   requests
     #   requests-oauthlib
 requests-oauthlib==1.3.1
     # via
@@ -1060,8 +1056,10 @@ semver==2.13.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-sentry-sdk==1.34.0
-    # via -r ./requirements.txt
+setuptools==69.0.2
+    # via
+    #   -r ./requirements.txt
+    #   pip-tools
 six==1.16.0
     # via
     #   -r ./requirements.txt
@@ -1101,7 +1099,6 @@ tomli==2.0.1
     #   build
     #   coverage
     #   pip-tools
-    #   pyproject-hooks
     #   pytest
 typing-extensions==4.8.0
     # via
@@ -1113,25 +1110,25 @@ typing-extensions==4.8.0
     #   azure-keyvault-keys
     #   azure-keyvault-secrets
     #   azure-storage-blob
+    #   azure-storage-queue
     #   black
 tzdata==2023.3
     # via
     #   -r ./requirements.txt
     #   oslo-serialization
     #   oslo-utils
-urllib3==2.0.7
+urllib3==2.1.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
     #   requests
-    #   sentry-sdk
 websocket-client==1.3.3
     # via
     #   -r ./requirements.txt
     #   azure-cli
 wheel==0.41.3
     # via pip-tools
-wrapt==1.15.0
+wrapt==1.16.0
     # via
     #   -r ./requirements.txt
     #   debtcollector
@@ -1141,11 +1138,3 @@ xmltodict==0.13.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-
-# The following packages are considered to be unsafe in a requirements file:
-pip==23.3.1
-    # via pip-tools
-setuptools==68.2.2
-    # via
-    #   -r ./requirements.txt
-    #   pip-tools

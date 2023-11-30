@@ -14,7 +14,9 @@ from azure.identity import DefaultAzureCredential, WorkloadIdentityCredential
 from azure.storage.queue import QueueClient, QueueServiceClient
 
 logging.basicConfig(level=logging.INFO)
-logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
+logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(
+    logging.WARNING
+)
 logger = logging.getLogger(__name__)
 
 QUEUE_NAME = "queue"
@@ -22,14 +24,16 @@ ACCOUNT_URL = "https://bouwdossiersdataoi5sk6et.queue.core.windows.net"
 MESSAGE_VISIBILITY_TIMEOUT = 60
 
 credentials = WorkloadIdentityCredential()
-queue_client = QueueClient(credential=credentials, account_url=ACCOUNT_URL, queue_name=QUEUE_NAME)
+queue_client = QueueClient(
+    credential=credentials, account_url=ACCOUNT_URL, queue_name=QUEUE_NAME
+)
 MESSAGE = "HOI KRIS, GROETJES UIT AKS"
 
 
 def send_messages():
-    queue_client.send_message(u"First message: " + MESSAGE)
-    queue_client.send_message(u"Second message: " + MESSAGE)
-    queue_client.send_message(u"Third message: " + MESSAGE)
+    queue_client.send_message("First message: " + MESSAGE)
+    queue_client.send_message("Second message: " + MESSAGE)
+    queue_client.send_message("Third message: " + MESSAGE)
 
 
 class TimeoutError(Exception):
@@ -37,7 +41,8 @@ class TimeoutError(Exception):
 
 
 def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
-    """ https://stackoverflow.com/questions/2281850/timeout-function-if-it-takes-too-long-to-finish """
+    """https://stackoverflow.com/questions/2281850/timeout-function-if-it-takes-too-long-to-finish"""
+
     def decorator(func):
         def _handle_timeout(signum, frame):
             raise TimeoutError(error_message)
@@ -51,6 +56,7 @@ def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
             finally:
                 signal.alarm(0)
             return result
+
         return wrapper
 
     return decorator
@@ -65,7 +71,9 @@ class AzureQueueConsumer:
             if count == 0:
                 time.sleep(5)
                 continue
-            message_iterator = queue_client.receive_messages(max_messages=1, visibility_timeout=MESSAGE_VISIBILITY_TIMEOUT)
+            message_iterator = queue_client.receive_messages(
+                max_messages=1, visibility_timeout=MESSAGE_VISIBILITY_TIMEOUT
+            )
             for message in message_iterator:
                 self.process_message(message)
                 queue_client.delete_message(message.id, message.pop_receipt)
@@ -78,7 +86,6 @@ class AzureQueueConsumer:
         messages!!! Always use a timeout decorator to prevent this.
         """
         logger.info("Processing message: " + message.content)
-
 
     def get_queue_length(self):
         properties = queue_client.get_queue_properties()

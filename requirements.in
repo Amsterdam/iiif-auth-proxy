@@ -3,7 +3,7 @@
 
 datapunt-authorization-django
 pyjwt
-pillow-simd
+pillow-simd  # Pillow with SIMD support
 six # Needed by jwcrypto, which mistakenly doesn't include it. PR with fix here: https://github.com/latchset/jwcrypto/pull/202
 psycopg2-binary
 python-swiftclient
@@ -19,10 +19,11 @@ django-ratelimit
 # Azure
 azure-cli
 azure-core
-azure-identity
+azure-identity==1.14  # 1.15 leads to incompatible version dependencies right now
 azure-storage-blob
 azure-keyvault
 azure-keyvault-secrets
+azure-storage-queue
 opencensus-ext-django
 opencensus-ext-azure
 opencensus-ext-postgresql
