@@ -48,13 +48,13 @@ iso8601==2.1.0
     # via
     #   keystoneauth1
     #   oslo-utils
-jwcrypto==1.5.0
+jwcrypto==1.5.1
     # via datapunt-authorization-django
 keystoneauth1==5.4.0
     # via python-keystoneclient
 msgpack==1.0.7
     # via oslo-serialization
-netaddr==0.9.0
+netaddr==0.10.0
     # via
     #   oslo-config
     #   oslo-utils
@@ -134,7 +134,7 @@ stevedore==5.1.0
     #   python-keystoneclient
 typing-extensions==4.9.0
     # via asgiref
-tzdata==2023.3
+tzdata==2023.4
     # via
     #   oslo-serialization
     #   oslo-utils
@@ -148,5 +148,5 @@ wrapt==1.16.0
     #   deprecated
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==69.0.2
+setuptools==69.0.3
     # via -r requirements.in
