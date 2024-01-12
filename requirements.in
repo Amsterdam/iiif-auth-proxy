@@ -1,16 +1,31 @@
 # Define all requirements, only pin when necessary (and if so, add a comment explaining why).
 # See # https://git.datapunt.amsterdam.nl/Datapunt/python-best-practices/blob/master/dependency_management/
 
-django<4.2  # Django 4.2 does not support Postgres 11 anymore
 datapunt-authorization-django
-sentry-sdk
-django-cors-headers
 pyjwt
-pillow-simd
-django-ratelimit
+pillow-simd  # Pillow with SIMD support
 six # Needed by jwcrypto, which mistakenly doesn't include it. PR with fix here: https://github.com/latchset/jwcrypto/pull/202
 psycopg2-binary
 python-swiftclient
 datapunt-data-ingress
 python-keystoneclient  # Although it is not directly imported anywhere, it is needed for the connection with the objectstore to work
 setuptools  # Needed to solve Trivy security risk
+
+# Django
+django<4.2  # Django 4.2 does not support Postgres 11 anymore
+django-cors-headers
+django-ratelimit
+
+# Azure
+azure-cli
+azure-core
+azure-identity==1.14  # 1.15 leads to incompatible version dependencies right now
+azure-storage-blob
+azure-keyvault
+azure-keyvault-secrets
+azure-storage-queue
+opencensus-ext-django
+opencensus-ext-azure
+opencensus-ext-postgresql
+opencensus-ext-logging
+opencensus-ext-requests

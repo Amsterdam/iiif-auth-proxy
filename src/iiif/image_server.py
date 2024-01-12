@@ -11,21 +11,23 @@ from iiif.tools import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 
-RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER = \
+RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER = (
     "The image-server cannot be reached because the following error occurred: "
+)
 
 
 def create_wabo_url(url_info, metadata):
     for document in metadata["documenten"]:
         if document["barcode"] == url_info["document_barcode"]:
-            return document["bestanden"][0]["filename"]  # there is always only one filename per bestand
+            return document["bestanden"][0][
+                "filename"
+            ]  # there is always only one filename per bestand
     # TODO: raise something in the unlikely event that nothing is found
 
 
 # TODO: split into two functions, one for url and one for headers
 def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
     if url_info["source"] == "edepot":
-
         # If the iiif url contains a reference to dossier like SQ1421 without a '-' or '/' between the letters
         # and the numbers, then this was added as a reference to stadsdeel and dossiernumber and
         # it should be removed. The line below does exactly that.
@@ -62,9 +64,7 @@ def get_file(request_meta, url_info, iiif_url, metadata):
     try:
         file_response = get_image_from_server(file_url, headers, cert, verify)
     except RequestException as e:
-        message = (
-            f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {e.__class__.__name__}"
-        )
+        message = f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {e.__class__.__name__}"
         log.error(message)
         raise ImmediateHttpResponse(response=HttpResponse(message, status=502))
 
@@ -121,14 +121,18 @@ def download_file_for_zip(
         file_response, file_url = get_file(request_meta, url_info, iiif_url, metadata)
         handle_file_response_codes(file_response, file_url)
     except ImmediateHttpResponse as e:
-        log.exception(f"HTTP Exception while retrieving {iiif_url} from the source system: ({e.response.content})")
+        log.exception(
+            f"HTTP Exception while retrieving {iiif_url} from the source system: ({e.response.content})"
+        )
         info_txt_contents += (
             f"Not included in this zip because an error occurred "
             f"while getting it from the source system\n"
         )
         return info_txt_contents
     except Exception as e:
-        log.exception(f"Exception while retrieving {iiif_url} from the source system: ({e}).")
+        log.exception(
+            f"Exception while retrieving {iiif_url} from the source system: ({e})."
+        )
         info_txt_contents += (
             f"Not included in this zip because an error occurred "
             f"while getting it from the source system\n"
