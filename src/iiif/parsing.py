@@ -98,7 +98,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "source_file": source_file,  # Bool whether the file should be served without image processing (pdf/xls)
                 "source_filename": source_filename,  # The filename on the source system
                 "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
-                "info_json": info_json,  # Whether the info.json is requested instead of the image itself
+                "info_json": info_json,  # Whether the info.json is requested instead of the file itself
             }
 
         elif source == "wabo":

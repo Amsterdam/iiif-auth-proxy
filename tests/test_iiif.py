@@ -236,6 +236,42 @@ class TestFileRetrievalWithAuthz:
 
     @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
+    def test_get_info_json_for_non_image(self, mock_do_metadata_request, mock_get_image_from_server, client):
+        mock_do_metadata_request.return_value = MockResponse(
+            200,
+            json_content={
+                "access": settings.ACCESS_PUBLIC,
+                "documenten": [
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_PUBLIC,
+                        "copyright": settings.COPYRIGHT_YES,
+                    },
+                    {
+                        "barcode": "SQ10079651",
+                        "access": settings.ACCESS_PUBLIC,
+                        "copyright": settings.COPYRIGHT_NO,
+                    },
+                    {"barcode": "SQ10092307", "access": settings.ACCESS_PUBLIC},
+                ],
+            },
+        )
+        mock_get_image_from_server.return_value = MockResponse(
+            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "application/zip"}
+        )
+        
+        header = {
+            "HTTP_AUTHORIZATION": "Bearer "
+            + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)
+        }
+        
+
+        response = client.get(self.url + PRE_WABO_INFO_JSON_URL, **header)
+        assert response.status_code == 400
+
+
+    @patch("iiif.image_server.get_image_from_server")
+    @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_without_token(
         self, mock_do_metadata_request, mock_get_image_from_server, client
     ):

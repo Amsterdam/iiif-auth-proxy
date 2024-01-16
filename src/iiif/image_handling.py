@@ -10,6 +10,7 @@ from iiif import tools
 
 log = logging.getLogger(__name__)
 
+NOT_AN_IMAGE = "This file is not an image, hence it is not possible to create an info.json file."
 MALFORMED_SCALING_PARAMETER = "The scaling parameter is malformed. It should either be 'full' or in the form of '100,50'."
 MISSING_SCALING_PARAMETER = "The scaling parameter is missing. It should either be 'full' or in the form of '100,50'."
 MALFORMED_REGION_PARAMETER = "The region parameter is malformed. It should either be 'full' or in the form of '50,50,100,100' (x,y,w,h)."
@@ -44,6 +45,12 @@ def generate_info_json(image_base_url, content, content_type):
     :param content_type: The content type of the image
     :return: The info.json
     """
+    # It is nonsensical to create an info_json about a non-image file
+    if not content_type.startswith('image/'):
+        raise tools.ImmediateHttpResponse(
+            response=HttpResponse(NOT_AN_IMAGE, status=400)
+        )
+
     img = Image.open(BytesIO(content))
 
     info_json = deepcopy(BASE_INFO_JSON)

@@ -33,11 +33,12 @@ def index(request, iiif_url):
         )
         image_server.handle_file_response_codes(file_response, file_url)
 
+        content_type = file_response.headers.get("Content-Type")
         if url_info["info_json"]:
             response_content = generate_info_json(
                 request.build_absolute_uri().replace("/info.json", ""),
                 file_response.content,
-                file_response.headers.get("Content-Type")
+                content_type
             )
             content_type = "application/json"
         else:
@@ -45,15 +46,15 @@ def index(request, iiif_url):
                 file_response.content,
                 url_info["source_file"],
                 url_info["region"],
-                file_response.headers.get("Content-Type")
+                content_type
             )
             response_content = scale_image(
                 cropped_content,
                 url_info["source_file"],
                 url_info["scaling"],
-                file_response.headers.get("Content-Type")
+                content_type
             )
-            content_type = file_response.headers.get("Content-Type")
+            content_type = content_type
     except tools.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in index:")
         return e.response
