@@ -41,26 +41,19 @@ def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
         return iiif_image_url, {}, cert
 
 
-def get_image_from_server(file_url, headers, cert, verify=True):
+def get_image_from_server(file_url, headers, cert):
     return requests.get(
-        file_url, headers=headers, cert=cert, verify=verify, timeout=(15, 25)
+        file_url, headers=headers, cert=cert, verify=False, timeout=(15, 25)
     )
 
 
 def get_file(request_meta, url_info, iiif_url, metadata):
-    # If we need to get an edepot source file directly from the stadsarchief we need to disable
-    # certificate checks because the wildcard cert doesn't include the host name.
-    # TODO: remove this once the cert is fixed
-    verify = True
-    if url_info["source"] == "edepot":
-        verify = False
-
     # Get the file itself
     file_url, headers, cert = create_file_url_and_headers(
         request_meta, url_info, iiif_url, metadata
     )
     try:
-        file_response = get_image_from_server(file_url, headers, cert, verify)
+        file_response = get_image_from_server(file_url, headers, cert)
     except RequestException as e:
         message = (
             f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {e.__class__.__name__}"
