@@ -42,7 +42,6 @@ def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
 
 
 def get_image_from_server(file_url, headers, cert):
-    log.error(f"Getting image from {file_url}")
     return requests.get(
         file_url, headers=headers, cert=cert, verify=False, timeout=(15, 25)
     )
