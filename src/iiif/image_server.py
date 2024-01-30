@@ -23,37 +23,35 @@ def create_wabo_url(url_info, metadata):
 
 
 # TODO: split into two functions, one for url and one for headers
-def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
-    if url_info["source"] == "edepot":
+def create_file_url_and_headers(url_info, metadata):
 
+    if url_info["source"] == "edepot":
         # If the iiif url contains a reference to dossier like SQ1421 without a '-' or '/' between the letters
         # and the numbers, then this was added as a reference to stadsdeel and dossiernumber and
         # it should be removed. The line below does exactly that.
         iiif_url_edepot = re.sub(r"[A-Z]+\d+/", "", url_info["source_filename"])
-
         iiif_image_url = f"{settings.EDEPOT_BASE_URL}{iiif_url_edepot}"
-        return iiif_image_url, {"Authorization": settings.HCP_AUTHORIZATION}, ()
+        return iiif_image_url, {"Authorization": settings.EDEPOT_AUTHORIZATION}
 
     elif url_info["source"] == "wabo":
         wabo_url = create_wabo_url(url_info, metadata)
         iiif_image_url = f"{settings.WABO_BASE_URL}{wabo_url}"
-        cert = "/tmp/sw444v1912.pem"
-        return iiif_image_url, {}, cert
+        return iiif_image_url, {"Authorization": settings.WABO_AUTHORIZATION}
 
 
-def get_image_from_server(file_url, headers, cert):
+def get_image_from_server(file_url, headers):
     return requests.get(
-        file_url, headers=headers, cert=cert, verify=False, timeout=(15, 25)
+        file_url, headers=headers, verify=False, timeout=(15, 25)
     )
 
 
 def get_file(request_meta, url_info, iiif_url, metadata):
     # Get the file itself
-    file_url, headers, cert = create_file_url_and_headers(
-        request_meta, url_info, iiif_url, metadata
+    file_url, headers = create_file_url_and_headers(
+        url_info, metadata
     )
     try:
-        file_response = get_image_from_server(file_url, headers, cert)
+        file_response = get_image_from_server(file_url, headers)
     except RequestException as e:
         message = (
             f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {e.__class__.__name__}"
