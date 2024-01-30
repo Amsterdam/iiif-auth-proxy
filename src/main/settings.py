@@ -50,9 +50,10 @@ EDEPOT_BASE_URL = os.getenv(
     "EDEPOT_BASE_URL", "https://bwt.uitplaatsing.shcp03.archivingondemand.nl/rest/"
 )
 WABO_BASE_URL = os.getenv(
-    "WABO_BASE_URL", "https://bwt.hs3-saa-bwt.shcp04.archivingondemand.nl/"
+    "WABO_BASE_URL", "https://bwt.hs3-saa-bwt.shcp04.archivingondemand.nl/rest/"
 )
-HCP_AUTHORIZATION = os.getenv("HCP_AUTHORIZATION", "dummy")
+EDEPOT_AUTHORIZATION = os.getenv("EDEPOT_AUTHORIZATION", "dummy")
+WABO_AUTHORIZATION = os.getenv('WABO_AUTHORIZATION', 'dummy')
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ALGORITHM = "HS256"
 SENDGRID_KEY = os.getenv("SENDGRID_KEY", "mock_key")

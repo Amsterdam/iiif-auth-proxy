@@ -221,14 +221,12 @@ class TestTools:
         }
 
         # pre-wabo with no headers
-        url, headers, cert = create_file_url_and_headers(
-            {},
+        url, headers = create_file_url_and_headers(
             {
                 "source": "edepot",
                 "source_file": False,
                 "source_filename": source_filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING),
                 "filename": filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)},
-            PRE_WABO_IMG_URL_WITH_SCALING,
             metadata
         )
 
@@ -237,34 +235,28 @@ class TestTools:
             url
             == f"{settings.EDEPOT_BASE_URL}{source_filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)}"
         )
-        assert headers == {'Authorization': settings.HCP_AUTHORIZATION}
-        assert cert == ()
+        assert headers == {'Authorization': settings.EDEPOT_AUTHORIZATION}
 
         # pre-wabo with source_file set to true
-        url, headers, cert = create_file_url_and_headers(
-            {},
+        url, headers = create_file_url_and_headers(
             {
                 "source": "edepot",
                 "source_file": True,
                 "source_filename": source_filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING),
                 "filename": filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING),
             },
-            PRE_WABO_IMG_URL_WITH_SCALING,
             metadata,
         )
         assert url == f"{settings.EDEPOT_BASE_URL}{source_filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)}"
-        assert headers["Authorization"] == settings.HCP_AUTHORIZATION
-        assert cert == ()
+        assert headers["Authorization"] == settings.EDEPOT_AUTHORIZATION
 
         # pre-wabo with added reference
-        url, headers, cert = create_file_url_and_headers(
-            {},
+        url, headers = create_file_url_and_headers(
             {
                 "source": "edepot",
                 "source_file": False,
                 "source_filename": source_filename_from_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE),
                 "filename": filename_from_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE)},
-            PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
             metadata,
         )
         # "2/edepot:SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg/full/1000,900/0/default.jpg"
@@ -274,15 +266,13 @@ class TestTools:
         )
 
         # pre-wabo with json url
-        url, headers, cert = create_file_url_and_headers(
-            {},
+        url, headers = create_file_url_and_headers(
             {
                 "source": "edepot",
                 "source_file": False,
                 "source_filename": source_filename_from_url(PRE_WABO_INFO_JSON_URL),
                 "filename": filename_from_url(PRE_WABO_INFO_JSON_URL)
             },
-            PRE_WABO_INFO_JSON_URL,
             metadata,
         )
 
@@ -292,15 +282,13 @@ class TestTools:
         )
 
         # wabo with adjusted url and X-Forwarded-ID
-        url, headers, cert = create_file_url_and_headers(
-            {},
+        url, headers = create_file_url_and_headers(
             {
                 "source": "wabo",
                 "document_barcode": "628547",
                 "formatting": "full/1000,1000/0/default.jpg",
                 "source_file": False,
             },
-            WABO_IMG_URL,
             metadata,
         )
         # WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547/full/1000,900/0/default.jpg"
@@ -308,40 +296,33 @@ class TestTools:
             url
             == f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF"
         )
-        assert cert == '/tmp/sw444v1912.pem'
 
         # wabo with adjusted url and X-Forwarded-ID and both forwarded headers
-        url, headers, cert = create_file_url_and_headers(
-            {"HTTP_X_FORWARDED_PROTO": "proto", "HTTP_X_FORWARDED_HOST": "host"},
+        url, headers = create_file_url_and_headers(
             {
                 "source": "wabo",
                 "document_barcode": "628547",
                 "formatting": "full/1000,1000/0/default.jpg",
                 "source_file": False,
             },
-            WABO_IMG_URL,
             metadata,
         )
         assert (
             url
             == f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF"
         )
-        assert cert == '/tmp/sw444v1912.pem'
 
         # wabo with source_file
-        url, headers, cert = create_file_url_and_headers(
-            {},
+        url, headers = create_file_url_and_headers(
             {
                 "source": "wabo",
                 "document_barcode": "628547",
                 "formatting": "full/1000,1000/0/default.jpg",
                 "source_file": True,
             },
-            WABO_IMG_URL,
             metadata,
         )
         assert url == f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF"
-        assert cert == "/tmp/sw444v1912.pem"
 
     def test_get_authentication_jwt(self):
         token = create_mail_login_token("jwttest@amsterdam.nl", settings.SECRET_KEY)
