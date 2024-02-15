@@ -11,11 +11,11 @@ asgiref==3.7.2
     #   django-cors-headers
 autoflake==2.2.1
     # via -r requirements_dev.in
-black==24.1.1
+black==24.2.0
     # via -r requirements_dev.in
 build==1.0.3
     # via pip-tools
-certifi==2023.11.17
+certifi==2024.2.2
     # via
     #   -r ./requirements.txt
     #   requests
@@ -36,7 +36,7 @@ coverage[toml]==7.4.1
     # via
     #   coverage
     #   pytest-cov
-cryptography==42.0.1
+cryptography==42.0.2
     # via
     #   -r ./requirements.txt
     #   jwcrypto
@@ -50,10 +50,6 @@ debtcollector==2.5.0
     #   oslo-config
     #   oslo-utils
     #   python-keystoneclient
-deprecated==1.2.14
-    # via
-    #   -r ./requirements.txt
-    #   jwcrypto
 django==4.1.13
     # via
     #   -r ./requirements.txt
@@ -84,7 +80,7 @@ iso8601==2.1.0
     #   oslo-utils
 isort==5.13.2
     # via -r requirements_dev.in
-jwcrypto==1.5.1
+jwcrypto==1.5.4
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
@@ -98,7 +94,7 @@ msgpack==1.0.7
     #   oslo-serialization
 mypy-extensions==1.0.0
     # via black
-netaddr==0.10.1
+netaddr==1.1.0
     # via
     #   -r ./requirements.txt
     #   oslo-config
@@ -153,7 +149,7 @@ pillow-simd==9.0.0.post1
     # via -r ./requirements.txt
 pip-tools==7.3.0
     # via -r requirements_dev.in
-platformdirs==4.1.0
+platformdirs==4.2.0
     # via black
 pluggy==1.4.0
     # via pytest
@@ -180,7 +176,7 @@ pytest==8.0.0
     #   pytest-django
 pytest-cov==4.1.0
     # via -r requirements_dev.in
-pytest-django==4.7.0
+pytest-django==4.8.0
     # via -r requirements_dev.in
 python-dateutil==2.8.2
     # via time-machine
@@ -188,7 +184,7 @@ python-keystoneclient==5.3.0
     # via -r ./requirements.txt
 python-swiftclient==4.4.0
     # via -r ./requirements.txt
-pytz==2023.4
+pytz==2024.1
     # via
     #   -r ./requirements.txt
     #   djangorestframework
@@ -211,7 +207,7 @@ rfc3986==2.0.0
     # via
     #   -r ./requirements.txt
     #   oslo-config
-sentry-sdk==1.39.2
+sentry-sdk==1.40.4
     # via -r ./requirements.txt
 six==1.16.0
     # via
@@ -244,12 +240,13 @@ typing-extensions==4.9.0
     #   -r ./requirements.txt
     #   asgiref
     #   black
-tzdata==2023.4
+    #   jwcrypto
+tzdata==2024.1
     # via
     #   -r ./requirements.txt
     #   oslo-serialization
     #   oslo-utils
-urllib3==2.1.0
+urllib3==2.2.0
     # via
     #   -r ./requirements.txt
     #   requests
@@ -260,12 +257,11 @@ wrapt==1.16.0
     # via
     #   -r ./requirements.txt
     #   debtcollector
-    #   deprecated
 
 # The following packages are considered to be unsafe in a requirements file:
-pip==23.3.2
+pip==24.0
     # via pip-tools
-setuptools==69.0.3
+setuptools==69.1.0
     # via
     #   -r ./requirements.txt
     #   pip-tools
