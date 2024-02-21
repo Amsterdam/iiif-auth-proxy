@@ -5,7 +5,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from requests.exceptions import RequestException
 
-from iiif.tools import ImmediateHttpResponse
+from iiif.utils import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 

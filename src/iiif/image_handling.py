@@ -6,7 +6,7 @@ from io import BytesIO
 from django.http import HttpResponse
 from PIL import Image
 
-from iiif import tools
+from iiif import utils
 
 log = logging.getLogger(__name__)
 
@@ -81,11 +81,11 @@ def parse_scaling_string(scaling):
         desired_width = int(parts[0]) if parts[0] else None
         desired_height = int(parts[1]) if parts[1] else None
     except ValueError:
-        raise tools.ImmediateHttpResponse(
+        raise utils.ImmediateHttpResponse(
             response=HttpResponse(MALFORMED_SCALING_PARAMETER, status=400)
         )
     except AttributeError:
-        raise tools.ImmediateHttpResponse(
+        raise utils.ImmediateHttpResponse(
             response=HttpResponse(MISSING_SCALING_PARAMETER, status=400)
         )
 
@@ -168,11 +168,11 @@ def parse_region_string(region):
         desired_width = int(parts[2])
         desired_height = int(parts[3])
     except ValueError:
-        raise tools.ImmediateHttpResponse(
+        raise utils.ImmediateHttpResponse(
             response=HttpResponse(MALFORMED_REGION_PARAMETER, status=400)
         )
     except AttributeError:
-        raise tools.ImmediateHttpResponse(
+        raise utils.ImmediateHttpResponse(
             response=HttpResponse(MISSING_REGION_PARAMETER, status=400)
         )
 
@@ -218,7 +218,7 @@ def crop_image(content, source_file, region, content_type):
     region_has_no_width = desired_width <= 0 or desired_width == None
     region_has_no_height = desired_height <= 0 or desired_height == None
     if region_has_no_width or region_has_no_height:
-        raise tools.ImmediateHttpResponse(
+        raise utils.ImmediateHttpResponse(
             response=HttpResponse(
                 NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER, status=400
             )
@@ -231,7 +231,7 @@ def crop_image(content, source_file, region, content_type):
         or desired_y >= img.height
     )
     if region_has_no_overlap_with_img:
-        raise tools.ImmediateHttpResponse(
+        raise utils.ImmediateHttpResponse(
             response=HttpResponse(NON_OVERLAPPING_REGION_PARAMETER, status=400)
         )
 

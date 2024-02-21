@@ -6,7 +6,7 @@ import urllib
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotAllowed
 
-from iiif.tools import ImmediateHttpResponse
+from iiif.utils import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 

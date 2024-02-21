@@ -6,7 +6,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from ingress.consumer.base import BaseConsumer
 
-from iiif import authentication, image_server, mailing, object_store, tools, zip_tools
+from iiif import authentication, image_server, mailing, object_store, utils, zip_tools
 from iiif.metadata import get_metadata
 from main import settings
 
@@ -56,7 +56,7 @@ class ZipConsumer(BaseConsumer):
                     authentication.check_restricted_file(
                         metadata, image_info["url_info"]
                     )
-                except tools.ImmediateHttpResponse as e:
+                except utils.ImmediateHttpResponse as e:
                     fail_reason = e.response.content.decode("utf-8")
 
                 info_txt_contents = image_server.download_file_for_zip(
