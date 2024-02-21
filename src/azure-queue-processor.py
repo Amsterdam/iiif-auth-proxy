@@ -2,39 +2,47 @@
 # pip install azure-storage-queue
 import errno
 import functools
+import json
 import logging
 import os
 import signal
 import time
 
 from azure.core.exceptions import ResourceExistsError
-
-# use azure workload identity to login to queue
 from azure.identity import DefaultAzureCredential, WorkloadIdentityCredential
 from azure.storage.queue import QueueClient, QueueServiceClient
 
 logging.basicConfig(level=logging.INFO)
-logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(
-    logging.WARNING
-)
+# logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(
+#     logging.WARNING
+# )
 logger = logging.getLogger(__name__)
 
-QUEUE_NAME = "queue"
-ACCOUNT_URL = "https://bouwdossiersdataoi5sk6et.queue.core.windows.net"
+QUEUE_NAME = "zip-queue"
 MESSAGE_VISIBILITY_TIMEOUT = 60
 
-credentials = WorkloadIdentityCredential()
-queue_client = QueueClient(
-    credential=credentials, account_url=ACCOUNT_URL, queue_name=QUEUE_NAME
-)
-MESSAGE = "HOI KRIS, GROETJES UIT AKS"
+# # Op Azure
+# ACCOUNT_URL = "https://bouwdossiersdataoi5sk6et.queue.core.windows.net"
+# credentials = WorkloadIdentityCredential()
+# queue_client = QueueClient(
+#     credential=credentials, account_url=ACCOUNT_URL, queue_name=QUEUE_NAME
+# )
+
+# Local with azurite
+AZURITE_QUEUE_CONNECTION_STRING = 'DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;'
+queue_service_client = QueueServiceClient.from_connection_string(AZURITE_QUEUE_CONNECTION_STRING)
+queue_client = queue_service_client.get_queue_client(QUEUE_NAME)
 
 
 def send_messages():
-    queue_client.send_message("First message: " + MESSAGE)
-    queue_client.send_message("Second message: " + MESSAGE)
-    queue_client.send_message("Third message: " + MESSAGE)
+    try:
+        queue_client.create_queue()
+    except ResourceExistsError as e:
+        logger.error("Error creating queue: " + str(e))
 
+    for i in range(3):
+        queue_client.send_message(json.dumps({"my_message": f"Message {i}"}))
+    
 
 class TimeoutError(Exception):
     pass
@@ -85,17 +93,20 @@ class AzureQueueConsumer:
         expires, the message will be put back on the queue and will be processed again. This can lead to duplicate
         messages!!! Always use a timeout decorator to prevent this.
         """
-        logger.info("Processing message: " + message.content)
+        logger.info(f"#################### Processing message (type {type(message.content)}): {message.content} ")
+        content_dict = json.loads(message.content)
+        logger.info(f"####################  {type(content_dict)} {content_dict}" )
+        
 
     def get_queue_length(self):
         properties = queue_client.get_queue_properties()
         count = properties.approximate_message_count
-        logger.info("Message count: " + str(count))
+        logger.info("#################### Message count: " + str(count))
         return count
 
 
 if __name__ == "__main__":
     send_messages()
 
-    # consumer = AzureQueueConsumer()
-    # consumer.run()
+    consumer = AzureQueueConsumer()
+    consumer.run()
