@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 
 class ZipConsumer(BaseConsumer):
-    collection_name = settings.ZIP_COLLECTION_NAME
+    collection_name = settings.ZIP_QUEUE_NAME
 
     """
     Whether or not to immediately remove messages once consumption succeeds.

@@ -44,8 +44,8 @@ class TestZipEndpoint:
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE]
         )
 
-        call_man_command("add_collection", settings.ZIP_COLLECTION_NAME)
-        call_man_command("enable_consumer", settings.ZIP_COLLECTION_NAME)
+        call_man_command("add_collection", settings.ZIP_QUEUE_NAME)
+        call_man_command("enable_consumer", settings.ZIP_QUEUE_NAME)
 
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_jwt_token(self, mock_do_metadata_request, client):

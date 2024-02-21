@@ -56,7 +56,9 @@ WABO_BASE_URL = os.getenv(
 HCP_AUTHORIZATION = os.getenv("HCP_AUTHORIZATION", "dummy")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ALGORITHM = "HS256"
-ZIP_COLLECTION_NAME = "zip_queue"
+ZIP_QUEUE_NAME = "zip-queue"
+AZURITE_QUEUE_CONNECTION_STRING = os.getenv('AZURITE_QUEUE_CONNECTION_STRING')
+QUEUE_ACCOUNT_URL = os.getenv("QUEUE_ACCOUNT_URL")
 LOGIN_ORIGIN_URL_TLD_WHITELIST = ["data.amsterdam.nl", "acc.dataportaal.amsterdam.nl"]
 if strtobool(os.getenv("ALLOW_LOCALHOST_LOGIN_URL", "false")):
     LOGIN_ORIGIN_URL_TLD_WHITELIST += ["localhost", "127.0.0.1"]

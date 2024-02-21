@@ -5,10 +5,30 @@ from pathlib import Path
 from uuid import uuid4
 from zipfile import ZipFile
 
+from azure.core.exceptions import ResourceExistsError
+from azure.identity import WorkloadIdentityCredential
+from azure.storage.queue import QueueClient, QueueServiceClient
 from django.conf import settings
-from ingress.models import Collection, Message
 
 TMP_BOUWDOSSIER_ZIP_FOLDER = "/tmp/bouwdossier-zips/"
+
+
+def get_queue_client():
+    if settings.AZURITE_QUEUE_CONNECTION_STRING:
+        queue_service_client = QueueServiceClient.from_connection_string(settings.AZURITE_QUEUE_CONNECTION_STRING)
+        queue_client = queue_service_client.get_queue_client(settings.ZIP_QUEUE_NAME)
+    else:
+        ACCOUNT_URL = "https://bouwdossiersdataoi5sk6et.queue.core.windows.net"
+        credentials = WorkloadIdentityCredential()
+        queue_client = QueueClient(credential=credentials, account_url=ACCOUNT_URL, queue_name=settings.ZIP_QUEUE_NAME)
+    
+    # TODO: Move this into a Django migration
+    try:
+        queue_client.create_queue()
+    except ResourceExistsError:
+        pass
+    
+    return queue_client
 
 
 def store_zip_job(zip_info):
@@ -18,11 +38,8 @@ def store_zip_job(zip_info):
         k: v for k, v in zip_info["request_meta"].items() if type(v) is str
     }
 
-    collection = Collection.objects.get(name=settings.ZIP_COLLECTION_NAME)
-    message = Message.objects.create(
-        raw_data=json.dumps(zip_info), collection=collection
-    )
-    return message
+    queue_client = get_queue_client()
+    queue_client.send_message(json.dumps(zip_info))
 
 
 def create_tmp_folder():

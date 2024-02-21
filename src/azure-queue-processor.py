@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 QUEUE_NAME = "zip-queue"
 MESSAGE_VISIBILITY_TIMEOUT = 60
 
-# # Op Azure
+# # On Azure
 # ACCOUNT_URL = "https://bouwdossiersdataoi5sk6et.queue.core.windows.net"
 # credentials = WorkloadIdentityCredential()
 # queue_client = QueueClient(
