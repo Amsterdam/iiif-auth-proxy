@@ -579,9 +579,7 @@ colorama==0.4.6
     #   -r ./requirements.txt
     #   azure-cli
 coverage[toml]==7.4.2
-    # via
-    #   coverage
-    #   pytest-cov
+    # via pytest-cov
 cryptography==42.0.4
     # via
     #   -r ./requirements.txt
@@ -599,8 +597,6 @@ cryptography==42.0.4
     #   pyjwt
     #   pyopenssl
 datapunt-authorization-django==1.3.3
-    # via -r ./requirements.txt
-datapunt-data-ingress==2.3.0
     # via -r ./requirements.txt
 debtcollector==2.5.0
     # via
@@ -626,18 +622,12 @@ django==4.1.13
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
-    #   datapunt-data-ingress
     #   django-cors-headers
-    #   djangorestframework
     #   opencensus-ext-django
 django-cors-headers==4.3.1
     # via -r ./requirements.txt
 django-ratelimit==4.1.0
     # via -r ./requirements.txt
-djangorestframework==3.14.0
-    # via
-    #   -r ./requirements.txt
-    #   datapunt-data-ingress
 exceptiongroup==1.2.0
     # via pytest
 fabric==3.2.2
@@ -648,7 +638,7 @@ google-api-core==2.17.1
     # via
     #   -r ./requirements.txt
     #   opencensus
-google-auth==2.28.0
+google-auth==2.28.1
     # via
     #   -r ./requirements.txt
     #   google-api-core
@@ -744,7 +734,6 @@ msal[broker]==1.26.0
     #   azure-cli-core
     #   azure-datalake-store
     #   azure-identity
-    #   msal
     #   msal-extensions
 msal-extensions==1.0.0
     # via
@@ -967,7 +956,6 @@ pyjwt[crypto]==2.8.0
     #   azure-cli-core
     #   msal
     #   pygithub
-    #   pyjwt
 pynacl==1.5.0
     # via
     #   -r ./requirements.txt
@@ -1013,7 +1001,6 @@ python-swiftclient==4.4.0
 pytz==2024.1
     # via
     #   -r ./requirements.txt
-    #   djangorestframework
     #   oslo-serialization
     #   oslo-utils
 pyyaml==6.0.1
@@ -1044,7 +1031,6 @@ requests[socks]==2.31.0
     #   pygithub
     #   python-keystoneclient
     #   python-swiftclient
-    #   requests
     #   requests-oauthlib
 requests-oauthlib==1.3.1
     # via

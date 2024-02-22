@@ -408,7 +408,7 @@ class TestTools:
     def test_create_local_zip_file(self):
         # First create some files
         uuid = str(uuid4())
-        folder_path = f"{TMP_BOUWDOSSIER_ZIP_FOLDER}{uuid}/"
+        folder_path = os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, uuid)
         os.makedirs(folder_path)
         filenames = [f"content{i}.txt" for i in range(5)]
         for filename in filenames:

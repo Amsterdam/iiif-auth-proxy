@@ -1,7 +1,7 @@
 import json
 import logging
-import time
 import os
+import time
 
 import timeout_decorator
 from django.conf import settings
@@ -9,7 +9,11 @@ from django.template.loader import render_to_string
 
 from iiif import authentication, image_server, mailing, utils, zip_tools
 from iiif.metadata import get_metadata
-from iiif.utils_azure import get_queue_client
+from iiif.utils_azure import (
+    create_storage_account_temp_url,
+    get_queue_client,
+    store_object_on_storage_account,
+)
 from main import settings
 
 logging.basicConfig(level=logging.INFO)
@@ -40,11 +44,11 @@ class AzureZipQueueConsumer:
 
             count = self.get_queue_length()
             message_iterator = None
+
             if self.end_at_empty_queue:
-                message_iterator = [m for m in self.queue_client.receive_messages(messages_per_page=1, visibility_timeout=1)]
+                message_iterator = [m for m in self.queue_client.receive_messages(messages_per_page=10, visibility_timeout=5)]
                 if count == 0 or len(message_iterator) == 0:
                     break
-
             if count == 0:
                 time.sleep(5)
                 continue
@@ -101,7 +105,6 @@ class AzureZipQueueConsumer:
                     record["request_meta"],
                     tmp_folder_path,
                 )
-
             # Store the info_file_along_with_the_image_files
             zip_tools.save_file_to_folder(
                 tmp_folder_path, "report.txt", info_txt_contents
@@ -113,29 +116,20 @@ class AzureZipQueueConsumer:
             )
             zip_file_name = os.path.basename(zip_file_path)
 
-            # TODO: ENABLE CODE BELOW
-            # # Move the file to the object store
-            # conn = object_store.get_object_store_connection()
-            # object_store.store_object_on_object_store(
-            #     conn, zip_file_path, zip_file_name
-            # )
-            # breakpoint()
-            # # Create a temporary url
-            # temp_zip_download_url = object_store.create_object_store_temp_url(
-            #     conn, zip_file_name, expiry_days=settings.TEMP_URL_EXPIRY_DAYS
-            # )
-            # breakpoint()
-            # # Send the email
+            blob_client = store_object_on_storage_account(zip_file_path, zip_file_name)
+            
+            # TODO: Make the code below work
+            # temp_zip_download_url = create_storage_account_temp_url(blob_client, expiry_days=settings.TEMP_URL_EXPIRY_DAYS)
+
             # email_subject = "Downloadlink Bouw- en omgevingdossiers"
             # email_body = render_to_string(
             #     "download_zip.html", {"temp_zip_download_url": temp_zip_download_url}
             # )
             # mailing.send_email(record["email_address"], email_subject, email_body)
 
-            # Cleanup the local zip file and folder with images
-            zip_tools.cleanup_local_files(zip_file_path, tmp_folder_path)
+            # # Cleanup the local zip file and folder with images
+            # zip_tools.cleanup_local_files(zip_file_path, tmp_folder_path)
 
         except Exception as e:
-            breakpoint()
-            logger.exception("ingress_zip_consumer_error:", e)
+            logger.exception("queue_zip_consumer_error:", e)
             raise e

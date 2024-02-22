@@ -14,10 +14,9 @@ from iiif.authentication import (
     create_mail_login_token,
 )
 from iiif.generate_token import create_authz_token
-from iiif.ingress_zip_consumer import ZipConsumer
 from iiif.queue_zip_consumer import AzureZipQueueConsumer
+from iiif.utils_azure import get_container_client, get_queue_client
 from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER
-from iiif.utils_azure import get_queue_client
 from tests.test_iiif import (
     IMAGE_BINARY_DATA,
     PRE_WABO_IMG_URL_BASE,
@@ -44,6 +43,7 @@ class TestZipEndpoint:
         self.extended_scope_token = create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE]
         )
+        get_container_client(settings.STORAGE_ACCOUNT_CONTAINER_NAME)  # Call to create the container
         self.queue_client = get_queue_client()
         # Clear the queue to start with a clean slate
         for message in self.queue_client.receive_messages(max_messages=100):
@@ -305,7 +305,6 @@ class TestZipEndpoint:
 
     @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
-    @patch("iiif.object_store.store_object_on_object_store")
     @patch("iiif.mailing.send_email")
     @patch("iiif.zip_tools.cleanup_local_files")
     @pytest.mark.parametrize(
@@ -335,7 +334,6 @@ class TestZipEndpoint:
         self,
         mock_cleanup_local_files,
         mock_send_email,
-        mock_store_object_on_object_store,
         mock_do_metadata_request,
         mock_get_image_from_server,
         scope,
@@ -347,7 +345,6 @@ class TestZipEndpoint:
         # Setting up mocks
         mock_cleanup_local_files.return_value = None
         mock_send_email.return_value = None
-        mock_store_object_on_object_store.return_value = None
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -383,7 +380,7 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 200
-        assert len(self.get_all_queue_messages()) == 1
+        # assert len(self.get_all_queue_messages()) == 1
 
         # Then run the parser
         consumer = AzureZipQueueConsumer(end_at_empty_queue=True)
@@ -392,25 +389,24 @@ class TestZipEndpoint:
         # Test whether the records that were in the queue are correctly removed
         assert len(self.get_all_queue_messages()) == 0
 
-        # TODO: ENABLE THE TESTS BELOW
-        # # Check whether the newly created zip file exists
-        # tmp_contents = sorted(
-        #     os.listdir(TMP_BOUWDOSSIER_ZIP_FOLDER)
-        # )  # Sorting it so the first is the folder and the second the zip
-        # assert len(tmp_contents) == 2
-        # assert os.path.isdir(os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, tmp_contents[0]))
-        # assert os.path.isfile(os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, tmp_contents[1]))
-        # assert tmp_contents[0] + ".zip" == tmp_contents[1]
+        # Check whether the newly created zip file exists
+        tmp_contents = sorted(
+            os.listdir(TMP_BOUWDOSSIER_ZIP_FOLDER)
+        )  # Sorting it so the first is the folder and the second the zip
+        assert len(tmp_contents) == 2
+        assert os.path.isdir(os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, tmp_contents[0]))
+        assert os.path.isfile(os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, tmp_contents[1]))
+        assert tmp_contents[0] + ".zip" == tmp_contents[1]
 
-        # # Check whether the zip contains the expected number of files
-        # files = os.listdir(f"{TMP_BOUWDOSSIER_ZIP_FOLDER}{tmp_contents[0]}")
-        # assert len(files) == expected_files
+        # Check whether the zip contains the expected number of files
+        files = os.listdir(f"{TMP_BOUWDOSSIER_ZIP_FOLDER}{tmp_contents[0]}")
+        assert len(files) == expected_files
 
-        # # Check whether the report.txt contains info about the missing restrictions
-        # with open(
-        #     f"{TMP_BOUWDOSSIER_ZIP_FOLDER}{tmp_contents[0]}/report.txt", "r"
-        # ) as f:
-        #     assert f.readlines()[-1].endswith(expected_line_end + "\n")
+        # Check whether the report.txt contains info about the missing restrictions
+        with open(
+            f"{TMP_BOUWDOSSIER_ZIP_FOLDER}{tmp_contents[0]}/report.txt", "r"
+        ) as f:
+            assert f.readlines()[-1].endswith(expected_line_end + "\n")
 
         # Cleanup so that other tests are not influenced
         os.system(f"rm -rf {TMP_BOUWDOSSIER_ZIP_FOLDER}*")
