@@ -1,4 +1,4 @@
-FROM python:3.11-buster as app
+FROM python:3.11-bookworm as app
 MAINTAINER datapunt@amsterdam.nl
 
 EXPOSE 8000

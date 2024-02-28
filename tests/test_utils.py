@@ -14,7 +14,7 @@ from django.conf import settings
 from iiif.authentication import create_mail_login_token, img_is_public_copyright
 from iiif.image_server import create_file_url_and_headers, create_wabo_url
 from iiif.parsing import InvalidIIIFUrlError, get_email_address, get_info_from_iiif_url
-from iiif.tools import ImmediateHttpResponse
+from iiif.utils import ImmediateHttpResponse
 from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER, create_local_zip_file
 from tests.test_iiif import (
     PRE_WABO_IMG_URL_NO_SCALING,
@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
 
 
-class TestTools:
+class TestUtils:
     def setup_method(self):
         self.test_email_address = "toolstest@amsterdam.nl"
 
@@ -408,7 +408,7 @@ class TestTools:
     def test_create_local_zip_file(self):
         # First create some files
         uuid = str(uuid4())
-        folder_path = f"{TMP_BOUWDOSSIER_ZIP_FOLDER}{uuid}/"
+        folder_path = os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, uuid)
         os.makedirs(folder_path)
         filenames = [f"content{i}.txt" for i in range(5)]
         for filename in filenames:

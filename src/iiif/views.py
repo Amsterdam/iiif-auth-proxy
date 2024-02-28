@@ -6,7 +6,7 @@ from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 from django_ratelimit.decorators import ratelimit
 
-from iiif import authentication, image_server, mailing, parsing, tools, zip_tools
+from iiif import authentication, image_server, mailing, parsing, utils, zip_tools
 from iiif.image_handling import crop_image, generate_info_json, scale_image
 from iiif.metadata import get_metadata
 
@@ -20,7 +20,7 @@ def index(request, iiif_url):
         mail_jwt_token, is_mail_login = authentication.read_out_mail_jwt_token(request)
         scope = authentication.get_max_scope(request, mail_jwt_token)
         url_info = parsing.get_url_info(
-            iiif_url, tools.str_to_bool(request.GET.get("source_file"))
+            iiif_url, utils.str_to_bool(request.GET.get("source_file"))
         )
 
         authentication.check_wabo_for_mail_login(is_mail_login, url_info)
@@ -54,7 +54,7 @@ def index(request, iiif_url):
                 file_response.headers.get("Content-Type"),
             )
             content_type = file_response.headers.get("Content-Type")
-    except tools.ImmediateHttpResponse as e:
+    except utils.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in index:")
         return e.response
 
@@ -87,7 +87,7 @@ def send_dataportaal_login_url_to_mail(request):
         # TODO: move actually sending the email to a separate process
         mailing.send_email(payload["email"], email_subject, email_body)
 
-    except tools.ImmediateHttpResponse as e:
+    except utils.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in login_url:")
         return e.response
 
@@ -106,7 +106,7 @@ def request_multiple_files_in_zip(request):
         email_address = parsing.get_email_address(request, read_jwt_token)
         payload = parsing.parse_payload(request)
         parsing.check_zip_payload(payload)
-    except tools.ImmediateHttpResponse as e:
+    except utils.ImmediateHttpResponse as e:
         log.error(e.response.content)
         return e.response
 
@@ -126,7 +126,7 @@ def request_multiple_files_in_zip(request):
             # We create a new dict with all the info so that we have it when we want to get and zip the files later
             zip_info["urls"][iiif_url] = {"url_info": url_info}
 
-        except tools.ImmediateHttpResponse as e:
+        except utils.ImmediateHttpResponse as e:
             log.error(e.response.content)
             return e.response
 
