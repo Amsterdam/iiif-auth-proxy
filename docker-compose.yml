@@ -16,13 +16,10 @@ x-app: &base-app
   environment: &base-app-env
     SECRET_KEY: 'insecure'
     JWT_SECRET_KEY: 'insecure'
-    START_STUNNEL: 'false'
     DEBUG: 'true'
     USE_JWKS_TEST_KEY: 'true'
-    IIIF_IMAGE_SERVER_WABO_CERT: dGhlIGNvbnRlbnRzIG9mIHRoZSBjZXJ0IGZpbGU=  # This says "the contents of the cert file"
     AZURITE_STORAGE_CONNECTION_STRING: 'DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;'
     AZURITE_QUEUE_CONNECTION_STRING: 'DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;'
-    STORAGE_ACCOUNT_ACCESS_KEY: 'Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=='
 
 services:
   database-iiif-auth-proxy:

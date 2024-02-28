@@ -53,7 +53,7 @@ def create_storage_account_temp_url(blob_client, expiry_days=0):
         account_name=blob_client.account_name,
         container_name=blob_client.container_name,
         blob_name=blob_client.blob_name,
-        account_key=settings.STORAGE_ACCOUNT_ACCESS_KEY,
+        account_key=blob_client.credential.account_key,
         permission=BlobSasPermissions(read=True),
         expiry=datetime.utcnow() + timedelta(days=expiry_days)
     )
