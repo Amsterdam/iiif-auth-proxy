@@ -117,18 +117,16 @@ class AzureZipQueueConsumer:
             zip_file_name = os.path.basename(zip_file_path)
 
             blob_client = store_object_on_storage_account(zip_file_path, zip_file_name)
-            
-            # TODO: Make the code below work
-            # temp_zip_download_url = create_storage_account_temp_url(blob_client, expiry_days=settings.TEMP_URL_EXPIRY_DAYS)
 
-            # email_subject = "Downloadlink Bouw- en omgevingdossiers"
-            # email_body = render_to_string(
-            #     "download_zip.html", {"temp_zip_download_url": temp_zip_download_url}
-            # )
-            # mailing.send_email(record["email_address"], email_subject, email_body)
+            temp_zip_download_url = create_storage_account_temp_url(blob_client, expiry_days=settings.TEMP_URL_EXPIRY_DAYS)
 
-            # # Cleanup the local zip file and folder with images
-            # zip_tools.cleanup_local_files(zip_file_path, tmp_folder_path)
+            email_subject = "Downloadlink Bouw- en omgevingdossiers"
+            email_body = render_to_string(
+                "download_zip.html", {"temp_zip_download_url": temp_zip_download_url}
+            )
+            mailing.send_email(record["email_address"], email_subject, email_body)
+
+            zip_tools.cleanup_local_files(zip_file_path, tmp_folder_path)
 
         except Exception as e:
             logger.exception("queue_zip_consumer_error:", e)

@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
 
 
-class TestTools:
+class TestUtils:
     def setup_method(self):
         self.test_email_address = "toolstest@amsterdam.nl"
 

@@ -24,7 +24,8 @@ from tests.test_iiif import (
     PRE_WABO_IMG_URL_WITH_SCALING,
     WABO_IMG_URL,
 )
-from tests.tools import MockResponse, call_man_command
+from tests.test_utils_azure import create_blob_container, create_queue
+from tests.tools import MockResponse
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
@@ -43,7 +44,9 @@ class TestZipEndpoint:
         self.extended_scope_token = create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE]
         )
-        get_container_client(settings.STORAGE_ACCOUNT_CONTAINER_NAME)  # Call to create the container
+
+        create_blob_container(settings.STORAGE_ACCOUNT_CONTAINER_NAME)
+        create_queue()
         self.queue_client = get_queue_client()
         # Clear the queue to start with a clean slate
         for message in self.queue_client.receive_messages(max_messages=100):
