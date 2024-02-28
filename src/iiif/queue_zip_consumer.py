@@ -27,7 +27,7 @@ class AzureZipQueueConsumer:
     # Be careful with the visibility timeout! If the message is still processing when the visibility timeout
     # expires, the message will be put back on the queue and will be processed again. This can lead to duplicate
     # messages!!! Always use a timeout decorator to prevent this.
-    # an hour, because some zips can simply be very very large
+    # We set it to an hour, because some zips can simply be very very large
     MESSAGE_VISIBILITY_TIMEOUT = 3600
 
     def __init__(self, end_at_empty_queue=False):
@@ -46,9 +46,11 @@ class AzureZipQueueConsumer:
             message_iterator = None
 
             if self.end_at_empty_queue:
+                # This part is only for testing purposes. To be able to exit the running process when the queue is empty.
                 message_iterator = [m for m in self.queue_client.receive_messages(messages_per_page=10, visibility_timeout=5)]
                 if count == 0 or len(message_iterator) == 0:
                     break
+
             if count == 0:
                 time.sleep(5)
                 continue
