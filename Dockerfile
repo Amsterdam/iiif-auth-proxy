@@ -1,4 +1,4 @@
-FROM python:3.11-bookworm as app
+FROM python:3.11-bullseye as app
 MAINTAINER datapunt@amsterdam.nl
 
 EXPOSE 8000
