@@ -17,5 +17,5 @@ jobs:
       timetell_code: 21079  # Timetell project id
       acceptance_pipeline: "https://ci.data.amsterdam.nl/job/opdrachten-team/job/iiif-auth-proxy/job/Deployments/job/main/"
       production_pipeline: "https://ci.data.amsterdam.nl/job/opdrachten-team/job/iiif-auth-proxy/job/Deployments/view/tags/jobs/<tag>/"
-      acceptance_urls: "https://acc.bouwdossiers.amsterdam.nl/iiif-metadata/bouwdossier/"
-      production_urls: "https://bouwdossiers.amsterdam.nl/iiif-metadata/bouwdossier/"
+      acceptance_urls: "https://acc.dataportaal.amsterdam.nl/data/bouwdossiers/bouwdossier/SJ93/?center=52.369701%2C4.8632354&term=Baarsjesweg+36%2C+1057HL+Amsterdam&zoom=14"
+      production_urls: "https://data.amsterdam.nl/data/bouwdossiers/bouwdossier/SJ93/?center=52.369701%2C4.8632354&term=Baarsjesweg+36%2C+1057HL+Amsterdam&zoom=14"
