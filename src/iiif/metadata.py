@@ -18,8 +18,7 @@ def do_metadata_request(url_info, keycloak_token):
     # Test with:
     # curl -i -H "Accept: application/json" http://iiif-metadata-server-api.service.consul:8183/iiif-metadata/bouwdossier/SA85385/
     metadata_url = (
-        f"{settings.STADSARCHIEF_META_SERVER_BASE_URL}:"
-        f"{settings.STADSARCHIEF_META_SERVER_PORT}/iiif-metadata/bouwdossier/{url_info['stadsdeel']}{url_info['dossier']}/"
+        f"{settings.METADATA_SERVER_BASE_URL}/iiif-metadata/bouwdossier/{url_info['stadsdeel']}{url_info['dossier']}/"
     )
 
     # Metadata for restricted images can only be retrieved by ambtenaren with VTH clearances (the extended scope). So
