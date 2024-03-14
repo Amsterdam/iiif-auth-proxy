@@ -23,7 +23,7 @@ x-app: &base-app
 
 services:
   database-iiif-auth-proxy:
-    image: amsterdam/postgres11
+    image: postgres:15
     environment:
       POSTGRES_DB: dev
       POSTGRES_USER: dev
