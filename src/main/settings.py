@@ -29,7 +29,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 METADATA_SERVER_BASE_URL = os.getenv(
     "METADATA_SERVER_BASE_URL",
-    "http://iiif-metadata-server-service",
+    "http://app-iiif-metadata-server",
 )
 ACCESS_PUBLIC = "PUBLIC"
 ACCESS_RESTRICTED = "RESTRICTED"
