@@ -22,6 +22,7 @@ def get_queue_client():
 
 def get_blob_service_client():
     if settings.AZURITE_STORAGE_CONNECTION_STRING:
+        # TODO: Move this code to a mocking of this function in the tests
         blob_service_client = BlobServiceClient.from_connection_string(settings.AZURITE_STORAGE_CONNECTION_STRING)
     else:
         default_credential = DefaultAzureCredential()
