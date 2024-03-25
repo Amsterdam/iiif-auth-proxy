@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 from distutils.util import strtobool
 
+from corsheaders.defaults import default_headers
+
 from .azure_settings import Azure
 
 azure = Azure()
@@ -25,7 +27,15 @@ DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 ALLOWED_HOSTS = ["*"]
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "false").lower() == "true"
+if not CORS_ALLOW_ALL_ORIGINS:
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        r"^https://\S+\.amsterdam\.nl$",
+    ]
+    CORS_ALLOW_METHODS = ("GET","POST",)
+    CORS_ALLOW_HEADERS = [
+        *default_headers,
+    ]
 
 METADATA_SERVER_BASE_URL = os.getenv(
     "METADATA_SERVER_BASE_URL",
@@ -121,8 +131,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
