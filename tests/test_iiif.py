@@ -106,33 +106,6 @@ class TestFileRetrievalWithAuthz:
             response.content.decode("utf-8") == RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA
         )
 
-    @patch("iiif.image_server.get_image_from_server")
-    @patch("iiif.metadata.do_metadata_request")
-    def test_keycloak_token_is_sent_to_metadata_server(
-        self, mock_do_metadata_request, mock_get_image_from_server, client
-    ):
-        mock_do_metadata_request.return_value = MockResponse(
-            200,
-            json_content={
-                "access": settings.ACCESS_RESTRICTED,
-                "documenten": [
-                    {"barcode": "ST00000126", "access": settings.ACCESS_RESTRICTED}
-                ],
-            },
-        )
-        mock_get_image_from_server.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={}
-        )
-
-        mock_token = "Bearer " + create_authz_token(
-            [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE]
-        )
-        header = {"HTTP_AUTHORIZATION": mock_token}
-        response = client.get(self.url + WABO_IMG_URL, **header)
-        assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA
-        mock_do_metadata_request.assert_called_with(ANY, mock_token)
-
     def test_get_image_when_metadata_server_is_not_available(self, client):
         header = {
             "HTTP_AUTHORIZATION": "Bearer "

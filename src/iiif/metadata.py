@@ -14,23 +14,17 @@ RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER = (
 )
 
 
-def do_metadata_request(url_info, keycloak_token):
+def get_metadata_url(url_info):
     # Test with:
-    # curl -i -H "Accept: application/json" http://iiif-metadata-server-api.service.consul:8183/iiif-metadata/bouwdossier/SA85385/
-    metadata_url = (
-        f"{settings.METADATA_SERVER_BASE_URL}/iiif-metadata/bouwdossier/{url_info['stadsdeel']}{url_info['dossier']}/"
-    )
-
-    # Metadata for restricted images can only be retrieved by ambtenaren with VTH clearances (the extended scope). So
-    # in case there's a keycloak token available we send it along to the metadata server.
-    headers = {}
-    if keycloak_token:
-        headers["Authorization"] = keycloak_token
-
-    return requests.get(metadata_url, headers=headers)
+    # curl -i -H "Accept: application/json" http://app-iiif-metadata-server/iiif-metadata/bouwdossier/SA85385/
+    return f"{settings.METADATA_SERVER_BASE_URL}/iiif-metadata/bouwdossier/{url_info['stadsdeel']}{url_info['dossier']}/"
 
 
-def get_metadata(url_info, iiif_url, keycloak_token, metadata_cache):
+def do_metadata_request(metadata_url):
+    return requests.get(metadata_url)
+
+
+def get_metadata(url_info, iiif_url, metadata_cache):
     # Check whether the metadata is already in the cache
     cache_key = f"{url_info['stadsdeel']}_{url_info['dossier']}"
     metadata = metadata_cache.get(cache_key)
@@ -39,7 +33,8 @@ def get_metadata(url_info, iiif_url, keycloak_token, metadata_cache):
 
     # Get the image metadata from the metadata server
     try:
-        meta_response = do_metadata_request(url_info, keycloak_token)
+        metadata_url = get_metadata_url(url_info)
+        meta_response = do_metadata_request(metadata_url)
     except RequestException as e:
         log.error(
             f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER} "
@@ -60,7 +55,8 @@ def get_metadata(url_info, iiif_url, keycloak_token, metadata_cache):
     elif meta_response.status_code != 200:
         log.info(
             f"Got response code {meta_response.status_code} while retrieving "
-            f"the metadata for {iiif_url} from the stadsarchief metadata server."
+            f"the metadata for {iiif_url} from the stadsarchief metadata server "
+            f"on url {metadata_url}."
         )
         raise ImmediateHttpResponse(
             response=HttpResponse(
