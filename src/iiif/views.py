@@ -24,9 +24,7 @@ def index(request, iiif_url):
         )
 
         authentication.check_wabo_for_mail_login(is_mail_login, url_info)
-        metadata, _ = get_metadata(
-            url_info, iiif_url, request.META.get("HTTP_AUTHORIZATION"), {}
-        )
+        metadata, _ = get_metadata(url_info, iiif_url, {})
         authentication.check_file_access_in_metadata(metadata, url_info, scope)
         file_response, file_url = image_server.get_file(
             request.META, url_info, iiif_url, metadata

@@ -85,7 +85,6 @@ class AzureZipQueueConsumer:
                 metadata, metadata_cache = get_metadata(
                     image_info["url_info"],
                     iiif_url,
-                    record["request_meta"].get("HTTP_AUTHORIZATION"),
                     metadata_cache,
                 )
                 try:
