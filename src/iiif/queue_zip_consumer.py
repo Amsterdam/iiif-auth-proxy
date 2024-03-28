@@ -119,7 +119,7 @@ class AzureZipQueueConsumer:
 
             blob_client = store_object_on_storage_account(zip_file_path, zip_file_name)
 
-            temp_zip_download_url = create_storage_account_temp_url(blob_client, expiry_days=settings.TEMP_URL_EXPIRY_DAYS)
+            temp_zip_download_url = create_storage_account_temp_url(blob_client)
 
             email_subject = "Downloadlink Bouw- en omgevingdossiers"
             email_body = render_to_string(
