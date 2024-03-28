@@ -39,20 +39,19 @@ def get_container_client(container_name):
 def get_blob_client(container_name, blob_name):
     blob_service_client = get_blob_service_client()
     blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
-    return blob_client
+    return blob_client, blob_service_client
 
 
 def store_object_on_storage_account(local_zip_file_path, filename):
-    blob_client = get_blob_client(settings.STORAGE_ACCOUNT_CONTAINER_NAME, filename)
+    blob_client, blob_service_client = get_blob_client(settings.STORAGE_ACCOUNT_CONTAINER_NAME, filename)
     with open(file=local_zip_file_path, mode="rb") as data:
         blob_client.upload_blob(data)
-    return blob_client
+    return blob_client, blob_service_client
 
 
-def create_storage_account_temp_url(blob_client, expiry_days=settings.TEMP_URL_EXPIRY_DAYS):
+def create_storage_account_temp_url(blob_client, blob_service_client, expiry_days=settings.TEMP_URL_EXPIRY_DAYS):
     key_start_time = datetime.utcnow()
     key_expiry_time = key_start_time + timedelta(days=expiry_days+1)
-    blob_service_client = BlobServiceClient(account_url=blob_client.url.rsplit('/', 2)[0], credential=blob_client.credential)
     user_delegation_key = blob_service_client.get_user_delegation_key(key_start_time, key_expiry_time)
     
     sas_token = generate_blob_sas(

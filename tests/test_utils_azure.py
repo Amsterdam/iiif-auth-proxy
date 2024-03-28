@@ -5,12 +5,7 @@ import requests
 from azure.core.exceptions import ResourceExistsError
 from django.conf import settings
 
-from iiif.utils_azure import (
-    create_storage_account_temp_url,
-    get_blob_service_client,
-    get_queue_client,
-    store_object_on_storage_account,
-)
+from iiif.utils_azure import get_blob_service_client, get_queue_client
 
 
 def create_blob_container(container_name):
