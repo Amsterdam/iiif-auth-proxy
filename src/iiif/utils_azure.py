@@ -50,7 +50,7 @@ def store_object_on_storage_account(local_zip_file_path, filename):
 
 
 def create_storage_account_temp_url(blob_client, expiry_days=settings.TEMP_URL_EXPIRY_DAYS):
-    key_start_time = datetime.now(datetime.utc)
+    key_start_time = datetime.utcnow()
     key_expiry_time = key_start_time + timedelta(days=expiry_days+1)
     blob_service_client = BlobServiceClient(account_url=blob_client.url.rsplit('/', 2)[0], credential=blob_client.credential)
     user_delegation_key = blob_service_client.get_user_delegation_key(key_start_time, key_expiry_time)
