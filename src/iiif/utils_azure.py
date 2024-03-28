@@ -53,7 +53,7 @@ def create_storage_account_temp_url(blob_client, blob_service_client, expiry_day
     key_start_time = datetime.utcnow()
     key_expiry_time = key_start_time + timedelta(days=expiry_days)
     user_delegation_key = blob_service_client.get_user_delegation_key(key_start_time, key_expiry_time)
-    
+
     sas_token = generate_blob_sas(
         account_name=blob_client.account_name,
         container_name=blob_client.container_name,
@@ -63,7 +63,9 @@ def create_storage_account_temp_url(blob_client, blob_service_client, expiry_day
         expiry=datetime.utcnow() + timedelta(days=expiry_days)
     )
 
-    return f"{blob_client.url}?{sas_token}"
+    file_url = blob_client.url.replace(blob_service_client.url, settings.APP_BASE_URL)
+
+    return f"{file_url}?{sas_token}"
 
 
 def remove_old_zips_from_storage_account():

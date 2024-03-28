@@ -27,6 +27,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+APP_BASE_URL = os.getenv("APP_BASE_URL", "https://bouwdossiers.amsterdam.nl/")
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "false").lower() == "true"
 if not CORS_ALLOW_ALL_ORIGINS:
