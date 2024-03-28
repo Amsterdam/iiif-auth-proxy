@@ -119,6 +119,9 @@ DATAPUNT_AUTHZ = {
 
 STORAGE_ACCOUNT_CONTAINER_NAME = "downloads"
 TEMP_URL_EXPIRY_DAYS = 7
+if TEMP_URL_EXPIRY_DAYS > 7:
+    raise ValueError("TEMP_URL_EXPIRY_DAYS must be 7 days or less")
+
 
 INSTALLED_APPS = [
     "django.contrib.auth",

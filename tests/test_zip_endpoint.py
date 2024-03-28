@@ -306,6 +306,7 @@ class TestZipEndpoint:
         assert response.status_code == 200
         assert len(self.get_all_queue_messages()) == 1
 
+    @patch("iiif.queue_zip_consumer.create_storage_account_temp_url")
     @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
     @patch("iiif.mailing.send_email")
@@ -339,6 +340,7 @@ class TestZipEndpoint:
         mock_send_email,
         mock_do_metadata_request,
         mock_get_image_from_server,
+        mock_create_storage_account_temp_url,
         scope,
         second_image_access,
         expected_line_end,
@@ -365,6 +367,7 @@ class TestZipEndpoint:
         mock_get_image_from_server.return_value = MockResponse(
             200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/png"}
         )
+        mock_create_storage_account_temp_url.return_value = "https://azure.com/tempurl"
 
         # Request some images in a zip
         header = {"HTTP_AUTHORIZATION": "Bearer " + create_authz_token([scope])}
@@ -383,7 +386,6 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 200
-        # assert len(self.get_all_queue_messages()) == 1
 
         # Then run the parser
         consumer = AzureZipQueueConsumer(end_at_empty_queue=True)
