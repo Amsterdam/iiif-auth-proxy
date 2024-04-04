@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import csrf_exempt
 from django_ratelimit.decorators import ratelimit
 
@@ -14,6 +15,7 @@ log = logging.getLogger(__name__)
 
 
 @csrf_exempt
+@cache_control(private=True, max_age=3600)
 def index(request, iiif_url):
     try:
         authentication.check_auth_availability(request)
