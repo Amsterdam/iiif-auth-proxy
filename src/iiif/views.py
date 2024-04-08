@@ -35,7 +35,7 @@ def index(request, iiif_url):
 
         if url_info["info_json"]:
             response_content = generate_info_json(
-                request.build_absolute_uri().replace("/info.json", ""),
+                request.build_absolute_uri().split("/info.json")[0],
                 file_response.content,
                 file_response.headers.get("Content-Type"),
             )
