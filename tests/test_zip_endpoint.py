@@ -6,7 +6,6 @@ from unittest.mock import patch
 import pytest
 import pytz
 from django.conf import settings
-from ingress.models import FailedMessage, Message
 
 from iiif.authentication import (
     RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN,
@@ -15,7 +14,8 @@ from iiif.authentication import (
     create_mail_login_token,
 )
 from iiif.generate_token import create_authz_token
-from iiif.ingress_zip_consumer import ZipConsumer
+from iiif.queue_zip_consumer import AzureZipQueueConsumer
+from iiif.utils_azure import get_container_client, get_queue_client
 from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER
 from tests.test_iiif import (
     IMAGE_BINARY_DATA,
@@ -24,7 +24,8 @@ from tests.test_iiif import (
     PRE_WABO_IMG_URL_WITH_SCALING,
     WABO_IMG_URL,
 )
-from tests.tools import MockResponse, call_man_command
+from tests.test_utils_azure import create_blob_container, create_queue
+from tests.tools import MockResponse
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
@@ -44,8 +45,15 @@ class TestZipEndpoint:
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE]
         )
 
-        call_man_command("add_collection", settings.ZIP_COLLECTION_NAME)
-        call_man_command("enable_consumer", settings.ZIP_COLLECTION_NAME)
+        create_blob_container(settings.STORAGE_ACCOUNT_CONTAINER_NAME)
+        create_queue()
+        self.queue_client = get_queue_client()
+        # Clear the queue to start with a clean slate
+        for message in self.queue_client.receive_messages(max_messages=100):
+            self.queue_client.delete_message(message)
+
+    def get_all_queue_messages(self):
+        return [m for m in self.queue_client.receive_messages(max_messages=10000)]
 
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_jwt_token(self, mock_do_metadata_request, client):
@@ -77,12 +85,13 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 200
-        assert Message.objects.count() == 1
-        message = Message.objects.first()
-        data = json.loads(message.raw_data)
+        messages = self.get_all_queue_messages()
+        assert len(messages) == 1
+        data = json.loads(messages[0].content)
         assert data["email_address"] == "zip@amsterdam.nl"
         assert len(data["urls"]) == 3
         assert "request_meta" in data
+        
 
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_authz_token(self, mock_do_metadata_request, client):
@@ -120,9 +129,9 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 200
-        assert Message.objects.count() == 1
-        message = Message.objects.first()
-        data = json.loads(message.raw_data)
+        messages = self.get_all_queue_messages()
+        assert len(messages) == 1
+        data = json.loads(messages[0].content)
         assert data["email_address"] == "authztest@amsterdam.nl"
         assert len(data["urls"]) == 3
         assert "request_meta" in data
@@ -204,7 +213,7 @@ class TestZipEndpoint:
         assert (
             response.content.decode("utf-8") == RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN
         )
-        assert Message.objects.count() == 0
+        assert len(self.get_all_queue_messages()) == 0
 
     @patch("iiif.metadata.do_metadata_request")
     def test_request_restricted_image_with_read_scope_succeeds(
@@ -243,7 +252,7 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 200
-        assert Message.objects.count() == 1
+        assert len(self.get_all_queue_messages()) == 1
 
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_with_restricted_scope_succeeds(
@@ -295,11 +304,11 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 200
-        assert Message.objects.count() == 1
+        assert len(self.get_all_queue_messages()) == 1
 
+    @patch("iiif.queue_zip_consumer.create_storage_account_temp_url")
     @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
-    @patch("iiif.object_store.store_object_on_object_store")
     @patch("iiif.mailing.send_email")
     @patch("iiif.zip_tools.cleanup_local_files")
     @pytest.mark.parametrize(
@@ -329,9 +338,9 @@ class TestZipEndpoint:
         self,
         mock_cleanup_local_files,
         mock_send_email,
-        mock_store_object_on_object_store,
         mock_do_metadata_request,
         mock_get_image_from_server,
+        mock_create_storage_account_temp_url,
         scope,
         second_image_access,
         expected_line_end,
@@ -341,7 +350,6 @@ class TestZipEndpoint:
         # Setting up mocks
         mock_cleanup_local_files.return_value = None
         mock_send_email.return_value = None
-        mock_store_object_on_object_store.return_value = None
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -359,6 +367,7 @@ class TestZipEndpoint:
         mock_get_image_from_server.return_value = MockResponse(
             200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/png"}
         )
+        mock_create_storage_account_temp_url.return_value = "https://azure.com/tempurl"
 
         # Request some images in a zip
         header = {"HTTP_AUTHORIZATION": "Bearer " + create_authz_token([scope])}
@@ -377,18 +386,13 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 200
-        assert Message.objects.count() == 1
 
         # Then run the parser
-        parser = ZipConsumer()
-        parser.consume(end_at_empty_queue=True)
+        consumer = AzureZipQueueConsumer(end_at_empty_queue=True)
+        consumer.run()
 
-        # Test whether the records in the ingress queue are correctly set to consumed
-        assert Message.objects.filter(consume_succeeded_at__isnull=False).count() == 1
-        assert FailedMessage.objects.count() == 0
-        for ingress in Message.objects.all():
-            assert ingress.consume_started_at is not None
-            assert ingress.consume_succeeded_at is not None
+        # Test whether the records that were in the queue are correctly removed
+        assert len(self.get_all_queue_messages()) == 0
 
         # Check whether the newly created zip file exists
         tmp_contents = sorted(

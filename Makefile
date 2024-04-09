@@ -1,6 +1,6 @@
 # This Makefile is based on the Makefile defined in the Python Best Practices repository:
 # https://git.datapunt.amsterdam.nl/Datapunt/python-best-practices/blob/master/dependency_management/
-.PHONY: app
+.PHONY: app push deploy
 
 dc = docker compose
 run = $(dc) run --rm
@@ -29,7 +29,7 @@ migrate:
 	$(dc) run --rm app python manage.py migrate
 
 build:
-	$(dc) build
+	$(dc) build --progress=plain
 
 push: build
 	$(dc) push
@@ -47,7 +47,6 @@ lintfix:             ## Execute lint fixes
 	$(run) test black /src/$(APP) /tests/$(APP)
 	$(run) test autoflake /src --recursive --in-place --remove-unused-variables --remove-all-unused-imports --quiet
 	$(run) test isort /src/$(APP) /tests/$(APP)
-
 
 lint:                               ## Execute lint checks
 	$(run) test autoflake /src --check --recursive --quiet

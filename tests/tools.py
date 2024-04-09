@@ -27,8 +27,8 @@ class MockResponse:
 
 
 def filename_from_url(url):
-    return url.split(':')[1].split('/')[0]
+    return url.split(":")[1].split("/")[0]
 
 
 def source_filename_from_url(url):
-    return filename_from_url(url).replace('-', '/')
+    return filename_from_url(url).replace("-", "/")
