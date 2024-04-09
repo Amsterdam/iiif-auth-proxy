@@ -142,6 +142,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "authorization_django.authorization_middleware",
+    "opencensus.ext.django.middleware.OpencensusMiddleware",
 ]
 
 ROOT_URLCONF = "main.urls"
@@ -268,3 +269,24 @@ LOGGING = {
         }
     },
 }
+
+APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv(
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"
+)
+
+if APPLICATIONINSIGHTS_CONNECTION_STRING:
+    OPENCENSUS = {
+        "TRACE": {
+            "SAMPLER": "opencensus.trace.samplers.ProbabilitySampler(rate=1)",
+            "EXPORTER": f"opencensus.ext.azure.trace_exporter.AzureExporter(connection_string='{APPLICATIONINSIGHTS_CONNECTION_STRING}')",
+        }
+    }
+    LOGGING["handlers"]["azure"] = {
+        "level": "DEBUG",
+        "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
+        "connection_string": APPLICATIONINSIGHTS_CONNECTION_STRING,
+    }
+    LOGGING["loggers"]["django"]["handlers"].append("azure")
+    LOGGING["loggers"]["django.request"]["handlers"].append("azure")
+    LOGGING["loggers"]["main"]["handlers"].append("azure")
+    LOGGING["loggers"]["bouwdossiers-auth-proxy"]["handlers"].append("azure")
