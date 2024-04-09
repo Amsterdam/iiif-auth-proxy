@@ -6,7 +6,7 @@ import urllib
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotAllowed
 
-from iiif.tools import ImmediateHttpResponse
+from iiif.utils import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 
@@ -61,18 +61,22 @@ def get_info_from_iiif_url(iiif_url, source_file):
             if "/" in iiif_url.split(":")[1]
             else ""
         )
-        
+
         info_json = False
         scaling = None
         region = None
         if formatting == "info.json":
             info_json = True
             formatting = None
-        elif '/' in formatting:
-            region = formatting.split('/')[0]
-            scaling = formatting.split('/')[1]
+        elif "/" in formatting:
+            region = formatting.split("/")[0]
+            scaling = formatting.split("/")[1]
+        elif source_file:
+            pass
         else:
-            raise InvalidIIIFUrlError(f"No formatting or info.json provided in iiif url: {iiif_url}")
+            raise InvalidIIIFUrlError(
+                f"No formatting or info.json provided in iiif url: {iiif_url}"
+            )
 
         if source == "edepot":  # aka pre-wabo
             m = re.match(r"^([A-Z]+)-?(\d+)-(.+)$", relevant_url_part)
@@ -116,7 +120,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
                 "info_json": info_json,
             }
-        
+
         raise InvalidIIIFUrlError(f"Invalid iiif url (no valid source): {iiif_url}")
 
     except Exception as e:

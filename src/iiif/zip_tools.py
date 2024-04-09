@@ -5,8 +5,7 @@ from pathlib import Path
 from uuid import uuid4
 from zipfile import ZipFile
 
-from django.conf import settings
-from ingress.models import Collection, Message
+from iiif.utils_azure import get_queue_client
 
 TMP_BOUWDOSSIER_ZIP_FOLDER = "/tmp/bouwdossier-zips/"
 
@@ -18,17 +17,14 @@ def store_zip_job(zip_info):
         k: v for k, v in zip_info["request_meta"].items() if type(v) is str
     }
 
-    collection = Collection.objects.get(name=settings.ZIP_COLLECTION_NAME)
-    message = Message.objects.create(
-        raw_data=json.dumps(zip_info), collection=collection
-    )
-    return message
+    queue_client = get_queue_client()
+    queue_client.send_message(json.dumps(zip_info))
 
 
 def create_tmp_folder():
     os.makedirs(TMP_BOUWDOSSIER_ZIP_FOLDER, exist_ok=True)
-    zipjob_uuid = uuid4()
-    tmp_folder_path = os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, str(zipjob_uuid))
+    zipjob_uuid = str(uuid4())
+    tmp_folder_path = os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, zipjob_uuid)
     os.mkdir(tmp_folder_path)
     return zipjob_uuid, tmp_folder_path
 
@@ -44,7 +40,7 @@ def create_local_zip_file(zipjob_uuid, folder_path):
     zip_file_path = os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, f"{zipjob_uuid}.zip")
     with ZipFile(zip_file_path, "w") as zip_obj:
         for file in Path(folder_path).glob("*"):
-            zip_obj.write(file, arcname=os.path.join(str(zipjob_uuid), file.name))
+            zip_obj.write(file, arcname=os.path.join(zipjob_uuid, file.name))
     return zip_file_path
 
 

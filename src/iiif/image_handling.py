@@ -6,7 +6,7 @@ from io import BytesIO
 from django.http import HttpResponse
 from PIL import Image
 
-from iiif import tools
+from iiif import utils
 
 log = logging.getLogger(__name__)
 
@@ -15,11 +15,13 @@ MISSING_SCALING_PARAMETER = "The scaling parameter is missing. It should either 
 MALFORMED_REGION_PARAMETER = "The region parameter is malformed. It should either be 'full' or in the form of '50,50,100,100' (x,y,w,h)."
 MISSING_REGION_PARAMETER = "The region parameter is missing. It should either be 'full' or in the form of '50,50,100,100' (x,y,w,h)."
 NON_OVERLAPPING_REGION_PARAMETER = "The region parameter should overlap with the image."
-NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER = "The region parameter should have a positive width and height value"
+NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER = (
+    "The region parameter should have a positive width and height value"
+)
 
 BASE_INFO_JSON = {
     "@context": "http://iiif.io/api/image/2/context.json",
-    "@id":  None,
+    "@id": None,
     "protocol": "http://iiif.io/api/image",
     "width": None,
     "height": None,
@@ -51,7 +53,9 @@ def generate_info_json(image_base_url, content, content_type):
     info_json["width"] = img.width
     info_json["height"] = img.height
     info_json["sizes"] = [{"width": img.width, "height": img.height}]
-    info_json["profile"][1]["formats"] = [content_type_to_format(content_type).replace("jpeg", "jpg")]
+    info_json["profile"][1]["formats"] = [
+        content_type_to_format(content_type).replace("jpeg", "jpg")
+    ]
 
     return json.dumps(info_json)
 
@@ -68,22 +72,25 @@ def parse_scaling_string(scaling):
         parts = scaling.split(",")
         if len(parts) != 2:
             raise ValueError("Invalid format for scaling")
-        
+
         if not (parts[0] or parts[1]):
-            raise ValueError('Invalid format for scaling. Width or height value required.')
+            raise ValueError(
+                "Invalid format for scaling. Width or height value required."
+            )
 
         desired_width = int(parts[0]) if parts[0] else None
         desired_height = int(parts[1]) if parts[1] else None
     except ValueError:
-        raise tools.ImmediateHttpResponse(
+        raise utils.ImmediateHttpResponse(
             response=HttpResponse(MALFORMED_SCALING_PARAMETER, status=400)
         )
     except AttributeError:
-        raise tools.ImmediateHttpResponse(
+        raise utils.ImmediateHttpResponse(
             response=HttpResponse(MISSING_SCALING_PARAMETER, status=400)
         )
 
     return desired_width, desired_height
+
 
 def content_type_to_format(content_type):
     return content_type.split("/")[1]
@@ -137,6 +144,7 @@ def scale_image(content, source_file, scaling, content_type):
 
     return scaled_image_data
 
+
 # TODO: Support percentage string: pct:x,y,w,h
 def parse_region_string(region):
     """
@@ -149,28 +157,32 @@ def parse_region_string(region):
         parts = region.split(",")
         if len(parts) != 4:
             raise ValueError("Invalid format for region")
-        
+
         if not (parts[0] and parts[1] and parts[2] and parts[3]):
-            raise ValueError('Invalid format for region. x, y, width and height values required.')
+            raise ValueError(
+                "Invalid format for region. x, y, width and height values required."
+            )
 
         desired_x = int(parts[0])
         desired_y = int(parts[1])
         desired_width = int(parts[2])
         desired_height = int(parts[3])
     except ValueError:
-        raise tools.ImmediateHttpResponse(
+        raise utils.ImmediateHttpResponse(
             response=HttpResponse(MALFORMED_REGION_PARAMETER, status=400)
         )
     except AttributeError:
-        raise tools.ImmediateHttpResponse(
+        raise utils.ImmediateHttpResponse(
             response=HttpResponse(MISSING_REGION_PARAMETER, status=400)
         )
 
     return desired_x, desired_y, desired_width, desired_height
 
+
 # TODO: Move to an util file
 def clamp(n, minn, maxn):
     return max(min(maxn, n), minn)
+
 
 # TODO: Extract sub functions to own functions for:
 # - asserting the region is valid
@@ -191,21 +203,25 @@ def crop_image(content, source_file, region, content_type):
     img = Image.open(BytesIO(content))
 
     match region.lower():
-        case 'full':
+        case "full":
             return content
-        case 'square':
+        case "square":
             shortest_side = min(img.width, img.height)
             desired_width = desired_height = shortest_side
             desired_x = (img.width - desired_width) / 2
             desired_y = (img.height - desired_height) / 2
         case _:
-            desired_x, desired_y, desired_width, desired_height = parse_region_string(region)
-    
+            desired_x, desired_y, desired_width, desired_height = parse_region_string(
+                region
+            )
+
     region_has_no_width = desired_width <= 0 or desired_width == None
     region_has_no_height = desired_height <= 0 or desired_height == None
     if region_has_no_width or region_has_no_height:
-        raise tools.ImmediateHttpResponse(
-            response=HttpResponse(NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER, status=400)
+        raise utils.ImmediateHttpResponse(
+            response=HttpResponse(
+                NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER, status=400
+            )
         )
 
     region_has_no_overlap_with_img = (
@@ -215,20 +231,17 @@ def crop_image(content, source_file, region, content_type):
         or desired_y >= img.height
     )
     if region_has_no_overlap_with_img:
-        raise tools.ImmediateHttpResponse(
+        raise utils.ImmediateHttpResponse(
             response=HttpResponse(NON_OVERLAPPING_REGION_PARAMETER, status=400)
         )
-        
+
     left = clamp(desired_x, 0, img.width)
     top = clamp(desired_y, 0, img.height)
     right = clamp(desired_x + desired_width, left, img.width)
     bottom = clamp(desired_y + desired_height, top, img.height)
 
     crop_contains_complete_img = (
-        left <= 0 and 
-        top <= 0 and 
-        right >= img.width and 
-        bottom >= img.height
+        left <= 0 and top <= 0 and right >= img.width and bottom >= img.height
     )
 
     if crop_contains_complete_img:

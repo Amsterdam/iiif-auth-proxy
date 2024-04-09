@@ -11,10 +11,14 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import sys
 from distutils.util import strtobool
 
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
+from corsheaders.defaults import default_headers
+
+from .azure_settings import Azure
+
+azure = Azure()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -23,16 +27,19 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+APP_BASE_URL = os.getenv("APP_BASE_URL", "https://bouwdossiers.amsterdam.nl/")
 ALLOWED_HOSTS = ["*"]
-CORS_ORIGIN_ALLOW_ALL = True
 
-STADSARCHIEF_META_SERVER_BASE_URL = os.getenv(
-    "STADSARCHIEF_META_SERVER_BASE_URL",
-    "http://iiif-metadata-server-api.service.consul",
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_DOMAINS", '').split(',')
+CORS_ALLOW_METHODS = ("GET","POST",)
+CORS_ALLOW_HEADERS = [
+    *default_headers,
+]
+
+METADATA_SERVER_BASE_URL = os.getenv(
+    "METADATA_SERVER_BASE_URL",
+    "http://app-iiif-metadata-server",
 )
-STADSARCHIEF_META_SERVER_PORT = os.getenv(
-    "STADSARCHIEF_META_SERVER_PORT", "8183"
-)  # This port is static within the network
 ACCESS_PUBLIC = "PUBLIC"
 ACCESS_RESTRICTED = "RESTRICTED"
 COPYRIGHT_YES = "J"
@@ -50,14 +57,18 @@ EDEPOT_BASE_URL = os.getenv(
     "EDEPOT_BASE_URL", "https://bwt.uitplaatsing.shcp03.archivingondemand.nl/rest/"
 )
 WABO_BASE_URL = os.getenv(
-    "WABO_BASE_URL", "https://bwt.hs3-saa-bwt.shcp04.archivingondemand.nl/"
+    "WABO_BASE_URL", "https://bwt.hs3-saa-bwt.shcp04.archivingondemand.nl/rest/"
 )
-HCP_AUTHORIZATION = os.getenv("HCP_AUTHORIZATION", "dummy")
+EDEPOT_AUTHORIZATION = os.getenv("EDEPOT_AUTHORIZATION", "dummy")
+WABO_AUTHORIZATION = os.getenv('WABO_AUTHORIZATION', 'dummy')
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ALGORITHM = "HS256"
-SENDGRID_KEY = os.getenv("SENDGRID_KEY", "mock_key")
-ZIP_COLLECTION_NAME = "zip_queue"
-LOGIN_ORIGIN_URL_TLD_WHITELIST = ["data.amsterdam.nl", "acc.data.amsterdam.nl", "acc.dataportaal.amsterdam.nl"]
+AZURITE_STORAGE_CONNECTION_STRING = os.getenv('AZURITE_STORAGE_CONNECTION_STRING')
+AZURITE_QUEUE_CONNECTION_STRING = os.getenv('AZURITE_QUEUE_CONNECTION_STRING')
+STORAGE_ACCOUNT_URL = os.getenv("STORAGE_ACCOUNT_URL")
+QUEUE_ACCOUNT_URL = os.getenv("QUEUE_ACCOUNT_URL")
+ZIP_QUEUE_NAME = "zip-queue"
+LOGIN_ORIGIN_URL_TLD_WHITELIST = ["data.amsterdam.nl", "acc.dataportaal.amsterdam.nl"]
 if strtobool(os.getenv("ALLOW_LOCALHOST_LOGIN_URL", "false")):
     LOGIN_ORIGIN_URL_TLD_WHITELIST += ["localhost", "127.0.0.1"]
 
@@ -66,10 +77,11 @@ EMAIL_HOST = os.getenv("EMAIL_HOST", "localhost")
 EMAIL_PORT = os.getenv("EMAIL_PORT", "587")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-EMAIL_FROM_EMAIL_ADDRESS = os.getenv("EMAIL_FROM_EMAIL_ADDRESS", "bouwdossiers@amsterdam.nl")
+EMAIL_FROM_EMAIL_ADDRESS = os.getenv(
+    "EMAIL_FROM_EMAIL_ADDRESS", "bouwdossiers@amsterdam.nl"
+)
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
 EMAIL_TIMEOUT = 5
-
 
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
 # This is a test public/private key def and added for testing .
@@ -103,34 +115,11 @@ DATAPUNT_AUTHZ = {
     "FORCED_ANONYMOUS_ROUTES": ["/status/health"],
 }
 
-OBJECT_STORE = {
-    "auth_version": "2.0",
-    "authurl": os.getenv("OS_AUTH_URL"),
-    "user": os.getenv("OS_USERNAME", "iiif"),
-    "key": os.getenv("OS_PASSWORD", "insecure"),
-    "tenant_name": os.getenv("OS_TENANT_NAME", "insecure"),
-    "os_options": {
-        "tenant_id": os.getenv("OS_TENANT_ID"),
-        "region_name": "NL",
-    },
-}
-OS_CONTAINER_NAME = os.getenv("OS_CONTAINER_NAME", "downloads_acceptance")
-OS_TEMP_URL_KEY = os.getenv("OS_TEMP_URL_KEY", "insecure")
-OS_TLD = os.getenv("OS_TLD", "objectstore.eu")
+STORAGE_ACCOUNT_CONTAINER_NAME = "downloads"
 TEMP_URL_EXPIRY_DAYS = 7
-OS_LARGE_FILE_SIZE = 5368709120  # 5GB
-OS_LARGE_FILE_OPTIONS = {
-    "object_dd_threads": 20,
-    "segment_size": 262144000,
-    "use_slo": True,
-}
+if TEMP_URL_EXPIRY_DAYS > 7:
+    raise ValueError("TEMP_URL_EXPIRY_DAYS must be 7 days or less")
 
-INGRESS_CONSUMER_CLASSES = [
-    "iiif.ingress_zip_consumer.ZipConsumer",  # worker to zip files, upload to object store and email user
-]
-INGRESS_DISABLE_ALL_AUTH_PERMISSION_CHECKS = (
-    True  # No endpoint is used, so no checks are needed
-)
 
 INSTALLED_APPS = [
     "django.contrib.auth",
@@ -141,12 +130,11 @@ INSTALLED_APPS = [
     "iiif",
     "health",
     "corsheaders",
-    "ingress",
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -180,15 +168,24 @@ WSGI_APPLICATION = "main.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+
+DATABASE_HOST = os.getenv("DATABASE_HOST", "database-iiif-auth-proxy")
+DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "dev")
+DATABASE_OPTIONS = {"sslmode": "allow", "connect_timeout": 5}
+if "azure.com" in DATABASE_HOST:
+    DATABASE_PASSWORD = azure.auth.db_password
+    DATABASE_OPTIONS["sslmode"] = "require"
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv("DATABASE_NAME", "iiif_auth_proxy"),
+        "NAME": os.getenv("DATABASE_NAME", "dev"),
         "USER": os.getenv("DATABASE_USER", "dev"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD", "dev"),
-        "HOST": os.getenv("DATABASE_HOST", "database"),
+        "PASSWORD": DATABASE_PASSWORD,
+        "HOST": DATABASE_HOST,
         "CONN_MAX_AGE": 20,
         "PORT": os.getenv("DATABASE_PORT", "5432"),
+        "OPTIONS": DATABASE_OPTIONS,
     },
 }
 
@@ -221,10 +218,53 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
-SENTRY_DSN = os.getenv("SENTRY_DSN")
-if SENTRY_DSN:
-    sentry_sdk.init(
-        dsn=SENTRY_DSN,
-        integrations=[DjangoIntegration()],
-        ignore_errors=["ExpiredSignatureError"],
-    )
+
+# Django Logging settings
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "root": {
+        "level": "INFO",
+        "handlers": ["console"],
+    },
+    "formatters": {
+        "console": {"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"},
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "console",
+        },
+    },
+    "loggers": {
+        "bouwdossiers-auth-proxy": {
+            "level": "WARNING",
+            "handlers": ["console"],
+            "propagate": True,
+        },
+        "main": {
+            "level": "WARNING",
+            "handlers": ["console"],
+            "propagate": True,
+        },
+        "django": {
+            "handlers": ["console"],
+            "level": os.getenv(
+                "DJANGO_LOG_LEVEL", "ERROR" if "pytest" in sys.argv[0] else "INFO"
+            ).upper(),
+            "propagate": False,
+        },
+        # Log all unhandled exceptions
+        "django.request": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "azure.core.pipeline.policies.http_logging_policy": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False
+        }
+    },
+}

@@ -7,64 +7,52 @@ from django.http import HttpResponse
 from requests.exceptions import RequestException
 
 from iiif import zip_tools
-from iiif.tools import ImmediateHttpResponse
+from iiif.utils import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 
-RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER = \
+RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER = (
     "The image-server cannot be reached because the following error occurred: "
+)
 
 
 def create_wabo_url(url_info, metadata):
     for document in metadata["documenten"]:
         if document["barcode"] == url_info["document_barcode"]:
-            return document["bestanden"][0]["filename"]  # there is always only one filename per bestand
+            return document["bestanden"][0][
+                "filename"
+            ]  # there is always only one filename per bestand
     # TODO: raise something in the unlikely event that nothing is found
 
 
 # TODO: split into two functions, one for url and one for headers
-def create_file_url_and_headers(request_meta, url_info, iiif_url, metadata):
+def create_file_url_and_headers(url_info, metadata):
     if url_info["source"] == "edepot":
-
         # If the iiif url contains a reference to dossier like SQ1421 without a '-' or '/' between the letters
         # and the numbers, then this was added as a reference to stadsdeel and dossiernumber and
         # it should be removed. The line below does exactly that.
         iiif_url_edepot = re.sub(r"[A-Z]+\d+/", "", url_info["source_filename"])
-
         iiif_image_url = f"{settings.EDEPOT_BASE_URL}{iiif_url_edepot}"
-        return iiif_image_url, {"Authorization": settings.HCP_AUTHORIZATION}, ()
+        return iiif_image_url, {"Authorization": settings.EDEPOT_AUTHORIZATION}
 
     elif url_info["source"] == "wabo":
         wabo_url = create_wabo_url(url_info, metadata)
         iiif_image_url = f"{settings.WABO_BASE_URL}{wabo_url}"
-        cert = "/tmp/sw444v1912.pem"
-        return iiif_image_url, {}, cert
+        return iiif_image_url, {"Authorization": settings.WABO_AUTHORIZATION}
 
 
-def get_image_from_server(file_url, headers, cert, verify=True):
+def get_image_from_server(file_url, headers):
     return requests.get(
-        file_url, headers=headers, cert=cert, verify=verify, timeout=(15, 25)
+        file_url, headers=headers, verify=False, timeout=(15, 25)
     )
 
 
 def get_file(request_meta, url_info, iiif_url, metadata):
-    # If we need to get an edepot source file directly from the stadsarchief we need to disable
-    # certificate checks because the wildcard cert doesn't include the host name.
-    # TODO: remove this once the cert is fixed
-    verify = True
-    if url_info["source"] == "edepot":
-        verify = False
-
-    # Get the file itself
-    file_url, headers, cert = create_file_url_and_headers(
-        request_meta, url_info, iiif_url, metadata
-    )
+    file_url, headers = create_file_url_and_headers(url_info, metadata)
     try:
-        file_response = get_image_from_server(file_url, headers, cert, verify)
+        file_response = get_image_from_server(file_url, headers)
     except RequestException as e:
-        message = (
-            f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {e.__class__.__name__}"
-        )
+        message = f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {e.__class__.__name__}"
         log.error(message)
         raise ImmediateHttpResponse(response=HttpResponse(message, status=502))
 
@@ -86,7 +74,7 @@ def handle_file_response_codes(file_response, file_url):
         raise ImmediateHttpResponse(
             response=HttpResponse(
                 f"We had a problem retrieving the image. We got status "
-                f"code {file_response.status_code} for url {file_url}",
+                f"code {file_response.status_code} for url {file_url}.",
                 status=502,
             )
         )
@@ -111,9 +99,6 @@ def download_file_for_zip(
     request_meta,
     tmp_folder_path,
 ):
-    # Tell image server we want the full image
-    iiif_url += "/full/full/0/default.jpg"
-
     info_txt_contents += f"{iiif_url}: "
 
     if fail_reason:
@@ -123,14 +108,19 @@ def download_file_for_zip(
     try:
         file_response, file_url = get_file(request_meta, url_info, iiif_url, metadata)
         handle_file_response_codes(file_response, file_url)
-    except ImmediateHttpResponse:
+    except ImmediateHttpResponse as e:
+        log.exception(
+            f"HTTP Exception while retrieving {iiif_url} from the source system: ({e.response.content})"
+        )
         info_txt_contents += (
             f"Not included in this zip because an error occurred "
             f"while getting it from the source system\n"
         )
         return info_txt_contents
-    except Exception:
-        log.exception(f"Exception while retrieving {iiif_url} from the source system.")
+    except Exception as e:
+        log.exception(
+            f"Exception while retrieving {iiif_url} from the source system: ({e})."
+        )
         info_txt_contents += (
             f"Not included in this zip because an error occurred "
             f"while getting it from the source system\n"
