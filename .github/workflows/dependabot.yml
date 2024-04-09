@@ -17,5 +17,5 @@ jobs:
       timetell_code: 21079  # Timetell project id
       acceptance_pipeline: "https://dev.azure.com/CloudCompetenceCenter/Opdrachten/_build?definitionId=2631"
       production_pipeline: "https://dev.azure.com/CloudCompetenceCenter/Opdrachten/_build?definitionId=2631"
-      acceptance_urls: "https://acc.bouwdossiers.amsterdam.nl/iiif-metadata/bouwdossier/"
-      production_urls: "https://bouwdossiers.amsterdam.nl/iiif-metadata/bouwdossier/"
+      acceptance_urls: "https://acc.dataportaal.amsterdam.nl/data/bouwdossiers/bouwdossier/SJ93/?center=52.369701%2C4.8632354&term=Baarsjesweg+36%2C+1057HL+Amsterdam&zoom=14"
+      production_urls: "https://data.amsterdam.nl/data/bouwdossiers/bouwdossier/SJ93/?center=52.369701%2C4.8632354&term=Baarsjesweg+36%2C+1057HL+Amsterdam&zoom=14"
