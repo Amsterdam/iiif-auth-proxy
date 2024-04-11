@@ -142,7 +142,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "authorization_django.authorization_middleware",
-    "opencensus.ext.django.middleware.OpencensusMiddleware",
 ]
 
 ROOT_URLCONF = "main.urls"
@@ -275,10 +274,14 @@ APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv(
 )
 
 if APPLICATIONINSIGHTS_CONNECTION_STRING:
+    MIDDLEWARE.append("opencensus.ext.django.middleware.OpencensusMiddleware")
     OPENCENSUS = {
         "TRACE": {
             "SAMPLER": "opencensus.trace.samplers.ProbabilitySampler(rate=1)",
-            "EXPORTER": f"opencensus.ext.azure.trace_exporter.AzureExporter(connection_string='{APPLICATIONINSIGHTS_CONNECTION_STRING}')",
+            "EXPORTER": f"""opencensus.ext.azure.trace_exporter.AzureExporter(
+                connection_string='{APPLICATIONINSIGHTS_CONNECTION_STRING}', 
+                service_name='app-iiif-auth-proxy'
+            )""",
         }
     }
     LOGGING["handlers"]["azure"] = {
