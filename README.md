@@ -16,7 +16,7 @@ The name "iiif-auth-proxy" has become kind of a misnomer. Many years ago, it ser
 
 ### Infrastructure overview
 
-![The infrastructure](iiif_infrastructure_v5.png)
+![The infrastructure](iiif_infrastructure_v7.png)
 
 ### Logic
 
