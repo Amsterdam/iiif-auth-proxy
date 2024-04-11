@@ -15,6 +15,7 @@ import sys
 from distutils.util import strtobool
 
 from corsheaders.defaults import default_headers
+from opencensus.trace import config_integration
 
 from .azure_settings import Azure
 
@@ -293,3 +294,5 @@ if APPLICATIONINSIGHTS_CONNECTION_STRING:
     LOGGING["loggers"]["django.request"]["handlers"].append("azure")
     LOGGING["loggers"]["main"]["handlers"].append("azure")
     LOGGING["loggers"]["bouwdossiers-auth-proxy"]["handlers"].append("azure")
+
+    config_integration.trace_integrations(["logging"])
