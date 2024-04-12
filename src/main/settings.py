@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
+import json
 import os
 import sys
 from distutils.util import strtobool
@@ -221,6 +222,10 @@ STATIC_URL = "/static/"
 
 
 # Django Logging settings
+base_log_fmt = {"time": "%(asctime)s", "name": "%(name)s", "level": "%(levelname)s"}
+log_fmt = base_log_fmt.copy()
+log_fmt["message"] = "%(message)s"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -229,25 +234,25 @@ LOGGING = {
         "handlers": ["console"],
     },
     "formatters": {
-        "console": {"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"},
+        "json": {"format": json.dumps(log_fmt)},
     },
     "handlers": {
         "console": {
             "level": "INFO",
             "class": "logging.StreamHandler",
-            "formatter": "console",
+            "formatter": "json",
         },
     },
     "loggers": {
-        "bouwdossiers-auth-proxy": {
+        "iiif": {
             "level": "WARNING",
             "handlers": ["console"],
-            "propagate": True,
+            "propagate": False,
         },
         "main": {
             "level": "WARNING",
             "handlers": ["console"],
-            "propagate": True,
+            "propagate": False,
         },
         "django": {
             "handlers": ["console"],
@@ -262,11 +267,16 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
-        "azure.core.pipeline.policies.http_logging_policy": {
+        "opencensus": {
             "handlers": ["console"],
             "level": "WARNING",
             "propagate": False
-        }
+        },
+        "azure.core.pipeline.policies.http_logging_policy": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
     },
 }
 
@@ -285,14 +295,13 @@ if APPLICATIONINSIGHTS_CONNECTION_STRING:
             )""",
         }
     }
+    config_integration.trace_integrations(["logging"])
     LOGGING["handlers"]["azure"] = {
         "level": "DEBUG",
         "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
         "connection_string": APPLICATIONINSIGHTS_CONNECTION_STRING,
+        "formatter": "json"
     }
-    LOGGING["loggers"]["django"]["handlers"].append("azure")
-    LOGGING["loggers"]["django.request"]["handlers"].append("azure")
-    LOGGING["loggers"]["main"]["handlers"].append("azure")
-    LOGGING["loggers"]["bouwdossiers-auth-proxy"]["handlers"].append("azure")
-
-    config_integration.trace_integrations(["logging"])
+    LOGGING["root"]["handlers"] = ["azure"]
+    for logger_name, logger_details in LOGGING["loggers"].items():
+        LOGGING["loggers"][logger_name]["handlers"].append("azure")
