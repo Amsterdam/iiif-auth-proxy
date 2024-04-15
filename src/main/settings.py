@@ -302,6 +302,6 @@ if APPLICATIONINSIGHTS_CONNECTION_STRING:
         "connection_string": APPLICATIONINSIGHTS_CONNECTION_STRING,
         "formatter": "json"
     }
-    LOGGING["root"]["handlers"] = ["azure"]
+    LOGGING["root"]["handlers"].append("azure")
     for logger_name, logger_details in LOGGING["loggers"].items():
         LOGGING["loggers"][logger_name]["handlers"].append("azure")
