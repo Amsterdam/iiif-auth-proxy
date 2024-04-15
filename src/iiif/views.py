@@ -12,10 +12,10 @@ from iiif.image_handling import crop_image, generate_info_json, scale_image
 from iiif.metadata import get_metadata
 
 log = logging.getLogger(__name__)
-
+HOUR = 3600
 
 @csrf_exempt
-@cache_control(private=True, max_age=3600)
+@cache_control(private=True, max_age=HOUR*36)
 def index(request, iiif_url):
     try:
         authentication.check_auth_availability(request)

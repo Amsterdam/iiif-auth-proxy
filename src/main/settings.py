@@ -32,11 +32,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 APP_BASE_URL = os.getenv("APP_BASE_URL", "https://bouwdossiers.amsterdam.nl/")
 ALLOWED_HOSTS = ["*"]
 
-CORS_ALLOWED_ORIGINS = os.getenv("CORS_DOMAINS", '').split(',')
-CORS_ALLOW_METHODS = ("GET","POST",)
-CORS_ALLOW_HEADERS = [
-    *default_headers,
-]
+if CORS_DOMAINS := os.getenv("CORS_DOMAINS", ""):
+    CORS_ALLOWED_ORIGINS = CORS_DOMAINS.split(",")
+    CORS_ALLOW_METHODS = (
+        "GET",
+        "POST",
+    )
+    CORS_ALLOW_HEADERS = [
+        *default_headers,
+    ]
 
 METADATA_SERVER_BASE_URL = os.getenv(
     "METADATA_SERVER_BASE_URL",
