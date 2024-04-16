@@ -8,6 +8,9 @@ from PIL import Image
 
 from iiif import utils
 
+# Allow larger images too be processed. We can do this because we trust the source of the images
+Image.MAX_IMAGE_PIXELS = None
+
 log = logging.getLogger(__name__)
 
 MALFORMED_SCALING_PARAMETER = "The scaling parameter is malformed. It should either be 'full' or in the form of '100,50'."
