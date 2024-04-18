@@ -66,11 +66,11 @@ WABO_BASE_URL = os.getenv(
     "WABO_BASE_URL", "https://bwt.hs3-saa-bwt.shcp04.archivingondemand.nl/rest/"
 )
 EDEPOT_AUTHORIZATION = os.getenv("EDEPOT_AUTHORIZATION", "dummy")
-WABO_AUTHORIZATION = os.getenv('WABO_AUTHORIZATION', 'dummy')
+WABO_AUTHORIZATION = os.getenv("WABO_AUTHORIZATION", "dummy")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ALGORITHM = "HS256"
-AZURITE_STORAGE_CONNECTION_STRING = os.getenv('AZURITE_STORAGE_CONNECTION_STRING')
-AZURITE_QUEUE_CONNECTION_STRING = os.getenv('AZURITE_QUEUE_CONNECTION_STRING')
+AZURITE_STORAGE_CONNECTION_STRING = os.getenv("AZURITE_STORAGE_CONNECTION_STRING")
+AZURITE_QUEUE_CONNECTION_STRING = os.getenv("AZURITE_QUEUE_CONNECTION_STRING")
 STORAGE_ACCOUNT_URL = os.getenv("STORAGE_ACCOUNT_URL")
 QUEUE_ACCOUNT_URL = os.getenv("QUEUE_ACCOUNT_URL")
 ZIP_QUEUE_NAME = "zip-queue"
@@ -271,11 +271,7 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
-        "opencensus": {
-            "handlers": ["console"],
-            "level": "WARNING",
-            "propagate": False
-        },
+        "opencensus": {"handlers": ["console"], "level": "WARNING", "propagate": False},
         "azure.core.pipeline.policies.http_logging_policy": {
             "handlers": ["console"],
             "level": "WARNING",
@@ -304,7 +300,7 @@ if APPLICATIONINSIGHTS_CONNECTION_STRING:
         "level": "DEBUG",
         "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
         "connection_string": APPLICATIONINSIGHTS_CONNECTION_STRING,
-        "formatter": "json"
+        "formatter": "json",
     }
     LOGGING["root"]["handlers"].append("azure")
     for logger_name, logger_details in LOGGING["loggers"].items():

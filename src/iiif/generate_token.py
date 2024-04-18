@@ -28,7 +28,7 @@ def create_authz_token(scopes=None):
     now = int(time.time())
     header = {
         "alg": "ES256",
-        "kid": key.key_id
+        "kid": key.key_id,
         # 'kid': 'abcd5678'
     }
     claims = {

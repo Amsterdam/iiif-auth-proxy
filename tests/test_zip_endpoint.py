@@ -91,7 +91,6 @@ class TestZipEndpoint:
         assert data["email_address"] == "zip@amsterdam.nl"
         assert len(data["urls"]) == 3
         assert "request_meta" in data
-        
 
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_authz_token(self, mock_do_metadata_request, client):

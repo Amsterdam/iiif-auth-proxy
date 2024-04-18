@@ -1,6 +1,5 @@
 import logging
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from iiif.queue_zip_consumer import AzureZipQueueConsumer

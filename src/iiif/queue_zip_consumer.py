@@ -4,7 +4,6 @@ import os
 import time
 
 import timeout_decorator
-from django.conf import settings
 from django.template.loader import render_to_string
 
 from iiif import authentication, image_server, mailing, utils, zip_tools
@@ -14,10 +13,10 @@ from iiif.utils_azure import (
     get_queue_client,
     store_object_on_storage_account,
 )
-from main import settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class TimeoutError(Exception):
     pass
@@ -38,7 +37,7 @@ class AzureZipQueueConsumer:
         properties = self.queue_client.get_queue_properties()
         count = properties.approximate_message_count
         return count
-    
+
     def run(self):
         while True:
 
@@ -47,7 +46,12 @@ class AzureZipQueueConsumer:
 
             if self.end_at_empty_queue:
                 # This part is only for testing purposes. To be able to exit the running process when the queue is empty.
-                message_iterator = [m for m in self.queue_client.receive_messages(messages_per_page=10, visibility_timeout=5)]
+                message_iterator = [
+                    m
+                    for m in self.queue_client.receive_messages(
+                        messages_per_page=10, visibility_timeout=5
+                    )
+                ]
                 if count == 0 or len(message_iterator) == 0:
                     break
 
@@ -117,9 +121,13 @@ class AzureZipQueueConsumer:
             )
             zip_file_name = os.path.basename(zip_file_path)
 
-            blob_client, blob_service_client = store_object_on_storage_account(zip_file_path, zip_file_name)
+            blob_client, blob_service_client = store_object_on_storage_account(
+                zip_file_path, zip_file_name
+            )
 
-            temp_zip_download_url = create_storage_account_temp_url(blob_client, blob_service_client)
+            temp_zip_download_url = create_storage_account_temp_url(
+                blob_client, blob_service_client
+            )
 
             email_subject = "Downloadlink Bouw- en omgevingdossiers"
             email_body = render_to_string(

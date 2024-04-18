@@ -42,9 +42,7 @@ def create_file_url_and_headers(url_info, metadata):
 
 
 def get_image_from_server(file_url, headers):
-    return requests.get(
-        file_url, headers=headers, verify=False, timeout=(15, 25)
-    )
+    return requests.get(file_url, headers=headers, verify=False, timeout=(15, 25))
 
 
 def get_file(request_meta, url_info, iiif_url, metadata):
