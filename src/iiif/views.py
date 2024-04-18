@@ -14,8 +14,9 @@ from iiif.metadata import get_metadata
 log = logging.getLogger(__name__)
 HOUR = 3600
 
+
 @csrf_exempt
-@cache_control(private=True, max_age=HOUR*36)
+@cache_control(private=True, max_age=HOUR * 36)
 def index(request, iiif_url):
     try:
         authentication.check_auth_availability(request)
