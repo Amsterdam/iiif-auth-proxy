@@ -5,20 +5,22 @@ from pathlib import Path
 from uuid import uuid4
 from zipfile import ZipFile
 
+from iiif.queue_zip_consumer import AzureZipQueueConsumer
 from iiif.utils_azure import get_queue_client
 
 TMP_BOUWDOSSIER_ZIP_FOLDER = "/tmp/bouwdossier-zips/"
 
 
-def store_zip_job(zip_info):
-    # There's a lot of things in the request_meta that is not JSON serializable.
-    # Since we just need some headers we simply remove all values that are not strings
-    zip_info["request_meta"] = {
-        k: v for k, v in zip_info["request_meta"].items() if type(v) is str
-    }
+def store_zip_job(job_name):
+    zip_job = json.dumps(
+        {
+            "version": AzureZipQueueConsumer.MESSAGE_VERSION_NAME,
+            "data": job_name,
+        }
+    )
 
     queue_client = get_queue_client()
-    queue_client.send_message(json.dumps(zip_info))
+    queue_client.send_message(zip_job)
 
 
 def create_tmp_folder():

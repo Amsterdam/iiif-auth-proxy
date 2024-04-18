@@ -1,4 +1,6 @@
+import json
 import logging
+import uuid
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -10,6 +12,7 @@ from django_ratelimit.decorators import ratelimit
 from iiif import authentication, image_server, mailing, parsing, utils, zip_tools
 from iiif.image_handling import crop_image, generate_info_json, scale_image
 from iiif.metadata import get_metadata
+from iiif.utils_azure import store_blob_on_storage_account
 
 log = logging.getLogger(__name__)
 HOUR = 3600
@@ -135,7 +138,20 @@ def request_multiple_files_in_zip(request):
     # It does NOT mean that the metadata exists or that the user is allowed to access all the files. This will
     # be checked in the consumer. We now proceed with storing the info as a zip job so that a zip worker
     # can pick it up.
-    zip_tools.store_zip_job(zip_info)
+
+    # Zip_info is too large for the request body (hard limit by Azure). So we use the claim check pattern.
+    # First, the jobs/zip_info is stored as a blob in the storage_account. Then we send a reference to the blob to the queue
+    blob_name = str(uuid.uuid4())
+    zip_job = json.dumps(
+        {
+            key: zip_info[key]
+            for key in ["email_address", "scope", "is_mail_login", "urls"]
+        }
+    )
+    store_blob_on_storage_account(
+        settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME, blob_name, zip_job
+    )
+    zip_tools.store_zip_job(blob_name)
 
     # Respond with a 200 to signal success.
     # The user will get an email once the files have been zipped by a worker.

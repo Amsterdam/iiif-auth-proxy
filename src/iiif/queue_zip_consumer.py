@@ -4,14 +4,17 @@ import os
 import time
 
 import timeout_decorator
+from django.conf import settings
 from django.template.loader import render_to_string
 
 from iiif import authentication, image_server, mailing, utils, zip_tools
 from iiif.metadata import get_metadata
 from iiif.utils_azure import (
     create_storage_account_temp_url,
+    get_blob_from_storage_account,
     get_queue_client,
-    store_object_on_storage_account,
+    remove_blob_from_storage_account,
+    store_file_on_storage_account,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -28,6 +31,9 @@ class AzureZipQueueConsumer:
     # messages!!! Always use a timeout decorator to prevent this.
     # We set it to an hour, because some zips can simply be very very large
     MESSAGE_VISIBILITY_TIMEOUT = 3600
+
+    # This consumer accepts messages with this name
+    MESSAGE_VERSION_NAME = "zip_job_v1"
 
     def __init__(self, end_at_empty_queue=False):
         self.queue_client = get_queue_client()
@@ -73,7 +79,16 @@ class AzureZipQueueConsumer:
 
         logger.info("Started process_message")
         try:
-            record = json.loads(message.content)
+            job = json.loads(message.content)
+            if not job["version"] == self.MESSAGE_VERSION_NAME:
+                return
+
+            # Get the job from the storage account
+            job_blob_name = job["data"]
+            blob_client, blob = get_blob_from_storage_account(
+                settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME, job_blob_name
+            )
+            record = json.loads(blob)
 
             # Prepare folder and report.txt file for downloads
             (
@@ -107,7 +122,7 @@ class AzureZipQueueConsumer:
                     image_info["url_info"],
                     fail_reason,
                     metadata,
-                    record["request_meta"],
+                    None,  # TODO: Remove parameter because not needed anymore (was: record["request_meta"])
                     tmp_folder_path,
                 )
             # Store the info_file_along_with_the_image_files
@@ -121,8 +136,8 @@ class AzureZipQueueConsumer:
             )
             zip_file_name = os.path.basename(zip_file_path)
 
-            blob_client, blob_service_client = store_object_on_storage_account(
-                zip_file_path, zip_file_name
+            blob_client, blob_service_client = store_file_on_storage_account(
+                settings.STORAGE_ACCOUNT_CONTAINER_NAME, zip_file_path, zip_file_name
             )
 
             temp_zip_download_url = create_storage_account_temp_url(
@@ -133,8 +148,12 @@ class AzureZipQueueConsumer:
             email_body = render_to_string(
                 "download_zip.html", {"temp_zip_download_url": temp_zip_download_url}
             )
+
             mailing.send_email(record["email_address"], email_subject, email_body)
 
+            remove_blob_from_storage_account(
+                settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME, job_blob_name
+            )
             zip_tools.cleanup_local_files(zip_file_path, tmp_folder_path)
 
         except Exception as e:
