@@ -56,11 +56,9 @@ def get_blob_client(container_name, blob_name):
     return blob_client, blob_service_client
 
 
-def store_object_on_storage_account(local_zip_file_path, filename):
-    blob_client, blob_service_client = get_blob_client(
-        settings.STORAGE_ACCOUNT_CONTAINER_NAME, filename
-    )
-    with open(file=local_zip_file_path, mode="rb") as data:
+def store_file_on_storage_account(storage_container, local_file_path, blob_name):
+    blob_client, blob_service_client = get_blob_client(storage_container, blob_name)
+    with open(file=local_file_path, mode="rb") as data:
         blob_client.upload_blob(data)
     return blob_client, blob_service_client
 
