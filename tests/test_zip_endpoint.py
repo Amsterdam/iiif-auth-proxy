@@ -1,10 +1,11 @@
 import json
 import logging
 import os
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 import pytest
 import pytz
+from azure.core.exceptions import ResourceNotFoundError
 from django.conf import settings
 
 from iiif.authentication import (
@@ -15,7 +16,7 @@ from iiif.authentication import (
 )
 from iiif.generate_token import create_authz_token
 from iiif.queue_zip_consumer import AzureZipQueueConsumer
-from iiif.utils_azure import get_container_client, get_queue_client
+from iiif.utils_azure import get_blob_from_storage_account, get_queue_client
 from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER
 from tests.test_iiif import (
     IMAGE_BINARY_DATA,
@@ -45,6 +46,7 @@ class TestZipEndpoint:
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE]
         )
 
+        create_blob_container(settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME)
         create_blob_container(settings.STORAGE_ACCOUNT_CONTAINER_NAME)
         create_queue()
         self.queue_client = get_queue_client()
@@ -54,6 +56,12 @@ class TestZipEndpoint:
 
     def get_all_queue_messages(self):
         return [m for m in self.queue_client.receive_messages(max_messages=10000)]
+
+    def get_zip_job(self, blob_name):
+        _, blob = get_blob_from_storage_account(
+            settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME, blob_name
+        )
+        return json.loads(blob)
 
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_jwt_token(self, mock_do_metadata_request, client):
@@ -87,10 +95,49 @@ class TestZipEndpoint:
         assert response.status_code == 200
         messages = self.get_all_queue_messages()
         assert len(messages) == 1
-        data = json.loads(messages[0].content)
+
+        job_name = json.loads(messages[0].content)["name"]
+        data = self.get_zip_job(job_name)
         assert data["email_address"] == "zip@amsterdam.nl"
         assert len(data["urls"]) == 3
-        assert "request_meta" in data
+
+    @patch("iiif.metadata.do_metadata_request")
+    def test_get_many_public_images(self, mock_do_metadata_request, client):
+        num_dossiers = 1000
+        # Set up mock metadata response
+        mock_do_metadata_request.return_value = MockResponse(
+            200,
+            json_content={
+                "access": settings.ACCESS_PUBLIC,
+                "documenten": [
+                    {"barcode": "ST00000126", "access": settings.ACCESS_PUBLIC},
+                    {"barcode": "SQ10079651", "access": settings.ACCESS_PUBLIC},
+                    {"barcode": "SQ10092307", "access": settings.ACCESS_PUBLIC},
+                ],
+            },
+        )
+        # Request two images
+        response = client.post(
+            self.url + "?auth=" + self.mail_login_token,
+            json.dumps(
+                {
+                    "urls": [
+                        self.BASE_URL + PRE_WABO_IMG_URL_BASE + f"?q={i}"
+                        for i in range(0, num_dossiers)
+                    ]
+                }
+            ),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        messages = self.get_all_queue_messages()
+        assert len(messages) == 1
+
+        job_name = json.loads(messages[0].content)["name"]
+        data = self.get_zip_job(job_name)
+        assert data["email_address"] == "zip@amsterdam.nl"
+        assert len(data["urls"]) == num_dossiers
 
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_authz_token(self, mock_do_metadata_request, client):
@@ -130,10 +177,11 @@ class TestZipEndpoint:
         assert response.status_code == 200
         messages = self.get_all_queue_messages()
         assert len(messages) == 1
-        data = json.loads(messages[0].content)
+
+        job_name = json.loads(messages[0].content)["name"]
+        data = self.get_zip_job(job_name)
         assert data["email_address"] == "authztest@amsterdam.nl"
         assert len(data["urls"]) == 3
-        assert "request_meta" in data
 
     def test_other_methods_than_post_fail(self, client):
         response = client.get(self.url + "?auth=" + self.mail_login_token)
@@ -386,6 +434,10 @@ class TestZipEndpoint:
 
         assert response.status_code == 200
 
+        messages = [m for m in self.queue_client.peek_messages()]
+        assert len(messages) == 1
+        job_name = json.loads(messages[0].content)["name"]
+
         # Then run the parser
         consumer = AzureZipQueueConsumer(end_at_empty_queue=True)
         consumer.run()
@@ -411,6 +463,13 @@ class TestZipEndpoint:
             f"{TMP_BOUWDOSSIER_ZIP_FOLDER}{tmp_contents[0]}/report.txt", "r"
         ) as f:
             assert f.readlines()[-1].endswith(expected_line_end + "\n")
+
+        # Check whether an email was send
+        mock_send_email.method_called_with("zip@amsterdam.nl", ANY, ANY)
+
+        # Check whether the zip job blob was removed
+        with pytest.raises(ResourceNotFoundError):
+            self.get_zip_job(job_name)
 
         # Cleanup so that other tests are not influenced
         os.system(f"rm -rf {TMP_BOUWDOSSIER_ZIP_FOLDER}*")

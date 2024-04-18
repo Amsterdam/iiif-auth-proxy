@@ -65,6 +65,29 @@ def store_object_on_storage_account(local_zip_file_path, filename):
     return blob_client, blob_service_client
 
 
+def store_blob_on_storage_account(storage_container, blob_name, blob):
+    blob_client, blob_service_client = get_blob_client(
+        container_name=storage_container, blob_name=blob_name
+    )
+    blob_client.upload_blob(blob, overwrite=True)
+    return blob_client, blob_service_client
+
+
+def get_blob_from_storage_account(storage_container, blob_name):
+    blob_client, _ = get_blob_client(
+        container_name=storage_container, blob_name=blob_name
+    )
+    blob = blob_client.download_blob().readall()
+    return blob_client, blob
+
+
+def remove_blob_from_storage_account(storage_container, blob_name):
+    blob_client, _ = get_blob_client(
+        container_name=storage_container, blob_name=blob_name
+    )
+    blob_client.delete_blob()
+
+
 def create_storage_account_temp_url(
     blob_client, blob_service_client, expiry_days=settings.TEMP_URL_EXPIRY_DAYS
 ):
