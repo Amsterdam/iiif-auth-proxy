@@ -32,6 +32,9 @@ class AzureZipQueueConsumer:
     # We set it to an hour, because some zips can simply be very very large
     MESSAGE_VISIBILITY_TIMEOUT = 3600
 
+    # This consumer accepts messages with this name
+    MESSAGE_VERSION_NAME = "zip_job_v1"
+
     def __init__(self, end_at_empty_queue=False):
         self.queue_client = get_queue_client()
         self.end_at_empty_queue = end_at_empty_queue
@@ -77,11 +80,11 @@ class AzureZipQueueConsumer:
         logger.info("Started process_message")
         try:
             job = json.loads(message.content)
-            if not job["type"] == "zip_job_v1":
+            if not job["version"] == self.MESSAGE_VERSION_NAME:
                 return
 
             # Get the job from the storage account
-            job_blob_name = job["name"]
+            job_blob_name = job["data"]
             blob_client, blob = get_blob_from_storage_account(
                 settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME, job_blob_name
             )

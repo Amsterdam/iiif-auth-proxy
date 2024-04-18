@@ -96,7 +96,7 @@ class TestZipEndpoint:
         messages = self.get_all_queue_messages()
         assert len(messages) == 1
 
-        job_name = json.loads(messages[0].content)["name"]
+        job_name = json.loads(messages[0].content)["data"]
         data = self.get_zip_job(job_name)
         assert data["email_address"] == "zip@amsterdam.nl"
         assert len(data["urls"]) == 3
@@ -134,7 +134,7 @@ class TestZipEndpoint:
         messages = self.get_all_queue_messages()
         assert len(messages) == 1
 
-        job_name = json.loads(messages[0].content)["name"]
+        job_name = json.loads(messages[0].content)["data"]
         data = self.get_zip_job(job_name)
         assert data["email_address"] == "zip@amsterdam.nl"
         assert len(data["urls"]) == num_dossiers
@@ -178,7 +178,7 @@ class TestZipEndpoint:
         messages = self.get_all_queue_messages()
         assert len(messages) == 1
 
-        job_name = json.loads(messages[0].content)["name"]
+        job_name = json.loads(messages[0].content)["data"]
         data = self.get_zip_job(job_name)
         assert data["email_address"] == "authztest@amsterdam.nl"
         assert len(data["urls"]) == 3
@@ -436,7 +436,7 @@ class TestZipEndpoint:
 
         messages = [m for m in self.queue_client.peek_messages()]
         assert len(messages) == 1
-        job_name = json.loads(messages[0].content)["name"]
+        job_name = json.loads(messages[0].content)["data"]
 
         # Then run the parser
         consumer = AzureZipQueueConsumer(end_at_empty_queue=True)
