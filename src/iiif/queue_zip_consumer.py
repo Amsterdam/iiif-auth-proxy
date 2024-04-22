@@ -33,7 +33,7 @@ class AzureZipQueueConsumer:
     MESSAGE_VISIBILITY_TIMEOUT = 3600
 
     # This consumer accepts messages with this name
-    MESSAGE_VERSION_NAME = "zip_job_v1"
+    MESSAGE_VERSION_NAME = zip_tools.ZIP_MESSAGE_VERSION_NAME
 
     def __init__(self, end_at_empty_queue=False):
         self.queue_client = get_queue_client()

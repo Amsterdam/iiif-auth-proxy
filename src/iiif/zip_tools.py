@@ -5,16 +5,16 @@ from pathlib import Path
 from uuid import uuid4
 from zipfile import ZipFile
 
-from iiif.queue_zip_consumer import AzureZipQueueConsumer
 from iiif.utils_azure import get_queue_client
 
 TMP_BOUWDOSSIER_ZIP_FOLDER = "/tmp/bouwdossier-zips/"
+ZIP_MESSAGE_VERSION_NAME = "zip_job_v1"
 
 
 def store_zip_job(job_name):
     zip_job = json.dumps(
         {
-            "version": AzureZipQueueConsumer.MESSAGE_VERSION_NAME,
+            "version": ZIP_MESSAGE_VERSION_NAME,
             "data": job_name,
         }
     )
