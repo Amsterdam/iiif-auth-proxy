@@ -12,6 +12,7 @@ pytest
 pytest-cov
 pytest-django
 time-machine
+pytz
 
 isort
 autoflake
