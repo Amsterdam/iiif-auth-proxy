@@ -14,17 +14,17 @@ argcomplete==3.1.6
     # via
     #   azure-cli-core
     #   knack
-asgiref==3.7.2
+asgiref==3.8.1
     # via
     #   django
     #   django-cors-headers
 azure-appconfiguration==1.1.1
     # via azure-cli
-azure-batch==14.0.0
+azure-batch==14.1.0
     # via azure-cli
-azure-cli==2.57.0
+azure-cli==2.59.0
     # via -r requirements.in
-azure-cli-core==2.57.0
+azure-cli-core==2.59.0
     # via azure-cli
 azure-cli-telemetry==1.1.0
     # via azure-cli-core
@@ -104,7 +104,7 @@ azure-common==1.1.28
     #   azure-synapse-artifacts
     #   azure-synapse-managedprivateendpoints
     #   azure-synapse-spark
-azure-core==1.30.0
+azure-core==1.30.1
     # via
     #   -r requirements.in
     #   azure-appconfiguration
@@ -165,7 +165,7 @@ azure-mgmt-applicationinsights==1.0.0
     # via azure-cli
 azure-mgmt-authorization==4.0.0
     # via azure-cli
-azure-mgmt-batch==17.0.0
+azure-mgmt-batch==17.2.0
     # via azure-cli
 azure-mgmt-batchai==7.0.0b1
     # via azure-cli
@@ -177,13 +177,13 @@ azure-mgmt-cdn==12.0.0
     # via azure-cli
 azure-mgmt-cognitiveservices==13.5.0
     # via azure-cli
-azure-mgmt-compute==30.4.0
+azure-mgmt-compute==30.6.0
     # via azure-cli
 azure-mgmt-containerinstance==10.1.0
     # via azure-cli
-azure-mgmt-containerregistry==10.1.0
+azure-mgmt-containerregistry==10.3.0
     # via azure-cli
-azure-mgmt-containerservice==29.0.0
+azure-mgmt-containerservice==29.1.0
     # via azure-cli
 azure-mgmt-core==1.4.0
     # via
@@ -305,7 +305,7 @@ azure-mgmt-policyinsights==1.1.0b4
     # via azure-cli
 azure-mgmt-privatedns==1.0.0
     # via azure-cli
-azure-mgmt-rdbms==10.2.0b14
+azure-mgmt-rdbms==10.2.0b16
     # via azure-cli
 azure-mgmt-recoveryservices==2.5.0
     # via azure-cli
@@ -325,7 +325,7 @@ azure-mgmt-servicebus==8.2.0
     # via azure-cli
 azure-mgmt-servicefabric==1.0.0
     # via azure-cli
-azure-mgmt-servicefabricmanagedclusters==1.0.0
+azure-mgmt-servicefabricmanagedclusters==2.0.0b6
     # via azure-cli
 azure-mgmt-servicelinker==1.2.0b1
     # via azure-cli
@@ -349,7 +349,7 @@ azure-multiapi-storage==1.2.0
     # via azure-cli
 azure-nspkg==3.0.2
     # via azure-mgmt-nspkg
-azure-storage-blob==12.19.0
+azure-storage-blob==12.19.1
     # via -r requirements.in
 azure-storage-common==1.4.2
     # via azure-cli
@@ -365,7 +365,7 @@ azure-synapse-spark==0.2.0
     # via azure-cli
 bcrypt==4.1.2
     # via paramiko
-cachetools==5.3.2
+cachetools==5.3.3
     # via google-auth
 certifi==2024.2.2
     # via
@@ -382,7 +382,7 @@ charset-normalizer==3.3.2
     # via requests
 colorama==0.4.6
     # via azure-cli
-cryptography==42.0.4
+cryptography==42.0.5
     # via
     #   adal
     #   azure-cli-core
@@ -399,7 +399,7 @@ cryptography==42.0.4
     #   pyopenssl
 datapunt-authorization-django==1.3.3
     # via -r requirements.in
-debtcollector==2.5.0
+debtcollector==3.0.0
     # via
     #   oslo-config
     #   oslo-utils
@@ -426,15 +426,15 @@ django-ratelimit==4.1.0
     # via -r requirements.in
 fabric==3.2.2
     # via azure-cli
-google-api-core==2.17.1
+google-api-core==2.18.0
     # via opencensus
-google-auth==2.28.1
+google-auth==2.29.0
     # via google-api-core
-googleapis-common-protos==1.62.0
+googleapis-common-protos==1.63.0
     # via google-api-core
 humanfriendly==10.0
     # via azure-cli-core
-idna==3.6
+idna==3.7
     # via requests
 invoke==2.2.0
     # via fabric
@@ -451,9 +451,11 @@ isodate==0.6.1
     #   azure-mgmt-apimanagement
     #   azure-mgmt-appconfiguration
     #   azure-mgmt-authorization
+    #   azure-mgmt-batch
     #   azure-mgmt-cognitiveservices
     #   azure-mgmt-compute
     #   azure-mgmt-containerinstance
+    #   azure-mgmt-containerregistry
     #   azure-mgmt-containerservice
     #   azure-mgmt-cosmosdb
     #   azure-mgmt-imagebuilder
@@ -468,6 +470,7 @@ isodate==0.6.1
     #   azure-mgmt-resource
     #   azure-mgmt-search
     #   azure-mgmt-security
+    #   azure-mgmt-servicefabricmanagedclusters
     #   azure-mgmt-signalr
     #   azure-mgmt-sql
     #   azure-mgmt-storage
@@ -485,13 +488,13 @@ jmespath==1.0.1
     #   knack
 jsondiff==2.0.0
     # via azure-cli
-jwcrypto==1.5.4
+jwcrypto==1.5.6
     # via datapunt-authorization-django
-keystoneauth1==5.5.0
+keystoneauth1==5.6.0
     # via python-keystoneclient
 knack==0.11.0
     # via azure-cli-core
-msal[broker]==1.26.0
+msal[broker]==1.27.0
     # via
     #   azure-cli-core
     #   azure-datalake-store
@@ -501,7 +504,7 @@ msal-extensions==1.0.0
     # via
     #   azure-cli-core
     #   azure-identity
-msgpack==1.0.7
+msgpack==1.0.8
     # via oslo-serialization
 msrest==0.7.1
     # via
@@ -511,12 +514,10 @@ msrest==0.7.1
     #   azure-mgmt-advisor
     #   azure-mgmt-appcontainers
     #   azure-mgmt-applicationinsights
-    #   azure-mgmt-batch
     #   azure-mgmt-batchai
     #   azure-mgmt-billing
     #   azure-mgmt-botservice
     #   azure-mgmt-cdn
-    #   azure-mgmt-containerregistry
     #   azure-mgmt-databoxedge
     #   azure-mgmt-datamigration
     #   azure-mgmt-devtestlabs
@@ -540,7 +541,6 @@ msrest==0.7.1
     #   azure-mgmt-privatedns
     #   azure-mgmt-servicebus
     #   azure-mgmt-servicefabric
-    #   azure-mgmt-servicefabricmanagedclusters
     #   azure-mgmt-servicelinker
     #   azure-mgmt-sqlvirtualmachine
     #   azure-mgmt-synapse
@@ -550,7 +550,7 @@ msrest==0.7.1
     #   azure-synapse-managedprivateendpoints
     #   azure-synapse-spark
     #   msrestazure
-msrestazure==0.6.4
+msrestazure==0.6.4.post1
     # via
     #   azure-batch
     #   azure-cli-core
@@ -588,20 +588,20 @@ opencensus-ext-requests==0.8.0
     # via -r requirements.in
 os-service-types==1.7.0
     # via keystoneauth1
-oslo-config==9.3.0
+oslo-config==9.4.0
     # via python-keystoneclient
-oslo-i18n==6.2.0
+oslo-i18n==6.3.0
     # via
     #   oslo-config
     #   oslo-utils
     #   python-keystoneclient
-oslo-serialization==5.3.0
+oslo-serialization==5.4.0
     # via python-keystoneclient
-oslo-utils==7.0.0
+oslo-utils==7.1.0
     # via
     #   oslo-serialization
     #   python-keystoneclient
-packaging==23.2
+packaging==24.0
     # via
     #   azure-cli
     #   azure-cli-core
@@ -624,16 +624,19 @@ pbr==6.0.0
     #   stevedore
 pillow-simd==9.0.0.post1
     # via -r requirements.in
-pkginfo==1.9.6
+pkginfo==1.10.0
     # via azure-cli-core
 portalocker==2.8.2
     # via
     #   azure-cli-telemetry
     #   msal-extensions
+proto-plus==1.23.0
+    # via google-api-core
 protobuf==4.25.3
     # via
     #   google-api-core
     #   googleapis-common-protos
+    #   proto-plus
 psutil==5.9.8
     # via
     #   azure-cli-core
@@ -642,15 +645,15 @@ psycopg2-binary==2.9.9
     # via
     #   -r requirements.in
     #   opencensus-ext-postgresql
-pyasn1==0.5.1
+pyasn1==0.6.0
     # via
     #   pyasn1-modules
     #   rsa
-pyasn1-modules==0.3.0
+pyasn1-modules==0.4.0
     # via google-auth
 pycomposefile==0.0.30
     # via azure-cli
-pycparser==2.21
+pycparser==2.22
     # via cffi
 pygithub==1.59.1
     # via azure-cli
@@ -668,25 +671,21 @@ pynacl==1.5.0
     #   azure-cli
     #   paramiko
     #   pygithub
-pyopenssl==24.0.0
+pyopenssl==24.1.0
     # via azure-cli-core
-pyparsing==3.1.1
+pyparsing==3.1.2
     # via oslo-utils
 pysocks==1.7.1
     # via requests
-python-dateutil==2.8.2
+python-dateutil==2.9.0.post0
     # via
     #   adal
     #   azure-multiapi-storage
     #   azure-storage-common
-python-keystoneclient==5.3.0
+python-keystoneclient==5.4.0
     # via -r requirements.in
-python-swiftclient==4.4.0
+python-swiftclient==4.5.0
     # via -r requirements.in
-pytz==2024.1
-    # via
-    #   oslo-serialization
-    #   oslo-utils
 pyyaml==6.0.1
     # via
     #   knack
@@ -714,7 +713,7 @@ requests[socks]==2.31.0
     #   python-keystoneclient
     #   python-swiftclient
     #   requests-oauthlib
-requests-oauthlib==1.3.1
+requests-oauthlib==2.0.0
     # via msrest
 rfc3986==2.0.0
     # via oslo-config
@@ -735,12 +734,11 @@ six==1.16.0
     #   msrestazure
     #   opencensus
     #   python-dateutil
-    #   python-keystoneclient
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via django
 sshtunnel==0.1.5
     # via azure-cli
-stevedore==5.1.0
+stevedore==5.2.0
     # via
     #   keystoneauth1
     #   oslo-config
@@ -749,7 +747,7 @@ tabulate==0.9.0
     # via knack
 timeout-decorator==0.5.0
     # via -r requirements.in
-typing-extensions==4.9.0
+typing-extensions==4.11.0
     # via
     #   asgiref
     #   azure-core
@@ -780,5 +778,5 @@ xmltodict==0.13.0
     # via azure-cli
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==69.1.0
+setuptools==69.5.1
     # via -r requirements.in
