@@ -17,7 +17,6 @@ from iiif.utils_azure import (
     store_file_on_storage_account,
 )
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -46,7 +45,6 @@ class AzureZipQueueConsumer:
 
     def run(self):
         while True:
-
             count = self.get_queue_length()
             message_iterator = None
 
@@ -157,5 +155,5 @@ class AzureZipQueueConsumer:
             zip_tools.cleanup_local_files(zip_file_path, tmp_folder_path)
 
         except Exception as e:
-            logger.exception("queue_zip_consumer_error:", e)
+            logger.exception(f"queue_zip_consumer error: {e}")
             raise e

@@ -40,6 +40,9 @@ app:
 dev:
 	$(run) --service-ports dev
 
+dev-consume-zips:
+	$(run) --service-ports dev python manage.py consume_zips
+
 test: lint
 	$(run) test pytest $(ARGS)
 
