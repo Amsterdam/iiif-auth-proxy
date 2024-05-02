@@ -15,7 +15,7 @@ from auth_mail.authentication import create_mail_login_token, img_is_public_copy
 from iiif.image_server import create_file_url_and_headers, create_wabo_url
 from iiif.parsing import InvalidIIIFUrlError, get_email_address, get_info_from_iiif_url
 from main.utils import ImmediateHttpResponse
-from tests.test_iiif import (
+from tests.test_settings import (
     PRE_WABO_IMG_URL_NO_SCALING,
     PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
     PRE_WABO_IMG_URL_WITH_REGION,
