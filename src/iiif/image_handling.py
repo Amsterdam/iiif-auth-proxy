@@ -6,7 +6,7 @@ from io import BytesIO
 from django.http import HttpResponse
 from PIL import Image
 
-from iiif import utils
+from main import utils
 
 # Allow larger images too be processed. We can do this because we trust the source of the images
 Image.MAX_IMAGE_PIXELS = None

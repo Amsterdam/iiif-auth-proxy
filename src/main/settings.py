@@ -128,17 +128,24 @@ TEMP_URL_EXPIRY_DAYS = 7
 if TEMP_URL_EXPIRY_DAYS > 7:
     raise ValueError("TEMP_URL_EXPIRY_DAYS must be 7 days or less")
 
-
-INSTALLED_APPS = [
+# Application definition
+DJANGO_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "iiif",
-    "health",
+]
+THIRD_PARTY_APPS = [
     "corsheaders",
 ]
+LOCAL_APPS = [
+    "iiif",
+    "health",
+    "zip_consumer",
+    "auth_mail",
+]
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

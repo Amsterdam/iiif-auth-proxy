@@ -9,7 +9,7 @@ from django.conf import settings
 from django.test import override_settings
 from requests.exceptions import ConnectTimeout, RequestException
 
-from iiif.authentication import (
+from auth_mail.authentication import (
     RESPONSE_CONTENT_COPYRIGHT,
     RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
     RESPONSE_CONTENT_NO_TOKEN,
@@ -17,7 +17,7 @@ from iiif.authentication import (
     RESPONSE_CONTENT_RESTRICTED,
     create_mail_login_token,
 )
-from iiif.generate_token import create_authz_token
+from auth_mail.generate_token import create_authz_token
 from iiif.image_server import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER
 from iiif.metadata import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
 from tests.tools import MockResponse
@@ -666,7 +666,7 @@ class TestFileRetrievalWithMailJWT:
             self.test_email_address, settings.SECRET_KEY
         )
 
-    @patch("iiif.mailing.send_email")
+    @patch("auth_mail.mailing.send_email")
     def test_send_dataportaal_login_url_to_burger_email_address(
         self, mock_send_email, client
     ):
@@ -734,7 +734,7 @@ class TestFileRetrievalWithMailJWT:
         assert response.status_code == 400
 
     @override_settings(LOGIN_ORIGIN_URL_TLD_WHITELIST=["localhost"])
-    @patch("iiif.mailing.send_email")
+    @patch("auth_mail.mailing.send_email")
     def test_request_with_localhost_and_port_in_origin_url_succeeds(
         self, mock_send_email, client
     ):

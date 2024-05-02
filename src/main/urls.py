@@ -18,6 +18,8 @@ from django.urls import include, path
 
 urlpatterns = [
     path("iiif/status/health", include("health.urls")),
+    path("iiif/", include("auth_mail.urls")),
     path("iiif/", include("iiif.urls")),
+    path("iiif/", include("zip_consumer.urls")),
     path("", include("health.urls")),
 ]
