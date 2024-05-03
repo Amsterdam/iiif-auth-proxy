@@ -41,7 +41,19 @@ def create_file_url_and_headers(url_info, metadata):
         return iiif_image_url, {"Authorization": settings.WABO_AUTHORIZATION}
 
 
+# For develop/test environments where we don't have access to the upstream server
+def get_image_from_mock_server():
+    response = requests.Response()
+    response.status_code = 200
+    with open(settings.STATIC_IMAGE, "rb") as f:
+        response._content = f.read()
+    response.headers["Content-Type"] = "image/png"
+    return response
+
+
 def get_image_from_server(file_url, headers):
+    if settings.MOCK_GET_IMAGE_FROM_SERVER:
+        return get_image_from_mock_server()
     return requests.get(file_url, headers=headers, verify=False, timeout=(15, 25))
 
 
