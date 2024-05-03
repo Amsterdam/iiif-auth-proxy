@@ -10,19 +10,19 @@
 
 version: "3.5"
 services:
-  database-iiif-auth-proxy:
+  auth-proxy-database:
     ports:
       - "5415:5432"		# allows to run database on different port on host
 
-  app:
+  auth-proxy-app:
     ports:
       - "8080:8000"		# allows to run app on different port on host
     user: 1001:1001		# set current user id so it has access to mounted volumes
 
-  dev:
+  auth-proxy-dev:
     ports:
       - "8080:8000"
     user: 1001:1001
 
-  test:
+  auth-proxy-test:
     user: 1003:1003
