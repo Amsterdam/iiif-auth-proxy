@@ -7,7 +7,7 @@ from iiif.image_handling import (
     parse_scaling_string,
     scale_image,
 )
-from iiif.utils import ImmediateHttpResponse
+from main.utils import ImmediateHttpResponse
 
 
 class TestImageFormatting:
