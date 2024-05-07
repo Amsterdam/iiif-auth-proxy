@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from jwt.exceptions import DecodeError, ExpiredSignatureError, InvalidSignatureError
 
-from iiif.utils import ImmediateHttpResponse
+from main.utils import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from iiif.queue_zip_consumer import AzureZipQueueConsumer
+from zip_consumer.queue_zip_consumer import AzureZipQueueConsumer
 
 logger = logging.getLogger(__name__)
 

@@ -7,15 +7,18 @@ import timeout_decorator
 from django.conf import settings
 from django.template.loader import render_to_string
 
-from iiif import authentication, image_server, mailing, utils, zip_tools
+from auth_mail import authentication, mailing
+from iiif import image_server
 from iiif.metadata import get_metadata
-from iiif.utils_azure import (
+from main import utils
+from main.utils_azure import (
     create_storage_account_temp_url,
     get_blob_from_storage_account,
     get_queue_client,
     remove_blob_from_storage_account,
     store_file_on_storage_account,
 )
+from zip_consumer import zip_tools
 
 logger = logging.getLogger(__name__)
 

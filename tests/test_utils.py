@@ -11,12 +11,11 @@ import pytest
 import pytz
 from django.conf import settings
 
-from iiif.authentication import create_mail_login_token, img_is_public_copyright
+from auth_mail.authentication import create_mail_login_token, img_is_public_copyright
 from iiif.image_server import create_file_url_and_headers, create_wabo_url
 from iiif.parsing import InvalidIIIFUrlError, get_email_address, get_info_from_iiif_url
-from iiif.utils import ImmediateHttpResponse
-from iiif.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER, create_local_zip_file
-from tests.test_iiif import (
+from main.utils import ImmediateHttpResponse
+from tests.test_settings import (
     PRE_WABO_IMG_URL_NO_SCALING,
     PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
     PRE_WABO_IMG_URL_WITH_REGION,
@@ -25,6 +24,7 @@ from tests.test_iiif import (
     WABO_IMG_URL,
 )
 from tests.tools import filename_from_url, source_filename_from_url
+from zip_consumer.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER, create_local_zip_file
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")

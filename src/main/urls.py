@@ -16,8 +16,12 @@ Including another URLconf
 
 from django.urls import include, path
 
+from main import settings
+
 urlpatterns = [
     path("iiif/status/health", include("health.urls")),
+    path("iiif/login-link-to-email/", include("auth_mail.urls")),
+    path("iiif/zip/", include("zip_consumer.urls")),
     path("iiif/", include("iiif.urls")),
     path("", include("health.urls")),
 ]
