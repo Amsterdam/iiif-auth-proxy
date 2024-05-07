@@ -1,14 +1,12 @@
 version: "3.5"
 
-name: iiif-auth-proxy
-
 x-app: &base-app
   build:
     context: .
     target: app
   depends_on:
-    - auth-proxy-database
-    - auth-proxy-azurite
+    - database
+    - azurite
   volumes:
     - ./src:/src
     - ./tests:/tests
@@ -18,25 +16,25 @@ x-app: &base-app
   environment: &base-app-env
     SECRET_KEY: 'insecure'
     JWT_SECRET_KEY: 'insecure'
-    DATABASE_HOST: 'auth-proxy-database'
-    AZURITE_STORAGE_CONNECTION_STRING: 'DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://auth-proxy-azurite:10000/devstoreaccount1;'
-    AZURITE_QUEUE_CONNECTION_STRING: 'DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://auth-proxy-azurite:10001/devstoreaccount1;'
+    DATABASE_HOST: 'database'
+    AZURITE_STORAGE_CONNECTION_STRING: 'DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;'
+    AZURITE_QUEUE_CONNECTION_STRING: 'DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;'
 
 services:
-  auth-proxy-database:
+  database:
     image: postgres:15
     environment:
       POSTGRES_DB: dev
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: dev
   
-  auth-proxy-azurite:
+  azurite:
     image: mcr.microsoft.com/azure-storage/azurite
     ports:
       - "10000:10000"  # Blob service
       - "10001:10001"  # Queue service
 
-  auth-proxy-app:
+  app:
     <<: *base-app
     build:
       context: .
@@ -44,7 +42,7 @@ services:
     image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-opdrachten/iiif-auth-proxy}:${VERSION:-latest}
     command: /deploy/docker-run.sh
 
-  auth-proxy-dev:
+  dev:
     <<: *base-app
     build:
       context: .
@@ -59,7 +57,7 @@ services:
     - ./static:/static
     command: python manage.py runserver 0.0.0.0:8000
 
-  auth-proxy-test:
+  test:
     <<: *base-app
     build:
       context: .

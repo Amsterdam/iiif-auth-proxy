@@ -16,22 +16,15 @@ networks:
     external: true
 
 services:
-  auth-proxy-database:
-    ports:
-      - "5415:5432"		# allows to run database on different port on host
-
-  auth-proxy-app:
+  app:
     ports:
       - "8080:8000"		# allows to run app on different port on host
     user: 1001:1001		# set current user id so it has access to mounted volumes
 
-  auth-proxy-dev:
+  dev:
     networks:
       - amsterdam-bouwdossiers  # allows the dev app to connect to the metadata server locally
       - default
     ports:
       - "8080:8000"
     user: 1001:1001
-
-  auth-proxy-test:
-    user: 1003:1003

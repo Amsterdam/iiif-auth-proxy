@@ -189,7 +189,7 @@ WSGI_APPLICATION = "main.wsgi.application"
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 
-DATABASE_HOST = os.getenv("DATABASE_HOST", "auth-proxy-database")
+DATABASE_HOST = os.getenv("DATABASE_HOST", "database")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "dev")
 DATABASE_OPTIONS = {"sslmode": "allow", "connect_timeout": 5}
 if "azure.com" in DATABASE_HOST:

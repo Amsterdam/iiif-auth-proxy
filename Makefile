@@ -23,10 +23,10 @@ requirements: pip-tools             ## Upgrade requirements (in requirements.in)
 upgrade: requirements install       ## Run 'requirements' and 'install' targets
 
 migrations:
-	$(dc) run --rm auth-proxy-app python manage.py makemigrations
+	$(dc) run --rm app python manage.py makemigrations
 
 migrate:
-	$(dc) run --rm auth-proxy-app python manage.py migrate
+	$(dc) run --rm app python manage.py migrate
 
 build:
 	$(dc) build --progress=plain
@@ -35,39 +35,39 @@ push: build
 	$(dc) push
 
 app:
-	$(dc) up auth-proxy-app
+	$(dc) up app
 
 dev:
-	$(run) --service-ports auth-proxy-dev
+	$(run) --service-ports dev
 
 dev-consume-zips:
-	$(run) --service-ports auth-proxy-dev python manage.py consume_zips
+	$(run) --service-ports dev python manage.py consume_zips
 
 test: lint
-	$(run) auth-proxy-test pytest $(ARGS)
+	$(run) test pytest $(ARGS)
 
 lintfix:             ## Execute lint fixes
-	$(run) auth-proxy-test black /src/$(APP) /tests/$(APP)
-	$(run) auth-proxy-test autoflake /src --recursive --in-place --remove-unused-variables --remove-all-unused-imports --quiet
-	$(run) auth-proxy-test isort /src/$(APP) /tests/$(APP)
+	$(run) test black /src/$(APP) /tests/$(APP)
+	$(run) test autoflake /src --recursive --in-place --remove-unused-variables --remove-all-unused-imports --quiet
+	$(run) test isort /src/$(APP) /tests/$(APP)
 
 lint:                ## Execute lint checks
-	$(run) auth-proxy-test black --check /src/$(APP) /tests/$(APP)
-	$(run) auth-proxy-test autoflake /src --check --recursive --quiet
-	$(run) auth-proxy-test isort --diff --check /src/$(APP) /tests/$(APP)
+	$(run) test black --check /src/$(APP) /tests/$(APP)
+	$(run) test autoflake /src --check --recursive --quiet
+	$(run) test isort --diff --check /src/$(APP) /tests/$(APP)
 
 pdb:
-	$(run) auth-proxy-test pytest --pdb $(ARGS)
+	$(run) test pytest --pdb $(ARGS)
 
 clean:
 	$(dc) down -v
 
 bash:
-	$(run) auth-proxy-dev bash
+	$(run) dev bash
 
 env:
 	env | sort
 
 trivy: 								## Detect image vulnerabilities
-	$(dc) build auth-proxy-app
+	$(dc) build app
 	trivy image --ignore-unfixed docker-registry.data.amsterdam.nl/datapunt/iiif-auth-proxy
