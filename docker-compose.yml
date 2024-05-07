@@ -20,6 +20,7 @@ x-app: &base-app
     - ./deploy:/deploy
   networks:
     - amsterdam-bouwdossiers
+    - default
   ports:
     - "8000:8000"
   environment: &base-app-env
@@ -32,8 +33,6 @@ x-app: &base-app
 services:
   auth-proxy-database:
     image: postgres:15
-    networks:
-      - amsterdam-bouwdossiers
     environment:
       POSTGRES_DB: dev
       POSTGRES_USER: dev
@@ -41,8 +40,6 @@ services:
   
   auth-proxy-azurite:
     image: mcr.microsoft.com/azure-storage/azurite
-    networks:
-      - amsterdam-bouwdossiers
     ports:
       - "10000:10000"  # Blob service
       - "10001:10001"  # Queue service
