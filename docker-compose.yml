@@ -2,11 +2,6 @@ version: "3.5"
 
 name: iiif-auth-proxy
 
-networks:
-  amsterdam-bouwdossiers:
-    name: amsterdam-bouwdossiers
-    external: true
-
 x-app: &base-app
   build:
     context: .
@@ -18,9 +13,6 @@ x-app: &base-app
     - ./src:/src
     - ./tests:/tests
     - ./deploy:/deploy
-  networks:
-    - amsterdam-bouwdossiers
-    - default
   ports:
     - "8000:8000"
   environment: &base-app-env

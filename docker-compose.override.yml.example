@@ -9,6 +9,12 @@
 # set your own values.
 
 version: "3.5"
+
+networks:
+  amsterdam-bouwdossiers:
+    name: amsterdam-bouwdossiers
+    external: true
+
 services:
   auth-proxy-database:
     ports:
@@ -20,6 +26,9 @@ services:
     user: 1001:1001		# set current user id so it has access to mounted volumes
 
   auth-proxy-dev:
+    networks:
+      - amsterdam-bouwdossiers  # allows the dev app to connect to the metadata server locally
+      - default
     ports:
       - "8080:8000"
     user: 1001:1001
