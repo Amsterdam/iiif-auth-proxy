@@ -1,9 +1,11 @@
 import logging
 import re
+from io import BytesIO
 
 import requests
 from django.conf import settings
 from django.http import HttpResponse
+from PIL import Image
 from requests.exceptions import RequestException
 
 from main.utils import ImmediateHttpResponse
@@ -41,13 +43,19 @@ def create_file_url_and_headers(url_info, metadata):
         return iiif_image_url, {"Authorization": settings.WABO_AUTHORIZATION}
 
 
+def create_mock_image(format):
+    img = Image.new("RGB", (32, 32), color="green")
+    buf = BytesIO()
+    img.save(buf, format=format)
+    return buf.getvalue()
+
+
 # For develop/test environments where we don't have access to the upstream server
 def get_image_from_mock_server():
     response = requests.Response()
     response.status_code = 200
-    with open(settings.STATIC_IMAGE, "rb") as f:
-        response._content = f.read()
-    response.headers["Content-Type"] = "image/png"
+    response.headers["Content-Type"] = "image/jpeg"
+    response._content = create_mock_image("JPEG")
     return response
 
 

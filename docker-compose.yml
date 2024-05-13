@@ -53,8 +53,6 @@ services:
       USE_JWKS_TEST_KEY: 'true'
       MOCK_GET_IMAGE_FROM_SERVER: 'true'
       METADATA_SERVER_BASE_URL: 'http://metadata-server:8000'
-    volumes:
-    - ./static:/static
     command: python manage.py runserver 0.0.0.0:8000
 
   test:
