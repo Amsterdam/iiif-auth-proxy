@@ -32,13 +32,13 @@ azure-appconfiguration==1.1.1
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-batch==14.1.0
+azure-batch==14.2.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-cli==2.59.0
+azure-cli==2.60.0
     # via -r ./requirements.txt
-azure-cli-core==2.59.0
+azure-cli-core==2.60.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -208,7 +208,7 @@ azure-mgmt-authorization==4.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-batch==17.2.0
+azure-mgmt-batch==17.3.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -244,7 +244,7 @@ azure-mgmt-containerregistry==10.3.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-containerservice==29.1.0
+azure-mgmt-containerservice==30.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -431,11 +431,11 @@ azure-mgmt-rdbms==10.2.0b16
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-recoveryservices==2.5.0
+azure-mgmt-recoveryservices==3.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-recoveryservicesbackup==8.0.0
+azure-mgmt-recoveryservicesbackup==9.1.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -471,7 +471,7 @@ azure-mgmt-servicefabricmanagedclusters==2.0.0b6
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-servicelinker==1.2.0b1
+azure-mgmt-servicelinker==1.2.0b2
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -479,7 +479,7 @@ azure-mgmt-signalr==2.0.0b1
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-sql==4.0.0b15
+azure-mgmt-sql==4.0.0b16
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -543,7 +543,7 @@ bcrypt==4.1.2
     # via
     #   -r ./requirements.txt
     #   paramiko
-black==24.4.0
+black==24.4.2
     # via -r requirements_dev.in
 build==1.2.1
     # via pip-tools
@@ -578,7 +578,7 @@ colorama==0.4.6
     # via
     #   -r ./requirements.txt
     #   azure-cli
-coverage[toml]==7.4.4
+coverage[toml]==7.5.0
     # via pytest-cov
 cryptography==42.0.5
     # via
@@ -634,7 +634,7 @@ fabric==3.2.2
     # via
     #   -r ./requirements.txt
     #   azure-cli
-google-api-core==2.18.0
+google-api-core==2.19.0
     # via
     #   -r ./requirements.txt
     #   opencensus
@@ -695,6 +695,7 @@ isodate==0.6.1
     #   azure-mgmt-search
     #   azure-mgmt-security
     #   azure-mgmt-servicefabricmanagedclusters
+    #   azure-mgmt-servicelinker
     #   azure-mgmt-signalr
     #   azure-mgmt-sql
     #   azure-mgmt-storage
@@ -731,14 +732,14 @@ knack==0.11.0
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
-msal[broker]==1.27.0
+msal[broker]==1.28.0
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
     #   azure-datalake-store
     #   azure-identity
     #   msal-extensions
-msal-extensions==1.0.0
+msal-extensions==1.2.0b1
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
@@ -783,7 +784,6 @@ msrest==0.7.1
     #   azure-mgmt-privatedns
     #   azure-mgmt-servicebus
     #   azure-mgmt-servicefabric
-    #   azure-mgmt-servicelinker
     #   azure-mgmt-sqlvirtualmachine
     #   azure-mgmt-synapse
     #   azure-mgmt-trafficmanager
@@ -899,7 +899,7 @@ pkginfo==1.10.0
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
-platformdirs==4.2.0
+platformdirs==4.2.1
     # via black
 pluggy==1.5.0
     # via pytest
@@ -975,7 +975,7 @@ pyparsing==3.1.2
     # via
     #   -r ./requirements.txt
     #   oslo-utils
-pyproject-hooks==1.0.0
+pyproject-hooks==1.1.0
     # via
     #   build
     #   pip-tools
@@ -983,7 +983,7 @@ pysocks==1.7.1
     # via
     #   -r ./requirements.txt
     #   requests
-pytest==8.1.1
+pytest==8.2.0
     # via
     #   -r requirements_dev.in
     #   pytest-cov
@@ -1094,7 +1094,6 @@ tomli==2.0.1
     #   build
     #   coverage
     #   pip-tools
-    #   pyproject-hooks
     #   pytest
 typing-extensions==4.11.0
     # via
