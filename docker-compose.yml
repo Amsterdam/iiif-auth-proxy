@@ -5,7 +5,7 @@ x-app: &base-app
     context: .
     target: app
   depends_on:
-    - database-iiif-auth-proxy
+    - database
     - azurite
   volumes:
     - ./src:/src
@@ -16,13 +16,12 @@ x-app: &base-app
   environment: &base-app-env
     SECRET_KEY: 'insecure'
     JWT_SECRET_KEY: 'insecure'
-    DEBUG: 'true'
-    USE_JWKS_TEST_KEY: 'true'
+    DATABASE_HOST: 'database'
     AZURITE_STORAGE_CONNECTION_STRING: 'DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;'
     AZURITE_QUEUE_CONNECTION_STRING: 'DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;'
 
 services:
-  database-iiif-auth-proxy:
+  database:
     image: postgres:15
     environment:
       POSTGRES_DB: dev
@@ -35,13 +34,6 @@ services:
       - "10000:10000"  # Blob service
       - "10001:10001"  # Queue service
 
-  dev:
-    <<: *base-app
-    build:
-      context: .
-      target: dev
-    command: python manage.py runserver 0.0.0.0:8000
-
   app:
     <<: *base-app
     build:
@@ -49,6 +41,19 @@ services:
       target: app
     image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-opdrachten/iiif-auth-proxy}:${VERSION:-latest}
     command: /deploy/docker-run.sh
+
+  dev:
+    <<: *base-app
+    build:
+      context: .
+      target: dev
+    environment:
+      <<: *base-app-env
+      DEBUG: 'true'
+      USE_JWKS_TEST_KEY: 'true'
+      MOCK_GET_IMAGE_FROM_SERVER: 'true'
+      METADATA_SERVER_BASE_URL: 'http://metadata-server:8000'
+    command: python manage.py runserver 0.0.0.0:8000
 
   test:
     <<: *base-app
@@ -58,3 +63,4 @@ services:
     environment:
       <<: *base-app-env
       DJANGO_SETTINGS_MODULE: "main.settings"
+      USE_JWKS_TEST_KEY: 'true'

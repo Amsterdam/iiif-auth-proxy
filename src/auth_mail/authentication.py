@@ -43,7 +43,7 @@ def read_out_mail_jwt_token(request):
     if not request.META.get("HTTP_AUTHORIZATION"):
         if not request.GET.get("auth"):
             if settings.DATAPUNT_AUTHZ["ALWAYS_OK"]:
-                return jwt_token
+                return jwt_token, is_mail_login
             raise ImmediateHttpResponse(
                 response=HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
             )

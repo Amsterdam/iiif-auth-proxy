@@ -89,6 +89,11 @@ EMAIL_FROM_EMAIL_ADDRESS = os.getenv(
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
 EMAIL_TIMEOUT = 5
 
+# Development
+MOCK_GET_IMAGE_FROM_SERVER = (
+    os.getenv("MOCK_GET_IMAGE_FROM_SERVER", "false").lower() == "true"
+)
+
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
 # This is a test public/private key def and added for testing .
 JWKS_TEST_KEY = """
@@ -114,8 +119,8 @@ USE_JWKS_TEST_KEY = os.getenv("USE_JWKS_TEST_KEY", "false").lower() == "true"
 PUB_JWKS = JWKS_TEST_KEY if USE_JWKS_TEST_KEY else os.getenv("PUB_JWKS")
 
 DATAPUNT_AUTHZ = {
-    # 'ALWAYS_OK': True if DEBUG else False,  # disable authz. tests will fail...
-    "ALWAYS_OK": False,
+    "ALWAYS_OK": True if DEBUG else False,  # disable authz. tests will fail...
+    # "ALWAYS_OK": False,
     "JWKS": PUB_JWKS,
     "JWKS_URL": os.getenv("KEYCLOAK_JWKS_URL"),
     "FORCED_ANONYMOUS_ROUTES": ["/status/health"],
@@ -184,7 +189,7 @@ WSGI_APPLICATION = "main.wsgi.application"
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 
-DATABASE_HOST = os.getenv("DATABASE_HOST", "database-iiif-auth-proxy")
+DATABASE_HOST = os.getenv("DATABASE_HOST", "database")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "dev")
 DATABASE_OPTIONS = {"sslmode": "allow", "connect_timeout": 5}
 if "azure.com" in DATABASE_HOST:
@@ -232,6 +237,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_IMAGE = os.path.join(STATIC_URL, "example.jpg")
 
 
 # Django Logging settings
