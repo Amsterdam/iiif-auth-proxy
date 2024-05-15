@@ -3,13 +3,14 @@
 
 datapunt-authorization-django
 pyjwt
-pillow-simd  # Pillow with SIMD support
+pillow-simd==9.0.0.post1  # Pillow with SIMD support
 six # Needed by jwcrypto, which mistakenly doesn't include it. PR with fix here: https://github.com/latchset/jwcrypto/pull/202
 psycopg2-binary
 python-swiftclient
 python-keystoneclient  # Although it is not directly imported anywhere, it is needed for the connection with the objectstore to work
 setuptools  # Needed to solve Trivy security risk
 timeout-decorator
+toolz # Zero-dependency library with a set of utility functions for iterators, functions, and dictionaries.
 
 # Django
 django<4.2  # Django 4.2 does not support Postgres 11 anymore

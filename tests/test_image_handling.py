@@ -41,29 +41,29 @@ class TestImageFormatting:
 
     def test_scale_image(self):
         assert (
-            scale_image(self.img_96x85, False, "full", "image/jpeg") == self.img_96x85
+            scale_image(False, "image/jpeg", "full", self.img_96x85) == self.img_96x85
         )
         assert (
-            scale_image(self.img_96x85, False, "100,100", "image/jpeg")
+            scale_image(False, "image/jpeg", "100,100", self.img_96x85)
             == self.img_96x85
         )
         assert (
-            scale_image(self.img_96x85, False, "100,", "image/jpeg") == self.img_96x85
+            scale_image(False, "image/jpeg", "100,", self.img_96x85) == self.img_96x85
         )
         assert (
-            scale_image(self.img_96x85, False, ",100", "image/jpeg") == self.img_96x85
+            scale_image(False, "image/jpeg", ",100", self.img_96x85) == self.img_96x85
         )
         assert (
-            scale_image(self.img_96x85, True, "20,20", "image/jpeg") == self.img_96x85
+            scale_image(True, "image/jpeg", "20,20", self.img_96x85) == self.img_96x85
         )
         assert (
-            scale_image(self.img_96x85, False, "50,50", "image/jpeg") == self.img_50x44
+            scale_image(False, "image/jpeg", "50,50", self.img_96x85) == self.img_50x44
         )
-        assert scale_image(self.img_96x85, False, "50,", "image/jpeg") == self.img_50x44
+        assert scale_image(False, "image/jpeg", "50,", self.img_96x85) == self.img_50x44
         assert (
-            scale_image(self.img_96x85, False, "60,44", "image/jpeg") == self.img_49x44
+            scale_image(False, "image/jpeg", "60,44", self.img_96x85) == self.img_49x44
         )
-        assert scale_image(self.img_96x85, False, ",44", "image/jpeg") == self.img_49x44
+        assert scale_image(False, "image/jpeg", ",44", self.img_96x85) == self.img_49x44
 
     @pytest.mark.parametrize("param", [None, "", ",,,", "x,y,w,h", "50,50,,"])
     def test_parse_invalid_region_string_raises(self, param):
@@ -75,43 +75,43 @@ class TestImageFormatting:
         assert parse_region_string("0,0,50,44") == (0, 0, 50, 44)
 
     def test_crop_image(self):
-        assert crop_image(self.img_96x85, False, "full", "image/jpeg") == self.img_96x85
+        assert crop_image(False, "image/jpeg", "full", self.img_96x85) == self.img_96x85
         assert (
-            crop_image(self.img_96x85, False, "square", "image/jpeg") == self.img_85x85
+            crop_image(False, "image/jpeg", "square", self.img_96x85) == self.img_85x85
         )
         assert (
-            crop_image(self.img_96x85, False, "0,0,100,100", "image/jpeg")
+            crop_image(False, "image/jpeg", "0,0,100,100", self.img_96x85)
             == self.img_96x85
         )
         assert (
-            crop_image(self.img_96x85, True, "0,0,50,44", "image/jpeg")
+            crop_image(True, "image/jpeg", "0,0,50,44", self.img_96x85)
             == self.img_96x85
         )
         assert (
-            crop_image(self.img_96x85, False, "0,0,50,44", "image/jpeg")
+            crop_image(False, "image/jpeg", "0,0,50,44", self.img_96x85)
             == self.img_0x0x50x44
         )
         assert (
-            crop_image(self.img_96x85, False, "24,24,48,48", "image/jpeg")
+            crop_image(False, "image/jpeg", "24,24,48,48", self.img_96x85)
             == self.img_24x24x72x72
         )
         assert (
-            crop_image(self.img_96x85, False, "0,41,96,85", "image/jpeg")
+            crop_image(False, "image/jpeg", "0,41,96,85", self.img_96x85)
             == self.img_0x41x96x44
         )
         assert (
-            crop_image(self.img_96x85, False, "48,0,96,85", "image/jpeg")
+            crop_image(False, "image/jpeg", "48,0,96,85", self.img_96x85)
             == self.img_48x0x48x85
         )
         assert (
-            crop_image(self.img_96x85, False, "-50,-56,100,100", "image/jpeg")
+            crop_image(False, "image/jpeg", "-50,-56,100,100", self.img_96x85)
             == self.img_0x0x50x44
         )
 
     def test_crop_image_no_size(self):
         with pytest.raises(ImmediateHttpResponse):
-            crop_image(self.img_96x85, False, "0,0,0,0", "image/jpeg")
+            crop_image(False, "image/jpeg", "0,0,0,0", self.img_96x85)
 
     def test_crop_outside_image(self):
         with pytest.raises(ImmediateHttpResponse):
-            crop_image(self.img_96x85, False, "100,100,50,50", "image/jpeg")
+            crop_image(False, "image/jpeg", "100,100,50,50", self.img_96x85)
