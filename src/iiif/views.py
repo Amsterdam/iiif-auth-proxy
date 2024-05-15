@@ -3,10 +3,16 @@ import logging
 from django.http import HttpResponse
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import csrf_exempt
+from toolz import partial, pipe
 
 from auth_mail import authentication
 from iiif import image_server, parsing
-from iiif.image_handling import crop_image, generate_info_json, scale_image
+from iiif.image_handling import (
+    crop_image,
+    generate_info_json,
+    is_image_content_type,
+    scale_image,
+)
 from iiif.metadata import get_metadata
 from main import utils
 
@@ -34,32 +40,37 @@ def index(request, iiif_url):
         )
         image_server.handle_file_response_codes(file_response, file_url)
 
+        file_content = file_response.content
+        file_type = file_response.headers.get("Content-Type")
         if url_info["info_json"]:
             response_content = generate_info_json(
                 request.build_absolute_uri().split("/info.json")[0],
-                file_response.content,
-                file_response.headers.get("Content-Type"),
+                file_content,
+                file_type,
             )
-            content_type = "application/json"
-        else:
-            cropped_content = crop_image(
-                file_response.content,
-                url_info["source_file"],
-                url_info["region"],
-                file_response.headers.get("Content-Type"),
+            return HttpResponse(
+                response_content,
+                content_type="application/json",
             )
-            response_content = scale_image(
-                cropped_content,
-                url_info["source_file"],
-                url_info["scaling"],
-                file_response.headers.get("Content-Type"),
-            )
-            content_type = file_response.headers.get("Content-Type")
+
+        crop = partial(
+            crop_image,
+            url_info["source_file"],
+            file_type,
+            url_info["region"],
+        )
+        scale = partial(
+            scale_image,
+            url_info["source_file"],
+            file_type,
+            url_info["scaling"],
+        )
+        edited_image = pipe(file_content, crop, scale)
+
+        return HttpResponse(
+            edited_image,
+            file_type,
+        )
     except utils.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in index:")
         return e.response
-
-    return HttpResponse(
-        response_content,
-        content_type,
-    )

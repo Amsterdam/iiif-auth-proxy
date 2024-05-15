@@ -99,7 +99,7 @@ def content_type_to_format(content_type):
     return content_type.split("/")[1]
 
 
-def scale_image(content, source_file, scaling, content_type):
+def scale_image(source_file, content_type, scaling, content):
     """
     Scale the image to the desired size. Never scale up.
 
@@ -190,7 +190,7 @@ def clamp(n, minn, maxn):
 # TODO: Extract sub functions to own functions for:
 # - asserting the region is valid
 # - return original when no crop was applied
-def crop_image(content, source_file, region, content_type):
+def crop_image(source_file, content_type, region, content):
     """
     Crop the image to the desired size. Never crop outside the image.
 
