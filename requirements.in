@@ -3,7 +3,7 @@
 
 datapunt-authorization-django
 pyjwt
-pillow-simd==9.0.0.post1  # Pillow with SIMD support
+pillow-simd  # Pillow with SIMD support
 six # Needed by jwcrypto, which mistakenly doesn't include it. PR with fix here: https://github.com/latchset/jwcrypto/pull/202
 psycopg2-binary
 python-swiftclient
