@@ -29,6 +29,7 @@ from tests.test_settings import (
     PRE_WABO_IMG_URL_WITH_REGION_NON_OVERLAPPING,
     PRE_WABO_IMG_URL_WITH_SCALING,
     PRE_WABO_INFO_JSON_URL,
+    PRE_WABO_METADATA_CONTENT,
     WABO_IMG_URL,
     IMAGE_BINARY_DATA_24x24x72x72,
     IMAGE_BINARY_DATA_50x44,
@@ -153,22 +154,7 @@ class TestFileRetrievalWithAuthz:
     ):
         mock_do_metadata_request.return_value = MockResponse(
             200,
-            json_content={
-                "access": settings.ACCESS_PUBLIC,
-                "documenten": [
-                    {
-                        "barcode": "ST00000126",
-                        "access": settings.ACCESS_PUBLIC,
-                        "copyright": settings.COPYRIGHT_YES,
-                    },
-                    {
-                        "barcode": "SQ10079651",
-                        "access": settings.ACCESS_PUBLIC,
-                        "copyright": settings.COPYRIGHT_NO,
-                    },
-                    {"barcode": "SQ10092307", "access": settings.ACCESS_PUBLIC},
-                ],
-            },
+            json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_get_image_from_server.return_value = MockResponse(
             200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
@@ -284,22 +270,7 @@ class TestFileRetrievalWithAuthz:
     ):
         mock_do_metadata_request.return_value = MockResponse(
             200,
-            json_content={
-                "access": settings.ACCESS_PUBLIC,
-                "documenten": [
-                    {
-                        "barcode": "ST00000126",
-                        "access": settings.ACCESS_PUBLIC,
-                        "copyright": settings.COPYRIGHT_YES,
-                    },
-                    {
-                        "barcode": "SQ10079651",
-                        "access": settings.ACCESS_PUBLIC,
-                        "copyright": settings.COPYRIGHT_NO,
-                    },
-                    {"barcode": "SQ10092307", "access": settings.ACCESS_PUBLIC},
-                ],
-            },
+            json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_get_image_from_server.return_value = MockResponse(
             200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
@@ -489,22 +460,7 @@ class TestFileRetrievalWithAuthz:
     ):
         mock_do_metadata_request.return_value = MockResponse(
             200,
-            json_content={
-                "access": settings.ACCESS_PUBLIC,
-                "documenten": [
-                    {
-                        "barcode": "ST00000126",
-                        "access": settings.ACCESS_PUBLIC,
-                        "copyright": settings.COPYRIGHT_YES,
-                    },
-                    {
-                        "barcode": "SQ10079651",
-                        "access": settings.ACCESS_PUBLIC,
-                        "copyright": settings.COPYRIGHT_NO,
-                    },
-                    {"barcode": "SQ10092307", "access": settings.ACCESS_PUBLIC},
-                ],
-            },
+            json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_get_image_from_server.return_value = MockResponse(
             200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
@@ -526,22 +482,7 @@ class TestFileRetrievalWithAuthz:
     ):
         mock_do_metadata_request.return_value = MockResponse(
             200,
-            json_content={
-                "access": settings.ACCESS_PUBLIC,
-                "documenten": [
-                    {
-                        "barcode": "ST00000126",
-                        "access": settings.ACCESS_PUBLIC,
-                        "copyright": settings.COPYRIGHT_YES,
-                    },
-                    {
-                        "barcode": "SQ10079651",
-                        "access": settings.ACCESS_PUBLIC,
-                        "copyright": settings.COPYRIGHT_NO,
-                    },
-                    {"barcode": "SQ10092307", "access": settings.ACCESS_PUBLIC},
-                ],
-            },
+            json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_get_image_from_server.return_value = MockResponse(
             200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
@@ -562,22 +503,7 @@ class TestFileRetrievalWithAuthz:
     ):
         mock_do_metadata_request.return_value = MockResponse(
             200,
-            json_content={
-                "access": settings.ACCESS_PUBLIC,
-                "documenten": [
-                    {
-                        "barcode": "ST00000126",
-                        "access": settings.ACCESS_PUBLIC,
-                        "copyright": settings.COPYRIGHT_YES,
-                    },
-                    {
-                        "barcode": "SQ10079651",
-                        "access": settings.ACCESS_PUBLIC,
-                        "copyright": settings.COPYRIGHT_NO,
-                    },
-                    {"barcode": "SQ10092307", "access": settings.ACCESS_PUBLIC},
-                ],
-            },
+            json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_get_image_from_server.return_value = MockResponse(
             200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
@@ -599,22 +525,7 @@ class TestFileRetrievalWithAuthz:
     ):
         mock_do_metadata_request.return_value = MockResponse(
             200,
-            json_content={
-                "access": settings.ACCESS_PUBLIC,
-                "documenten": [
-                    {
-                        "barcode": "ST00000126",
-                        "access": settings.ACCESS_PUBLIC,
-                        "copyright": settings.COPYRIGHT_YES,
-                    },
-                    {
-                        "barcode": "SQ10079651",
-                        "access": settings.ACCESS_PUBLIC,
-                        "copyright": settings.COPYRIGHT_NO,
-                    },
-                    {"barcode": "SQ10092307", "access": settings.ACCESS_PUBLIC},
-                ],
-            },
+            json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_get_image_from_server.return_value = MockResponse(
             200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}

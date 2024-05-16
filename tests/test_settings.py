@@ -1,3 +1,6 @@
+from django.conf import settings
+
+
 def filename_from_url(url):
     return url.split(":")[1].split("/")[0].replace("-", "/")
 
@@ -35,3 +38,20 @@ with open("test-images/test-image-50x44.jpg", "rb") as file:
     IMAGE_BINARY_DATA_50x44 = file.read()
 with open("test-images/test-image-cropped-24x24x72x72.jpg", "rb") as file:
     IMAGE_BINARY_DATA_24x24x72x72 = file.read()
+
+PRE_WABO_METADATA_CONTENT = {
+    "access": settings.ACCESS_PUBLIC,
+    "documenten": [
+        {
+            "barcode": "ST00000126",
+            "access": settings.ACCESS_PUBLIC,
+            "copyright": settings.COPYRIGHT_YES,
+        },
+        {
+            "barcode": "SQ10079651",
+            "access": settings.ACCESS_PUBLIC,
+            "copyright": settings.COPYRIGHT_NO,
+        },
+        {"barcode": "SQ10092307", "access": settings.ACCESS_PUBLIC},
+    ],
+}
