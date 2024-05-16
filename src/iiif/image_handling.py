@@ -95,6 +95,10 @@ def parse_scaling_string(scaling):
     return desired_width, desired_height
 
 
+def is_image_content_type(content_type):
+    return content_type.split("/")[0] == "image"
+
+
 def content_type_to_format(content_type):
     return content_type.split("/")[1]
 
