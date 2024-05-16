@@ -53,6 +53,13 @@ def index(request, iiif_url):
                 content_type="application/json",
             )
 
+        if not is_image_content_type(file_type):
+            raise utils.ImmediateHttpResponse(
+                response=HttpResponse(
+                    "Content-type of requested file not supported", status=400
+                )
+            )
+
         crop = partial(
             crop_image,
             url_info["source_file"],
