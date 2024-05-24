@@ -5,7 +5,10 @@ from main.settings import APP_NAME
 
 class AzureLogHandlerWithAppName(AzureLogHandler):
     def callback_function(self, envelope):
-        envelope.data.baseData.properties["app_name"] = APP_NAME
+        envelope.data.baseData.properties["Application name"] = APP_NAME
+        envelope.tags["ai.cloud.role"] = (
+            f"{APP_NAME} - {envelope.tags['ai.cloud.role']}"
+        )
         return True
 
     def __init__(self, *args, **kwargs):
