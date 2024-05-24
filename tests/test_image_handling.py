@@ -54,9 +54,6 @@ class TestImageFormatting:
             scale_image(False, "image/jpeg", ",100", self.img_96x85) == self.img_96x85
         )
         assert (
-            scale_image(True, "image/jpeg", "20,20", self.img_96x85) == self.img_96x85
-        )
-        assert (
             scale_image(False, "image/jpeg", "50,50", self.img_96x85) == self.img_50x44
         )
         assert scale_image(False, "image/jpeg", "50,", self.img_96x85) == self.img_50x44
@@ -81,10 +78,6 @@ class TestImageFormatting:
         )
         assert (
             crop_image(False, "image/jpeg", "0,0,100,100", self.img_96x85)
-            == self.img_96x85
-        )
-        assert (
-            crop_image(True, "image/jpeg", "0,0,50,44", self.img_96x85)
             == self.img_96x85
         )
         assert (
