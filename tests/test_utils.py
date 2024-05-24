@@ -44,7 +44,6 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] is None
         assert url_info["scaling"] is None
-        assert url_info["source_file"] is False
         assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
         assert url_info["filename"] == "ST-00015-ST00000126_00001.jpg"
         assert url_info["formatting"] is None
@@ -59,7 +58,6 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "50,50"
-        assert url_info["source_file"] is False
         assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
         assert url_info["filename"] == "ST-00015-ST00000126_00001.jpg"
         assert url_info["formatting"] == "full/50,50/0/default.jpg"
@@ -74,7 +72,6 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "50,50"
-        assert url_info["source_file"] is True
         assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
         assert url_info["filename"] == "ST-00015-ST00000126_00001.jpg"
         assert url_info["formatting"] == "full/50,50/0/default.jpg"
@@ -89,7 +86,6 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
-        assert url_info["source_file"] is True
         assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
         assert url_info["filename"] == "ST-00015-ST00000126_00001.jpg"
         assert url_info["formatting"] == "full/full/0/default.jpg"
@@ -104,7 +100,6 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] == "24,24,48,48"
         assert url_info["scaling"] == "full"
-        assert url_info["source_file"] is True
         assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
         assert url_info["filename"] == "ST-00015-ST00000126_00001.jpg"
         assert url_info["formatting"] == "24,24,48,48/full/0/default.jpg"
@@ -123,7 +118,6 @@ class TestUtils:
         assert url_info["document_barcode"] == "628547"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "1000,900"
-        assert url_info["source_file"] is False
         assert url_info["source_filename"] == "SDZ/38657/4900487_628547"
         assert url_info["filename"] == "SDZ-38657-4900487_628547"
         assert url_info["formatting"] == "full/1000,900/0/default.jpg"
@@ -138,7 +132,6 @@ class TestUtils:
         assert url_info["document_barcode"] == "628547"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "1000,900"
-        assert url_info["source_file"] is True
         assert url_info["source_filename"] == "SDZ/38657/4900487_628547"
         assert url_info["filename"] == "SDZ-38657-4900487_628547"
         assert url_info["formatting"] == "full/1000,900/0/default.jpg"
@@ -155,7 +148,6 @@ class TestUtils:
         assert url_info["document_barcode"] == "ECS0000004420_000_000"
         assert url_info["region"] is None
         assert url_info["scaling"] is None
-        assert url_info["source_file"] is False
         assert url_info["source_filename"] == "SDO/10316333/3304_ECS0000004420_000_000"
         assert url_info["filename"] == "SDO-10316333-3304_ECS0000004420_000_000"
         assert url_info["formatting"] is None
@@ -172,7 +164,6 @@ class TestUtils:
         assert url_info["document_barcode"] == "ECS0000004420-000_00-00"
         assert url_info["region"] is None
         assert url_info["scaling"] is None
-        assert url_info["source_file"] is False
         assert (
             url_info["source_filename"] == "SDO/10316333/3304_ECS0000004420-000_00-00"
         )
@@ -226,7 +217,6 @@ class TestUtils:
         url, headers = create_file_url_and_headers(
             {
                 "source": "edepot",
-                "source_file": False,
                 "source_filename": source_filename_from_url(
                     PRE_WABO_IMG_URL_WITH_SCALING
                 ),
@@ -245,7 +235,6 @@ class TestUtils:
         url, headers = create_file_url_and_headers(
             {
                 "source": "edepot",
-                "source_file": True,
                 "source_filename": source_filename_from_url(
                     PRE_WABO_IMG_URL_WITH_SCALING
                 ),
@@ -263,7 +252,6 @@ class TestUtils:
         url, headers = create_file_url_and_headers(
             {
                 "source": "edepot",
-                "source_file": False,
                 "source_filename": source_filename_from_url(
                     PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE
                 ),
@@ -281,7 +269,6 @@ class TestUtils:
         url, headers = create_file_url_and_headers(
             {
                 "source": "edepot",
-                "source_file": False,
                 "source_filename": source_filename_from_url(PRE_WABO_INFO_JSON_URL),
                 "filename": filename_from_url(PRE_WABO_INFO_JSON_URL),
             },
@@ -298,7 +285,6 @@ class TestUtils:
                 "source": "wabo",
                 "document_barcode": "628547",
                 "formatting": "full/1000,1000/0/default.jpg",
-                "source_file": False,
             },
             metadata,
         )
@@ -310,7 +296,6 @@ class TestUtils:
                 "source": "wabo",
                 "document_barcode": "628547",
                 "formatting": "full/1000,1000/0/default.jpg",
-                "source_file": False,
             },
             metadata,
         )
@@ -322,7 +307,6 @@ class TestUtils:
                 "source": "wabo",
                 "document_barcode": "628547",
                 "formatting": "full/1000,1000/0/default.jpg",
-                "source_file": True,
             },
             metadata,
         )

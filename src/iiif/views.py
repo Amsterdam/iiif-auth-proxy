@@ -27,9 +27,9 @@ def index(request, iiif_url):
         authentication.check_auth_availability(request)
         mail_jwt_token, is_mail_login = authentication.read_out_mail_jwt_token(request)
         scope = authentication.get_max_scope(request, mail_jwt_token)
-        url_info = parsing.get_url_info(
-            iiif_url, utils.str_to_bool(request.GET.get("source_file"))
-        )
+
+        is_source_file_requested = utils.str_to_bool(request.GET.get("source_file"))
+        url_info = parsing.get_url_info(iiif_url, is_source_file_requested)
 
         authentication.check_wabo_for_mail_login(is_mail_login, url_info)
         metadata, _ = get_metadata(url_info, iiif_url, {})
@@ -43,8 +43,7 @@ def index(request, iiif_url):
         file_content = file_response.content
         file_type = file_response.headers.get("Content-Type")
 
-        source_file = url_info["source_file"]
-        if source_file:
+        if is_source_file_requested:
             return HttpResponse(
                 file_content,
                 file_type,
