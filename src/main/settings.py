@@ -29,6 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+APP_NAME = os.getenv("APP_NAME", "iiif-auth-proxy")
 APP_BASE_URL = os.getenv("APP_BASE_URL", "https://bouwdossiers.amsterdam.nl/")
 ALLOWED_HOSTS = ["*"]
 
@@ -306,14 +307,14 @@ if APPLICATIONINSIGHTS_CONNECTION_STRING:
             "SAMPLER": "opencensus.trace.samplers.ProbabilitySampler(rate=1)",
             "EXPORTER": f"""opencensus.ext.azure.trace_exporter.AzureExporter(
                 connection_string='{APPLICATIONINSIGHTS_CONNECTION_STRING}', 
-                service_name='app-iiif-auth-proxy'
+                service_name='{APP_NAME}'
             )""",
         }
     }
     config_integration.trace_integrations(["logging"])
     LOGGING["handlers"]["azure"] = {
         "level": "DEBUG",
-        "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
+        "class": "main.utils_azure_insights.AzureLogHandlerWithAppName",
         "connection_string": APPLICATIONINSIGHTS_CONNECTION_STRING,
         "formatter": "json",
     }

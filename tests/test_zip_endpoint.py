@@ -15,7 +15,7 @@ from auth_mail.authentication import (
     create_mail_login_token,
 )
 from auth_mail.generate_token import create_authz_token
-from main.utils_azure import get_blob_from_storage_account, get_queue_client
+from main.utils_azure_storage import get_blob_from_storage_account, get_queue_client
 from tests.test_settings import (
     IMAGE_BINARY_DATA,
     PRE_WABO_IMG_URL_BASE,
