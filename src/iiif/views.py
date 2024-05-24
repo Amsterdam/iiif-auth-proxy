@@ -42,6 +42,21 @@ def index(request, iiif_url):
 
         file_content = file_response.content
         file_type = file_response.headers.get("Content-Type")
+
+        source_file = url_info["source_file"]
+        if source_file:
+            return HttpResponse(
+                file_content,
+                file_type,
+            )
+
+        if not is_image_content_type(file_type):
+            raise utils.ImmediateHttpResponse(
+                response=HttpResponse(
+                    "Content-type of requested file not supported", status=400
+                )
+            )
+
         if url_info["info_json"]:
             response_content = generate_info_json(
                 request.build_absolute_uri().split("/info.json")[0],
@@ -53,22 +68,13 @@ def index(request, iiif_url):
                 content_type="application/json",
             )
 
-        if not is_image_content_type(file_type):
-            raise utils.ImmediateHttpResponse(
-                response=HttpResponse(
-                    "Content-type of requested file not supported", status=400
-                )
-            )
-
         crop = partial(
             crop_image,
-            url_info["source_file"],
             file_type,
             url_info["region"],
         )
         scale = partial(
             scale_image,
-            url_info["source_file"],
             file_type,
             url_info["scaling"],
         )
