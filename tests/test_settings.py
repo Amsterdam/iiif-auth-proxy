@@ -18,6 +18,10 @@ PRE_WABO_IMG_URL_WITH_REGION_NON_OVERLAPPING = (
     PRE_WABO_IMG_URL_BASE + "10000,10000,48,48/full/0/default.jpg"
 )
 
+
+PRE_WABO_IMG_URL_SOURCE_FILE = (
+    "2/edepot:ST-00015-ST00000126_00001.jpg/?source_file=true&"
+)
 PRE_WABO_IMG_URL_NO_SCALING = (
     "2/edepot:ST-00015-ST00000126_00001.jpg/full/full/0/default.jpg"
 )

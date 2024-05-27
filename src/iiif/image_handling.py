@@ -103,17 +103,16 @@ def content_type_to_format(content_type):
     return content_type.split("/")[1]
 
 
-def scale_image(source_file, content_type, scaling, content):
+def scale_image(content_type, scaling, content):
     """
     Scale the image to the desired size. Never scale up.
 
     :param content: The image data
-    :param source_file: Bool whether the raw source file should be returned without any scaling
     :param scaling: The scaling string from the url
     :param content_type: The content type of the image
     :return: The scaled image data
     """
-    if source_file or scaling.lower() == "full":
+    if scaling.lower() == "full":
         return content
 
     desired_width, desired_height = parse_scaling_string(scaling)
@@ -194,7 +193,7 @@ def clamp(n, minn, maxn):
 # TODO: Extract sub functions to own functions for:
 # - asserting the region is valid
 # - return original when no crop was applied
-def crop_image(source_file, content_type, region, content):
+def crop_image(content_type, region, content):
     """
     Crop the image to the desired size. Never crop outside the image.
 
@@ -204,9 +203,6 @@ def crop_image(source_file, content_type, region, content):
     :param content_type: The content type of the image
     :return: The cropped image data
     """
-    if source_file:
-        return content
-
     img = Image.open(BytesIO(content))
 
     match region.lower():

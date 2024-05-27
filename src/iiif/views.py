@@ -27,9 +27,9 @@ def index(request, iiif_url):
         authentication.check_auth_availability(request)
         mail_jwt_token, is_mail_login = authentication.read_out_mail_jwt_token(request)
         scope = authentication.get_max_scope(request, mail_jwt_token)
-        url_info = parsing.get_url_info(
-            iiif_url, utils.str_to_bool(request.GET.get("source_file"))
-        )
+
+        is_source_file_requested = utils.str_to_bool(request.GET.get("source_file"))
+        url_info = parsing.get_url_info(iiif_url, is_source_file_requested)
 
         authentication.check_wabo_for_mail_login(is_mail_login, url_info)
         metadata, _ = get_metadata(url_info, iiif_url, {})
@@ -42,6 +42,20 @@ def index(request, iiif_url):
 
         file_content = file_response.content
         file_type = file_response.headers.get("Content-Type")
+
+        if is_source_file_requested:
+            return HttpResponse(
+                file_content,
+                file_type,
+            )
+
+        if not is_image_content_type(file_type):
+            raise utils.ImmediateHttpResponse(
+                response=HttpResponse(
+                    "Content-type of requested file not supported", status=400
+                )
+            )
+
         if url_info["info_json"]:
             response_content = generate_info_json(
                 request.build_absolute_uri().split("/info.json")[0],
@@ -53,22 +67,13 @@ def index(request, iiif_url):
                 content_type="application/json",
             )
 
-        if not is_image_content_type(file_type):
-            raise utils.ImmediateHttpResponse(
-                response=HttpResponse(
-                    "Content-type of requested file not supported", status=400
-                )
-            )
-
         crop = partial(
             crop_image,
-            url_info["source_file"],
             file_type,
             url_info["region"],
         )
         scale = partial(
             scale_image,
-            url_info["source_file"],
             file_type,
             url_info["scaling"],
         )

@@ -23,6 +23,7 @@ from iiif.metadata import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
 from tests.test_settings import (
     IMAGE_BINARY_DATA,
     PRE_WABO_IMG_URL_NO_SCALING,
+    PRE_WABO_IMG_URL_SOURCE_FILE,
     PRE_WABO_IMG_URL_WITH_EMPTY_SCALING,
     PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
     PRE_WABO_IMG_URL_WITH_REGION,
@@ -146,6 +147,27 @@ class TestFileRetrievalWithAuthz:
             response.content.decode("utf-8")
             == RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER + " ConnectTimeout"
         )
+
+    @patch("iiif.image_server.get_image_from_server")
+    @patch("iiif.metadata.do_metadata_request")
+    def test_get_info_json_non_image_raises(
+        self, mock_do_metadata_request, mock_get_image_from_server, client
+    ):
+        mock_do_metadata_request.return_value = MockResponse(
+            200,
+            json_content=PRE_WABO_METADATA_CONTENT,
+        )
+        mock_get_image_from_server.return_value = MockResponse(
+            200, content=b"b", headers={"Content-Type": "text/xml"}
+        )
+
+        header = {
+            "HTTP_AUTHORIZATION": "Bearer "
+            + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)
+        }
+
+        response = client.get(self.url + PRE_WABO_INFO_JSON_URL, **header)
+        assert response.status_code == 400
 
     @patch("iiif.image_server.get_image_from_server")
     @patch("iiif.metadata.do_metadata_request")
@@ -450,6 +472,28 @@ class TestFileRetrievalWithAuthz:
             + create_authz_token([settings.BOUWDOSSIER_EXTENDED_SCOPE])
         }
         response = client.get(self.url + PRE_WABO_IMG_URL_NO_SCALING, **header)
+        assert response.status_code == 200
+        assert response.content == IMAGE_BINARY_DATA
+
+    @patch("iiif.image_server.get_image_from_server")
+    @patch("iiif.metadata.do_metadata_request")
+    def test_get_source_image(
+        self, mock_do_metadata_request, mock_get_image_from_server, client
+    ):
+        mock_do_metadata_request.return_value = MockResponse(
+            200,
+            json_content=PRE_WABO_METADATA_CONTENT,
+        )
+        mock_get_image_from_server.return_value = MockResponse(
+            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+        )
+
+        header = {
+            "HTTP_AUTHORIZATION": "Bearer "
+            + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)
+        }
+
+        response = client.get(self.url + PRE_WABO_IMG_URL_SOURCE_FILE, **header)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
