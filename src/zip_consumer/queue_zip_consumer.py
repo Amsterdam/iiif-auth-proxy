@@ -11,7 +11,7 @@ from auth_mail import authentication, mailing
 from iiif import image_server
 from iiif.metadata import get_metadata
 from main import utils
-from main.utils_azure import (
+from main.utils_azure_storage import (
     create_storage_account_temp_url,
     get_blob_from_storage_account,
     get_queue_client,

@@ -18,6 +18,11 @@ from distutils.util import strtobool
 from corsheaders.defaults import default_headers
 from opencensus.trace import config_integration
 
+from main.utils_azure_insights import (
+    create_azure_log_handler_config,
+    create_azure_trace_config,
+)
+
 from .azure_settings import Azure
 
 azure = Azure()
@@ -29,6 +34,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+APP_NAME = os.getenv("APP_NAME", "iiif-auth-proxy")
 APP_BASE_URL = os.getenv("APP_BASE_URL", "https://bouwdossiers.amsterdam.nl/")
 ALLOWED_HOSTS = ["*"]
 
@@ -301,22 +307,15 @@ APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv(
 
 if APPLICATIONINSIGHTS_CONNECTION_STRING:
     MIDDLEWARE.append("opencensus.ext.django.middleware.OpencensusMiddleware")
-    OPENCENSUS = {
-        "TRACE": {
-            "SAMPLER": "opencensus.trace.samplers.ProbabilitySampler(rate=1)",
-            "EXPORTER": f"""opencensus.ext.azure.trace_exporter.AzureExporter(
-                connection_string='{APPLICATIONINSIGHTS_CONNECTION_STRING}', 
-                service_name='app-iiif-auth-proxy'
-            )""",
-        }
-    }
+
+    OPENCENSUS = create_azure_trace_config(
+        APPLICATIONINSIGHTS_CONNECTION_STRING, APP_NAME
+    )
+    LOGGING["handlers"]["azure"] = create_azure_log_handler_config(
+        APPLICATIONINSIGHTS_CONNECTION_STRING, APP_NAME
+    )
     config_integration.trace_integrations(["logging"])
-    LOGGING["handlers"]["azure"] = {
-        "level": "DEBUG",
-        "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
-        "connection_string": APPLICATIONINSIGHTS_CONNECTION_STRING,
-        "formatter": "json",
-    }
+
     LOGGING["root"]["handlers"].append("azure")
     for logger_name, logger_details in LOGGING["loggers"].items():
         LOGGING["loggers"][logger_name]["handlers"].append("azure")
