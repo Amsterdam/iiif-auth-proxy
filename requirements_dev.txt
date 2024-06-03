@@ -16,7 +16,7 @@ applicationinsights==0.11.10
     # via
     #   -r ./requirements.txt
     #   azure-cli-telemetry
-argcomplete==3.1.6
+argcomplete==3.3.0
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
@@ -36,9 +36,9 @@ azure-batch==14.2.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-cli==2.60.0
+azure-cli==2.61.0
     # via -r ./requirements.txt
-azure-cli-core==2.60.0
+azure-cli-core==2.61.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -232,7 +232,7 @@ azure-mgmt-cognitiveservices==13.5.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-compute==30.6.0
+azure-mgmt-compute==31.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -447,7 +447,7 @@ azure-mgmt-redis==14.3.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-resource==23.1.0b2
+azure-mgmt-resource==23.1.1
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -455,7 +455,7 @@ azure-mgmt-search==9.1.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-security==5.0.0
+azure-mgmt-security==6.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -463,7 +463,7 @@ azure-mgmt-servicebus==8.2.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-servicefabric==1.0.0
+azure-mgmt-servicefabric==2.1.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -515,13 +515,13 @@ azure-nspkg==3.0.2
     # via
     #   -r ./requirements.txt
     #   azure-mgmt-nspkg
-azure-storage-blob==12.19.1
+azure-storage-blob==12.20.0
     # via -r ./requirements.txt
 azure-storage-common==1.4.2
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-storage-queue==12.9.0
+azure-storage-queue==12.10.0
     # via -r ./requirements.txt
 azure-synapse-accesscontrol==0.5.0
     # via
@@ -539,7 +539,7 @@ azure-synapse-spark==0.2.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-bcrypt==4.1.2
+bcrypt==4.1.3
     # via
     #   -r ./requirements.txt
     #   paramiko
@@ -578,9 +578,9 @@ colorama==0.4.6
     # via
     #   -r ./requirements.txt
     #   azure-cli
-coverage[toml]==7.5.0
+coverage[toml]==7.5.3
     # via pytest-cov
-cryptography==42.0.5
+cryptography==42.0.7
     # via
     #   -r ./requirements.txt
     #   adal
@@ -694,6 +694,7 @@ isodate==0.6.1
     #   azure-mgmt-resource
     #   azure-mgmt-search
     #   azure-mgmt-security
+    #   azure-mgmt-servicefabric
     #   azure-mgmt-servicefabricmanagedclusters
     #   azure-mgmt-servicelinker
     #   azure-mgmt-signalr
@@ -783,7 +784,6 @@ msrest==0.7.1
     #   azure-mgmt-policyinsights
     #   azure-mgmt-privatedns
     #   azure-mgmt-servicebus
-    #   azure-mgmt-servicefabric
     #   azure-mgmt-sqlvirtualmachine
     #   azure-mgmt-synapse
     #   azure-mgmt-trafficmanager
@@ -804,7 +804,7 @@ msrestazure==0.6.4.post1
     #   azure-mgmt-managedservices
 mypy-extensions==1.0.0
     # via black
-netaddr==1.2.1
+netaddr==1.3.0
     # via
     #   -r ./requirements.txt
     #   oslo-config
@@ -895,11 +895,11 @@ pillow-simd==9.0.0.post1
     # via -r ./requirements.txt
 pip-tools==7.4.1
     # via -r requirements_dev.in
-pkginfo==1.10.0
+pkginfo==1.11.0
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
-platformdirs==4.2.1
+platformdirs==4.2.2
     # via black
 pluggy==1.5.0
     # via pytest
@@ -936,7 +936,7 @@ pyasn1-modules==0.4.0
     # via
     #   -r ./requirements.txt
     #   google-auth
-pycomposefile==0.0.30
+pycomposefile==0.0.31
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -950,7 +950,7 @@ pygithub==1.59.1
     # via
     #   -r ./requirements.txt
     #   azure-cli
-pygments==2.17.2
+pygments==2.18.0
     # via
     #   -r ./requirements.txt
     #   knack
@@ -983,7 +983,7 @@ pysocks==1.7.1
     # via
     #   -r ./requirements.txt
     #   requests
-pytest==8.2.0
+pytest==8.2.1
     # via
     #   -r requirements_dev.in
     #   pytest-cov
@@ -1001,7 +1001,7 @@ python-dateutil==2.9.0.post0
     #   time-machine
 python-keystoneclient==5.4.0
     # via -r ./requirements.txt
-python-swiftclient==4.5.0
+python-swiftclient==4.6.0
     # via -r ./requirements.txt
 pytz==2024.1
     # via -r requirements_dev.in
@@ -1012,7 +1012,7 @@ pyyaml==6.0.1
     #   oslo-config
     #   oslo-utils
     #   pycomposefile
-requests[socks]==2.31.0
+requests[socks]==2.32.3
     # via
     #   -r ./requirements.txt
     #   adal
@@ -1082,6 +1082,7 @@ stevedore==5.2.0
 tabulate==0.9.0
     # via
     #   -r ./requirements.txt
+    #   azure-cli
     #   knack
 time-machine==2.14.1
     # via -r requirements_dev.in
@@ -1095,7 +1096,9 @@ tomli==2.0.1
     #   coverage
     #   pip-tools
     #   pytest
-typing-extensions==4.11.0
+toolz==0.12.1
+    # via -r ./requirements.txt
+typing-extensions==4.12.0
     # via
     #   -r ./requirements.txt
     #   asgiref
@@ -1139,7 +1142,7 @@ xmltodict==0.13.0
 # The following packages are considered to be unsafe in a requirements file:
 pip==24.0
     # via pip-tools
-setuptools==69.5.1
+setuptools==70.0.0
     # via
     #   -r ./requirements.txt
     #   pip-tools
