@@ -10,7 +10,6 @@ from main.utils import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 
-RESPONSE_CONTENT_JWT_TOKEN_EXPIRED = "Your token has expired. Request a new token."
 RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA = "Document not found in metadata"
 RESPONSE_CONTENT_INVALID_SCOPE = "Invalid scope"
 RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN = (
