@@ -121,7 +121,6 @@ class AzureZipQueueConsumer:
                 image_info["url_info"],
                 fail_reason,
                 metadata,
-                None,  # TODO: Remove parameter because not needed anymore (was: record["request_meta"])
                 tmp_folder_path,
             )
         # Store the info_file_along_with_the_image_files

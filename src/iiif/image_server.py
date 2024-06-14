@@ -18,13 +18,19 @@ RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER = (
 )
 
 
+class FilenameNotFoundInDocumentInMetadataError(Exception):
+    pass
+
+
 def create_wabo_url(url_info, metadata):
     for document in metadata["documenten"]:
         if document["barcode"] == url_info["document_barcode"]:
             return document["bestanden"][0][
                 "filename"
             ]  # there is always only one filename per bestand
-    # TODO: raise something in the unlikely event that nothing is found
+    raise FilenameNotFoundInDocumentInMetadataError(
+        f'Filename for document {url_info["document_barcode"]} not found'
+    )
 
 
 # TODO: split into two functions, one for url and one for headers
@@ -65,7 +71,7 @@ def get_image_from_server(file_url, headers):
     return requests.get(file_url, headers=headers, verify=False, timeout=(15, 25))
 
 
-def get_file(request_meta, url_info, iiif_url, metadata):
+def get_file(url_info, metadata):
     file_url, headers = create_file_url_and_headers(url_info, metadata)
     try:
         file_response = get_image_from_server(file_url, headers)
@@ -114,7 +120,6 @@ def download_file_for_zip(
     url_info,
     fail_reason,
     metadata,
-    request_meta,
     tmp_folder_path,
 ):
     info_txt_contents += f"{iiif_url}: "
@@ -124,7 +129,7 @@ def download_file_for_zip(
         return info_txt_contents
 
     try:
-        file_response, file_url = get_file(request_meta, url_info, iiif_url, metadata)
+        file_response, file_url = get_file(url_info, metadata)
         handle_file_response_codes(file_response, file_url)
     except ImmediateHttpResponse as e:
         log.exception(

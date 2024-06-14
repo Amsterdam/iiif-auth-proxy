@@ -35,9 +35,7 @@ def index(request, iiif_url):
         metadata, _ = get_metadata(url_info, iiif_url, {})
         authentication.check_file_access_in_metadata(metadata, url_info, scope)
         # TODO image from image_server cached?
-        file_response, file_url = image_server.get_file(
-            request.META, url_info, iiif_url, metadata
-        )
+        file_response, file_url = image_server.get_file(url_info, metadata)
         image_server.handle_file_response_codes(file_response, file_url)
 
         file_content = file_response.content
