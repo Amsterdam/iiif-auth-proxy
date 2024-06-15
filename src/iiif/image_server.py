@@ -78,7 +78,7 @@ def get_file(url_info, metadata):
     except RequestException as e:
         message = f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {e.__class__.__name__}"
         log.error(message)
-        raise ImmediateHttpResponse(response=HttpResponse(message, status=502))
+        raise ImmediateHttpResponse(response=HttpResponse(message, status=502)) from e
 
     return file_response, file_url
 

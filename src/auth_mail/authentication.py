@@ -64,18 +64,18 @@ def read_out_mail_jwt_token(request):
                             RESPONSE_CONTENT_INVALID_SCOPE, status=401
                         )
                     )
-        except ExpiredSignatureError:
+        except ExpiredSignatureError as e:
             raise ImmediateHttpResponse(
                 response=HttpResponse("Expired JWT token signature", status=401)
-            )
-        except InvalidSignatureError:
+            ) from e
+        except InvalidSignatureError as e:
             raise ImmediateHttpResponse(
                 response=HttpResponse("Invalid JWT token signature", status=401)
-            )
-        except DecodeError:
+            ) from e
+        except DecodeError as e:
             raise ImmediateHttpResponse(
                 response=HttpResponse("Invalid JWT token", status=401)
-            )
+            ) from e
 
         is_mail_login = True
 
@@ -145,10 +145,10 @@ def check_file_access_in_metadata(metadata, url_info, scope):
             raise ImmediateHttpResponse(
                 response=HttpResponse(RESPONSE_CONTENT_RESTRICTED, status=401)
             )
-    except DocumentNotFoundInMetadataError:
+    except DocumentNotFoundInMetadataError as e:
         raise ImmediateHttpResponse(
             response=HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404)
-        )
+        ) from e
 
 
 def check_restricted_file(metadata, url_info):

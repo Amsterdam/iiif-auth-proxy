@@ -83,14 +83,14 @@ def parse_scaling_string(scaling):
 
         desired_width = int(parts[0]) if parts[0] else None
         desired_height = int(parts[1]) if parts[1] else None
-    except ValueError:
+    except ValueError as e:
         raise utils.ImmediateHttpResponse(
             response=HttpResponse(MALFORMED_SCALING_PARAMETER, status=400)
-        )
-    except AttributeError:
+        ) from e
+    except AttributeError as e:
         raise utils.ImmediateHttpResponse(
             response=HttpResponse(MISSING_SCALING_PARAMETER, status=400)
-        )
+        ) from e
 
     return desired_width, desired_height
 
@@ -142,7 +142,6 @@ def scale_image(content_type, scaling, content):
         return content
 
     scaled_image = img.resize((new_width, new_height), Image.LANCZOS)
-
     image_stream = BytesIO()
     format = content_type_to_format(content_type)
     scaled_image.save(image_stream, format=format)
@@ -173,14 +172,14 @@ def parse_region_string(region):
         desired_y = int(parts[1])
         desired_width = int(parts[2])
         desired_height = int(parts[3])
-    except ValueError:
+    except ValueError as e:
         raise utils.ImmediateHttpResponse(
             response=HttpResponse(MALFORMED_REGION_PARAMETER, status=400)
-        )
-    except AttributeError:
+        ) from e
+    except AttributeError as e:
         raise utils.ImmediateHttpResponse(
             response=HttpResponse(MISSING_REGION_PARAMETER, status=400)
-        )
+        ) from e
 
     return desired_x, desired_y, desired_width, desired_height
 

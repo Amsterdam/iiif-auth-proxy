@@ -44,7 +44,7 @@ def get_metadata(url_info, iiif_url, metadata_cache):
             response=HttpResponse(
                 RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER, status=502
             )
-        )
+        ) from e
 
     if meta_response.status_code == 404:
         raise ImmediateHttpResponse(

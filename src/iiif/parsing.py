@@ -123,7 +123,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
 
     except Exception as e:
         log.error(f"Invalid iiif url: {iiif_url} ({e})")
-        raise InvalidIIIFUrlError(f"Invalid iiif url: {iiif_url}")
+        raise InvalidIIIFUrlError(f"Invalid iiif url: {iiif_url}") from e
 
 
 def get_email_address(request, jwt_token):
@@ -146,18 +146,20 @@ def get_email_address(request, jwt_token):
 def get_url_info(iiif_url, source_file):
     try:
         url_info = get_info_from_iiif_url(iiif_url, source_file)
-    except InvalidIIIFUrlError:
+    except InvalidIIIFUrlError as e:
         raise ImmediateHttpResponse(
             response=HttpResponse("Invalid formatted url", status=400)
-        )
+        ) from e
     return url_info
 
 
 def parse_payload(request):
     try:
         return json.loads(request.body.decode("utf-8"))
-    except json.decoder.JSONDecodeError:
-        raise ImmediateHttpResponse(response=HttpResponse("JSON invalid", status=400))
+    except json.decoder.JSONDecodeError as e:
+        raise ImmediateHttpResponse(
+            response=HttpResponse("JSON invalid", status=400)
+        ) from e
 
 
 def check_login_url_payload(payload):
