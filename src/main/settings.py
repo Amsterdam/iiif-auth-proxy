@@ -13,11 +13,11 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import json
 import os
 import sys
-from distutils.util import strtobool
 
 from corsheaders.defaults import default_headers
 from opencensus.trace import config_integration
 
+from main.utils import str_to_bool
 from main.utils_azure_insights import (
     create_azure_log_handler_config,
     create_azure_trace_config,
@@ -27,11 +27,12 @@ from .azure_settings import Azure
 
 azure = Azure()
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-DEBUG = os.getenv("DEBUG", "false").lower() == "true"
+DEBUG = str_to_bool(os.getenv("DEBUG", "false"))
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 APP_NAME = os.getenv("APP_NAME", "iiif-auth-proxy")
@@ -81,7 +82,9 @@ STORAGE_ACCOUNT_URL = os.getenv("STORAGE_ACCOUNT_URL")
 QUEUE_ACCOUNT_URL = os.getenv("QUEUE_ACCOUNT_URL")
 ZIP_QUEUE_NAME = "zip-queue"
 LOGIN_ORIGIN_URL_TLD_WHITELIST = ["data.amsterdam.nl", "acc.dataportaal.amsterdam.nl"]
-if strtobool(os.getenv("ALLOW_LOCALHOST_LOGIN_URL", "false")):
+
+
+if str_to_bool(os.getenv("ALLOW_LOCALHOST_LOGIN_URL", "false")):
     LOGIN_ORIGIN_URL_TLD_WHITELIST += ["localhost", "127.0.0.1"]
 
 # SMTP email settings using Secure Mail Relay
@@ -92,12 +95,12 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_FROM_EMAIL_ADDRESS = os.getenv(
     "EMAIL_FROM_EMAIL_ADDRESS", "bouwdossiers@amsterdam.nl"
 )
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
+EMAIL_USE_TLS = str_to_bool(os.getenv("EMAIL_USE_TLS", "true"))
 EMAIL_TIMEOUT = 5
 
 # Development
-MOCK_GET_IMAGE_FROM_SERVER = (
-    os.getenv("MOCK_GET_IMAGE_FROM_SERVER", "false").lower() == "true"
+MOCK_GET_IMAGE_FROM_SERVER = str_to_bool(
+    os.getenv("MOCK_GET_IMAGE_FROM_SERVER", "false")
 )
 
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
@@ -121,7 +124,7 @@ JWKS_TEST_KEY = """
     }
 """
 
-USE_JWKS_TEST_KEY = os.getenv("USE_JWKS_TEST_KEY", "false").lower() == "true"
+USE_JWKS_TEST_KEY = str_to_bool(os.getenv("USE_JWKS_TEST_KEY", "false"))
 PUB_JWKS = JWKS_TEST_KEY if USE_JWKS_TEST_KEY else os.getenv("PUB_JWKS")
 
 DATAPUNT_AUTHZ = {
