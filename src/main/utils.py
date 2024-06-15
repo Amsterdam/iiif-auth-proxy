@@ -29,3 +29,7 @@ def str_to_bool(boolstr):
 
 def find(func, seq):
     return next(filter(func, seq), None)
+
+
+def clamp(n, minn, maxn):
+    return max(min(maxn, n), minn)
