@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from jwt.exceptions import DecodeError, ExpiredSignatureError, InvalidSignatureError
 
-from main.utils import ImmediateHttpResponse
+from main.utils import ImmediateHttpResponse, find
 
 log = logging.getLogger(__name__)
 
@@ -152,9 +152,7 @@ def check_file_access_in_metadata(metadata, url_info, scope):
 
 
 def check_restricted_file(metadata, url_info):
-    is_public, has_copyright = img_is_public_copyright(
-        metadata, url_info["document_barcode"]
-    )
+    is_public, _ = img_is_public_copyright(metadata, url_info["document_barcode"])
     if not is_public:
         raise ImmediateHttpResponse(
             response=HttpResponse(RESPONSE_CONTENT_RESTRICTED_IN_ZIP, status=400)
@@ -163,27 +161,23 @@ def check_restricted_file(metadata, url_info):
 
 def img_is_public_copyright(metadata, document_barcode):
     """
-    Return if document is public and has copyright.
-    If it is not public the copyright is not used en returned as unknown
+    Return whether document is public and has copyright.
+    If the document is not public the copyright is not used and returned as unknown
     """
-    public = None
-    copyright1 = None
+    is_public = False
+    has_copyright = None
     if metadata["access"] != settings.ACCESS_PUBLIC:
-        public = False
-    else:
-        for meta_document in metadata["documenten"]:
-            if meta_document["barcode"] == document_barcode:
-                if meta_document["access"] == settings.ACCESS_PUBLIC:
-                    public = True
-                    copyright1 = (
-                        meta_document.get("copyright") == settings.COPYRIGHT_YES
-                    )
-                elif meta_document["access"] == settings.ACCESS_RESTRICTED:
-                    public = False
-                break
-    if public is None:
+        return is_public, has_copyright
+
+    document = find(lambda d: d["barcode"] == document_barcode, metadata["documenten"])
+    if not document:
         raise DocumentNotFoundInMetadataError()
-    return public, copyright1
+
+    if document["access"] == settings.ACCESS_PUBLIC:
+        is_public = True
+        has_copyright = document.get("copyright") == settings.COPYRIGHT_YES
+
+    return is_public, has_copyright
 
 
 def create_mail_login_token(email_address, key, expiry_hours=24):
