@@ -32,7 +32,7 @@ azure = Azure()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-DEBUG = str_to_bool(os.getenv("DEBUG", "false"))
+IN_DEBUG_MODE = str_to_bool(os.getenv("DEBUG", "false"))
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 APP_NAME = os.getenv("APP_NAME", "iiif-auth-proxy")
@@ -128,8 +128,7 @@ USE_JWKS_TEST_KEY = str_to_bool(os.getenv("USE_JWKS_TEST_KEY", "false"))
 PUB_JWKS = JWKS_TEST_KEY if USE_JWKS_TEST_KEY else os.getenv("PUB_JWKS")
 
 DATAPUNT_AUTHZ = {
-    "ALWAYS_OK": True if DEBUG else False,  # disable authz. tests will fail...
-    # "ALWAYS_OK": False,
+    "ALWAYS_OK": IN_DEBUG_MODE,  # disable authz. tests will fail...
     "JWKS": PUB_JWKS,
     "JWKS_URL": os.getenv("KEYCLOAK_JWKS_URL"),
     "FORCED_ANONYMOUS_ROUTES": ["/status/health"],
