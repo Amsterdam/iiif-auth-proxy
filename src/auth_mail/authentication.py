@@ -88,26 +88,27 @@ def get_max_scope(request, mail_jwt_token):
     #
     # In case of an authz token a list is returned: https://github.com/Amsterdam/authorization_django/blob/97194d7a61deb25ac30ad2954bc913cc6ec28887/authorization_django/middleware.py#L159
     # but in case of a keycloak token a set is returned: https://github.com/Amsterdam/authorization_django/blob/97194d7a61deb25ac30ad2954bc913cc6ec28887/authorization_django/middleware.py#L166
-    # So to not breaking adding a set with a list, below we always convert both structures to a list.
+    # So to not breaking adding a set with a list, below we always convert both structures to a set.
 
-    if settings.DATAPUNT_AUTHZ["ALWAYS_OK"]:
-        scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
-    elif settings.BOUWDOSSIER_EXTENDED_SCOPE in list(request.get_token_scopes) + list(
-        mail_jwt_token.get("scopes", [])
-    ):
-        scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
-    elif settings.BOUWDOSSIER_READ_SCOPE in list(request.get_token_scopes) + list(
-        mail_jwt_token.get("scopes", [])
-    ):
-        scope = settings.BOUWDOSSIER_READ_SCOPE
-    elif settings.BOUWDOSSIER_PUBLIC_SCOPE in mail_jwt_token.get("scopes", []):
-        scope = settings.BOUWDOSSIER_PUBLIC_SCOPE
-    else:
-        raise ImmediateHttpResponse(
-            response=HttpResponse(RESPONSE_CONTENT_INVALID_SCOPE, status=401)
-        )
+    request_token_scopes = set(getattr(request, "get_token_scopes", []))
+    mail_jwt_scopes = set(mail_jwt_token.get("scopes", []))
+    user_scopes = request_token_scopes | mail_jwt_scopes
 
-    return scope
+    if (
+        settings.DATAPUNT_AUTHZ["ALWAYS_OK"]
+        or settings.BOUWDOSSIER_EXTENDED_SCOPE in user_scopes
+    ):
+        return settings.BOUWDOSSIER_EXTENDED_SCOPE
+
+    if settings.BOUWDOSSIER_READ_SCOPE in user_scopes:
+        return settings.BOUWDOSSIER_READ_SCOPE
+
+    if settings.BOUWDOSSIER_PUBLIC_SCOPE in mail_jwt_scopes:
+        return settings.BOUWDOSSIER_PUBLIC_SCOPE
+
+    raise ImmediateHttpResponse(
+        response=HttpResponse(RESPONSE_CONTENT_INVALID_SCOPE, status=401)
+    )
 
 
 def check_wabo_for_mail_login(is_mail_login, url_info):
