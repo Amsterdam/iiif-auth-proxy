@@ -22,6 +22,17 @@ class FilenameNotFoundInDocumentInMetadataError(Exception):
     pass
 
 
+class FileSourceNotValidError(Exception):
+    pass
+
+
+def create_prewabo_url(url_info):
+    # If the iiif url contains a reference to dossier like SQ1421 without a '-' or '/' between the letters
+    # and the numbers, then this was added as a reference to stadsdeel and dossiernumber and
+    # it should be removed. The line below does exactly that.
+    return re.sub(r"[A-Z]+\d+/", "", url_info["source_filename"])
+
+
 def create_wabo_url(url_info, metadata):
     for document in metadata["documenten"]:
         if document["barcode"] == url_info["document_barcode"]:
@@ -33,26 +44,24 @@ def create_wabo_url(url_info, metadata):
     )
 
 
-# TODO: split into two functions, one for url and one for headers
 def create_file_url_and_headers(url_info, metadata):
     if url_info["source"] == "edepot":
-        # If the iiif url contains a reference to dossier like SQ1421 without a '-' or '/' between the letters
-        # and the numbers, then this was added as a reference to stadsdeel and dossiernumber and
-        # it should be removed. The line below does exactly that.
-        iiif_url_edepot = re.sub(r"[A-Z]+\d+/", "", url_info["source_filename"])
+        iiif_url_edepot = create_prewabo_url(url_info)
         iiif_image_url = f"{settings.EDEPOT_BASE_URL}{iiif_url_edepot}"
         return iiif_image_url, {"Authorization": settings.EDEPOT_AUTHORIZATION}
 
-    elif url_info["source"] == "wabo":
+    if url_info["source"] == "wabo":
         wabo_url = create_wabo_url(url_info, metadata)
         iiif_image_url = f"{settings.WABO_BASE_URL}{wabo_url}"
         return iiif_image_url, {"Authorization": settings.WABO_AUTHORIZATION}
 
+    raise FileSourceNotValidError(f'File source: {url_info["source"]} invalid')
 
-def create_mock_image(format):
+
+def create_mock_image(image_format):
     img = Image.new("RGB", (32, 32), color="green")
     buf = BytesIO()
-    img.save(buf, format=format)
+    img.save(buf, format=image_format)
     return buf.getvalue()
 
 
@@ -90,7 +99,8 @@ def handle_file_response_codes(file_response, file_url):
                 f"No source file could be found for the url {file_url}", status=404
             )
         )
-    elif file_response.status_code != 200:
+
+    if file_response.status_code != 200:
         log.info(
             f"Got response code {file_response.status_code} while retrieving "
             f"the image {file_url} from the image server."
