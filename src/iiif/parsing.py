@@ -78,45 +78,44 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 f"No formatting or info.json provided in iiif url: {iiif_url}"
             )
 
+        url_info = {
+            "source": source,
+            "formatting": formatting,
+            "region": region,
+            "scaling": scaling,
+            "source_filename": source_filename,  # The filename on the source system
+            "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
+            "info_json": info_json,  # Whether the info.json is requested instead of the image itself
+        }
         if source == "edepot":  # aka pre-wabo
-            m = re.match(r"^([A-Z]+)-?(\d+)-(.+)$", relevant_url_part)
-            if not m:
+            # ST-00015-ST00000126_00001.jpg=relevant_url_part  ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
+            # SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg=relevant_url_part  SQ=stadsdeel  01425=dossier  SQ100796511=document_barcode  00001=file/bestand
+            try:
+                stadsdeel, dossier, document_barcode, file = re.match(
+                    r"^.*?([A-Z]{2})-(\d{5}).*?-(.+)_(.*?)\.\w+$", relevant_url_part
+                ).groups()
+            except Exception as e:
                 raise InvalidIIIFUrlError(
                     f"Invalid iiif url (no valid source): {iiif_url}"
-                )
-            stadsdeel = m.group(1)
-            dossier = m.group(2)
-            document_and_file = m.group(3).split("-")[-1]
-            document_barcode, file = document_and_file.split("_")
+                ) from e
+
             return {
-                "source": source,
+                **url_info,
                 "stadsdeel": stadsdeel,
                 "dossier": dossier,
                 "document_barcode": document_barcode,
-                "file": file.split(".")[0],  # The file in the dossier
-                "formatting": formatting,
-                "region": region,
-                "scaling": scaling,
-                "source_filename": source_filename,  # The filename on the source system
-                "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
-                "info_json": info_json,  # Whether the info.json is requested instead of the image itself
+                "file": file,  # The file in the dossier
             }
 
         elif source == "wabo":
             stadsdeel, dossier, olo_and_document = relevant_url_part.split("-", 2)
             olo, document_barcode = olo_and_document.split("_", 1)
             return {
-                "source": source,
+                **url_info,
                 "stadsdeel": stadsdeel,
                 "dossier": dossier,
                 "olo": olo,
                 "document_barcode": document_barcode,
-                "formatting": formatting,
-                "region": region,
-                "scaling": scaling,
-                "source_filename": source_filename,  # The filename on the source system
-                "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
-                "info_json": info_json,
             }
 
         raise InvalidIIIFUrlError(f"Invalid iiif url (no valid source): {iiif_url}")
