@@ -34,7 +34,8 @@ def create_tmp_folder():
 def save_file_to_folder(folder, filename, content):
     file_path = os.path.join(folder, filename)
     open_mode = "w" if isinstance(content, str) else "wb"
-    with open(file_path, open_mode) as f:
+    encoding = "utf-8" if "b" not in open_mode else None
+    with open(file_path, open_mode, encoding=encoding) as f:
         f.write(content)
 
 
