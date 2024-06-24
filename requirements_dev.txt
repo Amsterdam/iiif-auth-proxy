@@ -123,7 +123,7 @@ azure-common==1.1.28
     #   azure-synapse-artifacts
     #   azure-synapse-managedprivateendpoints
     #   azure-synapse-spark
-azure-core==1.30.1
+azure-core==1.30.2
     # via
     #   -r ./requirements.txt
     #   azure-appconfiguration
@@ -427,7 +427,7 @@ azure-mgmt-privatedns==1.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-rdbms==10.2.0b16
+azure-mgmt-rdbms==10.2.0b17
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -551,7 +551,7 @@ cachetools==5.3.3
     # via
     #   -r ./requirements.txt
     #   google-auth
-certifi==2024.2.2
+certifi==2024.6.2
     # via
     #   -r ./requirements.txt
     #   msrest
@@ -578,9 +578,9 @@ colorama==0.4.6
     # via
     #   -r ./requirements.txt
     #   azure-cli
-coverage[toml]==7.5.3
+coverage[toml]==7.5.4
     # via pytest-cov
-cryptography==42.0.7
+cryptography==42.0.8
     # via
     #   -r ./requirements.txt
     #   adal
@@ -624,7 +624,7 @@ django==4.1.13
     #   datapunt-authorization-django
     #   django-cors-headers
     #   opencensus-ext-django
-django-cors-headers==4.3.1
+django-cors-headers==4.4.0
     # via -r ./requirements.txt
 django-ratelimit==4.1.0
     # via -r ./requirements.txt
@@ -638,11 +638,11 @@ google-api-core==2.19.0
     # via
     #   -r ./requirements.txt
     #   opencensus
-google-auth==2.29.0
+google-auth==2.30.0
     # via
     #   -r ./requirements.txt
     #   google-api-core
-googleapis-common-protos==1.63.0
+googleapis-common-protos==1.63.1
     # via
     #   -r ./requirements.txt
     #   google-api-core
@@ -862,7 +862,7 @@ oslo-utils==7.1.0
     #   -r ./requirements.txt
     #   oslo-serialization
     #   python-keystoneclient
-packaging==24.0
+packaging==24.1
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -895,7 +895,7 @@ pillow-simd==9.0.0.post1
     # via -r ./requirements.txt
 pip-tools==7.4.1
     # via -r requirements_dev.in
-pkginfo==1.11.0
+pkginfo==1.11.1
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
@@ -903,12 +903,12 @@ platformdirs==4.2.2
     # via black
 pluggy==1.5.0
     # via pytest
-portalocker==2.8.2
+portalocker==2.10.0
     # via
     #   -r ./requirements.txt
     #   azure-cli-telemetry
     #   msal-extensions
-proto-plus==1.23.0
+proto-plus==1.24.0
     # via
     #   -r ./requirements.txt
     #   google-api-core
@@ -983,7 +983,7 @@ pysocks==1.7.1
     # via
     #   -r ./requirements.txt
     #   requests
-pytest==8.2.1
+pytest==8.2.2
     # via
     #   -r requirements_dev.in
     #   pytest-cov
@@ -1098,7 +1098,7 @@ tomli==2.0.1
     #   pytest
 toolz==0.12.1
     # via -r ./requirements.txt
-typing-extensions==4.12.0
+typing-extensions==4.12.2
     # via
     #   -r ./requirements.txt
     #   asgiref
@@ -1117,7 +1117,7 @@ tzdata==2024.1
     #   -r ./requirements.txt
     #   oslo-serialization
     #   oslo-utils
-urllib3==2.2.1
+urllib3==2.2.2
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -1140,9 +1140,9 @@ xmltodict==0.13.0
     #   azure-cli
 
 # The following packages are considered to be unsafe in a requirements file:
-pip==24.0
+pip==24.1
     # via pip-tools
-setuptools==70.0.0
+setuptools==70.1.0
     # via
     #   -r ./requirements.txt
     #   pip-tools
