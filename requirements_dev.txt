@@ -159,7 +159,7 @@ azure-graphrbac==0.60.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-identity==1.14.0
+azure-identity==1.16.1
     # via
     #   -r ./requirements.txt
     #   opencensus-ext-azure

@@ -132,7 +132,7 @@ azure-datalake-store==0.0.53
     # via azure-cli
 azure-graphrbac==0.60.0
     # via azure-cli
-azure-identity==1.14.0
+azure-identity==1.16.1
     # via
     #   -r requirements.in
     #   opencensus-ext-azure

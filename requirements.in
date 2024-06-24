@@ -20,7 +20,7 @@ django-ratelimit
 # Azure
 azure-cli
 azure-core
-azure-identity==1.14  # 1.15 leads to incompatible version dependencies right now
+azure-identity==1.16.1  # 1.15 leads to incompatible version dependencies right now
 azure-storage-blob
 azure-keyvault
 azure-keyvault-secrets
