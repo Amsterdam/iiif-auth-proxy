@@ -2,8 +2,12 @@
 # https://git.datapunt.amsterdam.nl/Datapunt/python-best-practices/blob/master/dependency_management/
 .PHONY: app push deploy
 
+UID:=$(shell id --user)
+GID:=$(shell id --group)
+
 dc = docker compose
-run = $(dc) run --rm
+run = $(dc) run --rm -u ${UID}:${GID}
+manage = $(run) dev python manage.py
 
 help:                               ## Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
@@ -23,10 +27,10 @@ requirements: pip-tools             ## Upgrade requirements (in requirements.in)
 upgrade: requirements install       ## Run 'requirements' and 'install' targets
 
 migrations:
-	$(dc) run --rm app python manage.py makemigrations
+	$(manage) makemigrations
 
 migrate:
-	$(dc) run --rm app python manage.py migrate
+	$(manage) migrate
 
 build:
 	$(dc) build --progress=plain
@@ -41,7 +45,7 @@ dev:
 	$(run) --service-ports dev
 
 dev-consume-zips:
-	$(run) --service-ports dev python manage.py consume_zips
+	$(manage) consume_zips
 
 test: lint
 	$(run) test pytest $(ARGS)

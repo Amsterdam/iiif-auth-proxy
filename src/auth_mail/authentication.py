@@ -6,11 +6,10 @@ from django.conf import settings
 from django.http import HttpResponse
 from jwt.exceptions import DecodeError, ExpiredSignatureError, InvalidSignatureError
 
-from main.utils import ImmediateHttpResponse
+from main.utils import ImmediateHttpResponse, find
 
 log = logging.getLogger(__name__)
 
-RESPONSE_CONTENT_JWT_TOKEN_EXPIRED = "Your token has expired. Request a new token."
 RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA = "Document not found in metadata"
 RESPONSE_CONTENT_INVALID_SCOPE = "Invalid scope"
 RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN = (
@@ -65,18 +64,18 @@ def read_out_mail_jwt_token(request):
                             RESPONSE_CONTENT_INVALID_SCOPE, status=401
                         )
                     )
-        except ExpiredSignatureError:
+        except ExpiredSignatureError as e:
             raise ImmediateHttpResponse(
                 response=HttpResponse("Expired JWT token signature", status=401)
-            )
-        except InvalidSignatureError:
+            ) from e
+        except InvalidSignatureError as e:
             raise ImmediateHttpResponse(
                 response=HttpResponse("Invalid JWT token signature", status=401)
-            )
-        except DecodeError:
+            ) from e
+        except DecodeError as e:
             raise ImmediateHttpResponse(
                 response=HttpResponse("Invalid JWT token", status=401)
-            )
+            ) from e
 
         is_mail_login = True
 
@@ -89,26 +88,27 @@ def get_max_scope(request, mail_jwt_token):
     #
     # In case of an authz token a list is returned: https://github.com/Amsterdam/authorization_django/blob/97194d7a61deb25ac30ad2954bc913cc6ec28887/authorization_django/middleware.py#L159
     # but in case of a keycloak token a set is returned: https://github.com/Amsterdam/authorization_django/blob/97194d7a61deb25ac30ad2954bc913cc6ec28887/authorization_django/middleware.py#L166
-    # So to not breaking adding a set with a list, below we always convert both structures to a list.
+    # So to not breaking adding a set with a list, below we always convert both structures to a set.
 
-    if settings.DATAPUNT_AUTHZ["ALWAYS_OK"]:
-        scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
-    elif settings.BOUWDOSSIER_EXTENDED_SCOPE in list(request.get_token_scopes) + list(
-        mail_jwt_token.get("scopes", [])
-    ):
-        scope = settings.BOUWDOSSIER_EXTENDED_SCOPE
-    elif settings.BOUWDOSSIER_READ_SCOPE in list(request.get_token_scopes) + list(
-        mail_jwt_token.get("scopes", [])
-    ):
-        scope = settings.BOUWDOSSIER_READ_SCOPE
-    elif settings.BOUWDOSSIER_PUBLIC_SCOPE in mail_jwt_token.get("scopes", []):
-        scope = settings.BOUWDOSSIER_PUBLIC_SCOPE
-    else:
-        raise ImmediateHttpResponse(
-            response=HttpResponse(RESPONSE_CONTENT_INVALID_SCOPE, status=401)
-        )
+    request_token_scopes = set(getattr(request, "get_token_scopes", []))
+    mail_jwt_scopes = set(mail_jwt_token.get("scopes", []))
+    user_scopes = request_token_scopes | mail_jwt_scopes
 
-    return scope
+    if (
+        settings.DATAPUNT_AUTHZ["ALWAYS_OK"]
+        or settings.BOUWDOSSIER_EXTENDED_SCOPE in user_scopes
+    ):
+        return settings.BOUWDOSSIER_EXTENDED_SCOPE
+
+    if settings.BOUWDOSSIER_READ_SCOPE in user_scopes:
+        return settings.BOUWDOSSIER_READ_SCOPE
+
+    if settings.BOUWDOSSIER_PUBLIC_SCOPE in mail_jwt_scopes:
+        return settings.BOUWDOSSIER_PUBLIC_SCOPE
+
+    raise ImmediateHttpResponse(
+        response=HttpResponse(RESPONSE_CONTENT_INVALID_SCOPE, status=401)
+    )
 
 
 def check_wabo_for_mail_login(is_mail_login, url_info):
@@ -145,16 +145,14 @@ def check_file_access_in_metadata(metadata, url_info, scope):
             raise ImmediateHttpResponse(
                 response=HttpResponse(RESPONSE_CONTENT_RESTRICTED, status=401)
             )
-    except DocumentNotFoundInMetadataError:
+    except DocumentNotFoundInMetadataError as e:
         raise ImmediateHttpResponse(
             response=HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404)
-        )
+        ) from e
 
 
 def check_restricted_file(metadata, url_info):
-    is_public, has_copyright = img_is_public_copyright(
-        metadata, url_info["document_barcode"]
-    )
+    is_public, _ = img_is_public_copyright(metadata, url_info["document_barcode"])
     if not is_public:
         raise ImmediateHttpResponse(
             response=HttpResponse(RESPONSE_CONTENT_RESTRICTED_IN_ZIP, status=400)
@@ -163,27 +161,23 @@ def check_restricted_file(metadata, url_info):
 
 def img_is_public_copyright(metadata, document_barcode):
     """
-    Return if document is public and has copyright.
-    If it is not public the copyright is not used en returned as unknown
+    Return whether document is public and has copyright.
+    If the document is not public the copyright is not used and returned as unknown
     """
-    public = None
-    copyright1 = None
+    is_public = False
+    has_copyright = None
     if metadata["access"] != settings.ACCESS_PUBLIC:
-        public = False
-    else:
-        for meta_document in metadata["documenten"]:
-            if meta_document["barcode"] == document_barcode:
-                if meta_document["access"] == settings.ACCESS_PUBLIC:
-                    public = True
-                    copyright1 = (
-                        meta_document.get("copyright") == settings.COPYRIGHT_YES
-                    )
-                elif meta_document["access"] == settings.ACCESS_RESTRICTED:
-                    public = False
-                break
-    if public is None:
+        return is_public, has_copyright
+
+    document = find(lambda d: d["barcode"] == document_barcode, metadata["documenten"])
+    if not document:
         raise DocumentNotFoundInMetadataError()
-    return public, copyright1
+
+    if document["access"] == settings.ACCESS_PUBLIC:
+        is_public = True
+        has_copyright = document.get("copyright") == settings.COPYRIGHT_YES
+
+    return is_public, has_copyright
 
 
 def create_mail_login_token(email_address, key, expiry_hours=24):

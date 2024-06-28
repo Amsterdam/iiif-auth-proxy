@@ -1,17 +1,11 @@
 from django.conf import settings
 
-
-def filename_from_url(url):
-    return url.split(":")[1].split("/")[0].replace("-", "/")
-
-
 PRE_WABO_IMG_URL_BASE = "2/edepot:ST-00015-ST00000126_00001.jpg/"
 
 PRE_WABO_INFO_JSON_URL = PRE_WABO_IMG_URL_BASE + "info.json"
 
 PRE_WABO_IMG_URL_WITH_SCALING = PRE_WABO_IMG_URL_BASE + "full/50,50/0/default.jpg"
 PRE_WABO_IMG_URL_WITH_EMPTY_SCALING = PRE_WABO_IMG_URL_BASE + "full//0/default.jpg"
-PRE_WABO_FILE_NAME_WITH_SCALING = filename_from_url(PRE_WABO_IMG_URL_WITH_SCALING)
 
 PRE_WABO_IMG_URL_WITH_REGION = PRE_WABO_IMG_URL_BASE + "24,24,48,48/full/0/default.jpg"
 PRE_WABO_IMG_URL_WITH_REGION_NON_OVERLAPPING = (
@@ -25,13 +19,9 @@ PRE_WABO_IMG_URL_SOURCE_FILE = (
 PRE_WABO_IMG_URL_NO_SCALING = (
     "2/edepot:ST-00015-ST00000126_00001.jpg/full/full/0/default.jpg"
 )
-PRE_WABO_FILE_NAME_NO_SCALING = filename_from_url(PRE_WABO_IMG_URL_NO_SCALING)
 
 PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE = (
     "2/edepot:SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg/full/full/0/default.jpg"
-)
-PRE_WABO_IMG_FILE_NAME_WITH_EXTRA_REFERENCE = filename_from_url(
-    PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE
 )
 
 WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547/full/1000,900/0/default.jpg"

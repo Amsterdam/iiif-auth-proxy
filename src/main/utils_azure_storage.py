@@ -107,8 +107,3 @@ def create_storage_account_temp_url(
     file_url = blob_client.url.replace(blob_service_client.url, settings.APP_BASE_URL)
 
     return f"{file_url}?{sas_token}"
-
-
-def remove_old_zips_from_storage_account():
-    # TODO: Implement this
-    pass

@@ -23,10 +23,6 @@ from zip_consumer import zip_tools
 logger = logging.getLogger(__name__)
 
 
-class TimeoutError(Exception):
-    pass
-
-
 class AzureZipQueueConsumer:
     # Be careful with the visibility timeout! If the message is still processing when the visibility timeout
     # expires, the message will be put back on the queue and will be processed again. This can lead to duplicate
@@ -53,12 +49,11 @@ class AzureZipQueueConsumer:
 
             if self.end_at_empty_queue:
                 # This part is only for testing purposes. To be able to exit the running process when the queue is empty.
-                message_iterator = [
-                    m
-                    for m in self.queue_client.receive_messages(
+                message_iterator = list(
+                    self.queue_client.receive_messages(
                         messages_per_page=10, visibility_timeout=5
                     )
-                ]
+                )
                 if count == 0 or len(message_iterator) == 0:
                     break
 
@@ -121,7 +116,6 @@ class AzureZipQueueConsumer:
                 image_info["url_info"],
                 fail_reason,
                 metadata,
-                None,  # TODO: Remove parameter because not needed anymore (was: record["request_meta"])
                 tmp_folder_path,
             )
         # Store the info_file_along_with_the_image_files

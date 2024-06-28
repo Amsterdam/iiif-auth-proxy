@@ -21,7 +21,7 @@ def get_metadata_url(url_info):
 
 
 def do_metadata_request(metadata_url):
-    return requests.get(metadata_url)
+    return requests.get(metadata_url, timeout=(15, 25))
 
 
 def get_metadata(url_info, iiif_url, metadata_cache):
@@ -44,7 +44,7 @@ def get_metadata(url_info, iiif_url, metadata_cache):
             response=HttpResponse(
                 RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER, status=502
             )
-        )
+        ) from e
 
     if meta_response.status_code == 404:
         raise ImmediateHttpResponse(
@@ -52,7 +52,7 @@ def get_metadata(url_info, iiif_url, metadata_cache):
                 "No metadata could be found for this dossier", status=404
             )
         )
-    elif meta_response.status_code != 200:
+    if meta_response.status_code != 200:
         log.info(
             f"Got response code {meta_response.status_code} while retrieving "
             f"the metadata for {iiif_url} from the stadsarchief metadata server "

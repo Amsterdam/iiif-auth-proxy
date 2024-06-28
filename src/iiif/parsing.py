@@ -107,7 +107,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "file": file,  # The file in the dossier
             }
 
-        elif source == "wabo":
+        if source == "wabo":
             stadsdeel, dossier, olo_and_document = relevant_url_part.split("-", 2)
             olo, document_barcode = olo_and_document.split("_", 1)
             return {
@@ -122,7 +122,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
 
     except Exception as e:
         log.error(f"Invalid iiif url: {iiif_url} ({e})")
-        raise InvalidIIIFUrlError(f"Invalid iiif url: {iiif_url}")
+        raise InvalidIIIFUrlError(f"Invalid iiif url: {iiif_url}") from e
 
 
 def get_email_address(request, jwt_token):
@@ -145,18 +145,20 @@ def get_email_address(request, jwt_token):
 def get_url_info(iiif_url, source_file):
     try:
         url_info = get_info_from_iiif_url(iiif_url, source_file)
-    except InvalidIIIFUrlError:
+    except InvalidIIIFUrlError as e:
         raise ImmediateHttpResponse(
             response=HttpResponse("Invalid formatted url", status=400)
-        )
+        ) from e
     return url_info
 
 
 def parse_payload(request):
     try:
         return json.loads(request.body.decode("utf-8"))
-    except json.decoder.JSONDecodeError:
-        raise ImmediateHttpResponse(response=HttpResponse("JSON invalid", status=400))
+    except json.decoder.JSONDecodeError as e:
+        raise ImmediateHttpResponse(
+            response=HttpResponse("JSON invalid", status=400)
+        ) from e
 
 
 def check_login_url_payload(payload):
@@ -200,10 +202,10 @@ def strip_full_iiif_url(url):
 
 
 def check_email_validity(email_address):
-    EMAIL_REGEX = re.compile(
+    is_email_regex = re.compile(
         r"[^@]+@[^@]+\.[^@]+"
     )  # Just basic sanity check for a @ and a dot
-    if not EMAIL_REGEX.match(email_address):
+    if not is_email_regex.match(email_address):
         raise ImmediateHttpResponse(
             response=HttpResponse("Email is not valid", status=400)
         )

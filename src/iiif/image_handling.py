@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from PIL import Image
 
 from main import utils
+from main.utils import clamp
 
 # Allow larger images too be processed. We can do this because we trust the source of the images
 Image.MAX_IMAGE_PIXELS = None
@@ -81,18 +82,18 @@ def parse_scaling_string(scaling):
                 "Invalid format for scaling. Width or height value required."
             )
 
-        desired_width = int(parts[0]) if parts[0] else None
-        desired_height = int(parts[1]) if parts[1] else None
-    except ValueError:
+        requested_width = int(parts[0]) if parts[0] else None
+        requested_height = int(parts[1]) if parts[1] else None
+    except ValueError as e:
         raise utils.ImmediateHttpResponse(
             response=HttpResponse(MALFORMED_SCALING_PARAMETER, status=400)
-        )
-    except AttributeError:
+        ) from e
+    except AttributeError as e:
         raise utils.ImmediateHttpResponse(
             response=HttpResponse(MISSING_SCALING_PARAMETER, status=400)
-        )
+        ) from e
 
-    return desired_width, desired_height
+    return requested_width, requested_height
 
 
 def is_image_content_type(content_type):
@@ -103,9 +104,33 @@ def content_type_to_format(content_type):
     return content_type.split("/")[1]
 
 
+def calculate_scaled_dimensions(img, requested_width, requested_height):
+    aspect_ratio = img.width / img.height
+    if requested_width is None:
+        width = int(requested_height * aspect_ratio)
+        height = requested_height
+        return width, height
+
+    if requested_height is None:
+        width = requested_width
+        height = int(requested_width / aspect_ratio)
+        return width, height
+
+    width_reduction_percentage = (img.width - requested_width) / img.width
+    height_reduction_percentage = (img.height - requested_height) / img.height
+
+    if width_reduction_percentage >= height_reduction_percentage:
+        width = requested_width
+        height = int(requested_width / aspect_ratio)
+    else:
+        width = int(requested_height * aspect_ratio)
+        height = requested_height
+    return width, height
+
+
 def scale_image(content_type, scaling, content):
     """
-    Scale the image to the desired size. Never scale up.
+    Scale the image to the requested size. Never scale up.
 
     :param content: The image data
     :param scaling: The scaling string from the url
@@ -115,37 +140,20 @@ def scale_image(content_type, scaling, content):
     if scaling.lower() == "full":
         return content
 
-    desired_width, desired_height = parse_scaling_string(scaling)
-
     img = Image.open(BytesIO(content))
-
-    aspect_ratio = img.width / img.height
-    if desired_width is None:
-        new_width = int(desired_height * aspect_ratio)
-        new_height = desired_height
-    elif desired_height is None:
-        new_width = desired_width
-        new_height = int(desired_width / aspect_ratio)
-    else:
-        width_reduction_percentage = (img.width - desired_width) / img.width
-        height_reduction_percentage = (img.height - desired_height) / img.height
-
-        if width_reduction_percentage >= height_reduction_percentage:
-            new_width = desired_width
-            new_height = int(desired_width / aspect_ratio)
-        else:
-            new_width = int(desired_height * aspect_ratio)
-            new_height = desired_height
+    requested_width, requested_height = parse_scaling_string(scaling)
+    target_width, target_height = calculate_scaled_dimensions(
+        img, requested_width, requested_height
+    )
 
     # Ensure we don't scale up
-    if new_width > img.width or new_height > img.height:
+    if target_width > img.width or target_height > img.height:
         return content
 
-    scaled_image = img.resize((new_width, new_height), Image.LANCZOS)
-
     image_stream = BytesIO()
-    format = content_type_to_format(content_type)
-    scaled_image.save(image_stream, format=format)
+    image_format = content_type_to_format(content_type)
+    scaled_image = img.resize((target_width, target_height), Image.LANCZOS)
+    scaled_image.save(image_stream, format=image_format)
     scaled_image_data = image_stream.getvalue()
 
     return scaled_image_data
@@ -157,7 +165,7 @@ def parse_region_string(region):
     Parse the region string from the url (either 'full', 'square' or 'x,y,w,h' in pixels)
 
     :param region: The region string from the url
-    :return: Tuple containing the desired x, y, width and height.
+    :return: Tuple containing the requested x, y, width and height.
     """
     try:
         parts = region.split(",")
@@ -169,25 +177,44 @@ def parse_region_string(region):
                 "Invalid format for region. x, y, width and height values required."
             )
 
-        desired_x = int(parts[0])
-        desired_y = int(parts[1])
-        desired_width = int(parts[2])
-        desired_height = int(parts[3])
-    except ValueError:
+        requested_x = int(parts[0])
+        requested_y = int(parts[1])
+        requested_width = int(parts[2])
+        requested_height = int(parts[3])
+    except ValueError as e:
         raise utils.ImmediateHttpResponse(
             response=HttpResponse(MALFORMED_REGION_PARAMETER, status=400)
-        )
-    except AttributeError:
+        ) from e
+    except AttributeError as e:
         raise utils.ImmediateHttpResponse(
             response=HttpResponse(MISSING_REGION_PARAMETER, status=400)
+        ) from e
+
+    return requested_x, requested_y, requested_width, requested_height
+
+
+def assert_valid_region(
+    img, requested_x, requested_y, requested_width, requested_height
+):
+    region_has_no_width = requested_width <= 0 or requested_width is None
+    region_has_no_height = requested_height <= 0 or requested_height is None
+    if region_has_no_width or region_has_no_height:
+        raise utils.ImmediateHttpResponse(
+            response=HttpResponse(
+                NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER, status=400
+            )
         )
 
-    return desired_x, desired_y, desired_width, desired_height
-
-
-# TODO: Move to an util file
-def clamp(n, minn, maxn):
-    return max(min(maxn, n), minn)
+    region_has_no_overlap_with_img = (
+        requested_x + requested_width <= 0
+        or requested_y + requested_height <= 0
+        or requested_x >= img.width
+        or requested_y >= img.height
+    )
+    if region_has_no_overlap_with_img:
+        raise utils.ImmediateHttpResponse(
+            response=HttpResponse(NON_OVERLAPPING_REGION_PARAMETER, status=400)
+        )
 
 
 # TODO: Extract sub functions to own functions for:
@@ -195,7 +222,7 @@ def clamp(n, minn, maxn):
 # - return original when no crop was applied
 def crop_image(content_type, region, content):
     """
-    Crop the image to the desired size. Never crop outside the image.
+    Crop the image to the requested size. Never crop outside the image.
 
     :param content: The image data
     :param source_file: Bool whether the raw source file should be returned without any cropping
@@ -210,51 +237,33 @@ def crop_image(content_type, region, content):
             return content
         case "square":
             shortest_side = min(img.width, img.height)
-            desired_width = desired_height = shortest_side
-            desired_x = (img.width - desired_width) / 2
-            desired_y = (img.height - desired_height) / 2
+            requested_width = requested_height = shortest_side
+            requested_x = (img.width - requested_width) / 2
+            requested_y = (img.height - requested_height) / 2
         case _:
-            desired_x, desired_y, desired_width, desired_height = parse_region_string(
-                region
+            requested_x, requested_y, requested_width, requested_height = (
+                parse_region_string(region)
             )
 
-    region_has_no_width = desired_width <= 0 or desired_width == None
-    region_has_no_height = desired_height <= 0 or desired_height == None
-    if region_has_no_width or region_has_no_height:
-        raise utils.ImmediateHttpResponse(
-            response=HttpResponse(
-                NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER, status=400
-            )
-        )
-
-    region_has_no_overlap_with_img = (
-        desired_x + desired_width <= 0
-        or desired_y + desired_height <= 0
-        or desired_x >= img.width
-        or desired_y >= img.height
+    assert_valid_region(
+        img, requested_x, requested_y, requested_width, requested_height
     )
-    if region_has_no_overlap_with_img:
-        raise utils.ImmediateHttpResponse(
-            response=HttpResponse(NON_OVERLAPPING_REGION_PARAMETER, status=400)
-        )
 
-    left = clamp(desired_x, 0, img.width)
-    top = clamp(desired_y, 0, img.height)
-    right = clamp(desired_x + desired_width, left, img.width)
-    bottom = clamp(desired_y + desired_height, top, img.height)
+    left = clamp(requested_x, 0, img.width)
+    top = clamp(requested_y, 0, img.height)
+    right = clamp(requested_x + requested_width, left, img.width)
+    bottom = clamp(requested_y + requested_height, top, img.height)
 
     crop_contains_complete_img = (
         left <= 0 and top <= 0 and right >= img.width and bottom >= img.height
     )
-
     if crop_contains_complete_img:
         return content
 
-    cropped_image = img.crop((left, top, right, bottom))
-
     image_stream = BytesIO()
-    format = content_type_to_format(content_type)
-    cropped_image.save(image_stream, format=format)
+    image_format = content_type_to_format(content_type)
+    cropped_image = img.crop((left, top, right, bottom))
+    cropped_image.save(image_stream, format=image_format)
     cropped_image_data = image_stream.getvalue()
 
     return cropped_image_data
