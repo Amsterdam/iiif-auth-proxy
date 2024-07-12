@@ -1,8 +1,9 @@
 import logging
 
 from django.http import HttpResponse
-from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import add_never_cache_headers, patch_cache_control
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.vary import vary_on_headers
 from toolz import partial, pipe
 
 from auth_mail import authentication
@@ -14,14 +15,29 @@ from iiif.image_handling import (
     scale_image,
 )
 from iiif.metadata import get_metadata
-from main import utils
+from main import settings, utils
 
 log = logging.getLogger(__name__)
 HOUR = 3600
 
 
+def get_caching_strategy(scope):
+    if (
+        scope == settings.BOUWDOSSIER_READ_SCOPE
+        or scope == settings.BOUWDOSSIER_PUBLIC_SCOPE
+    ):
+        return partial(patch_cache_control, private=True, max_age=HOUR * 36)
+    return add_never_cache_headers
+
+
+def scoped_http_response(scope, *args, **kwargs):
+    response = HttpResponse(*args, **kwargs)
+    get_caching_strategy(scope)(response)
+    return response
+
+
 @csrf_exempt
-@cache_control(private=True, max_age=HOUR * 36)
+@vary_on_headers("Authorization")
 def index(request, iiif_url):
     try:
         authentication.check_auth_availability(request)
@@ -42,10 +58,7 @@ def index(request, iiif_url):
         file_type = file_response.headers.get("Content-Type")
 
         if is_source_file_requested:
-            return HttpResponse(
-                file_content,
-                file_type,
-            )
+            return scoped_http_response(scope, file_content, file_type)
 
         if not is_image_content_type(file_type):
             raise utils.ImmediateHttpResponse(
@@ -60,9 +73,8 @@ def index(request, iiif_url):
                 file_content,
                 file_type,
             )
-            return HttpResponse(
-                response_content,
-                content_type="application/json",
+            return scoped_http_response(
+                scope, response_content, content_type="application/json"
             )
 
         crop = partial(
@@ -77,10 +89,7 @@ def index(request, iiif_url):
         )
         edited_image = pipe(file_content, crop, scale)
 
-        return HttpResponse(
-            edited_image,
-            file_type,
-        )
+        return scoped_http_response(scope, edited_image, file_type)
     except utils.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in index:")
         return e.response
