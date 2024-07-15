@@ -32,7 +32,8 @@ def get_caching_strategy(scope):
 
 def scoped_http_response(scope, *args, **kwargs):
     response = HttpResponse(*args, **kwargs)
-    get_caching_strategy(scope)(response)
+    add_cache_headers = get_caching_strategy(scope)
+    add_cache_headers(response)
     return response
 
 
