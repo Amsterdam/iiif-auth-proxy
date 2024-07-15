@@ -82,7 +82,7 @@ def read_out_mail_jwt_token(request):
     return jwt_token, is_mail_login
 
 
-def get_max_scope(request, mail_jwt_token):
+def get_user_scope(request, mail_jwt_token):
     # request.get_token_scopes gets the authz or keycloak tokens.
     # mail_jwt_token['scopes'] get the in-url token which non-ambtenaren get in their email
     #
@@ -149,6 +149,13 @@ def check_file_access_in_metadata(metadata, url_info, scope):
         raise ImmediateHttpResponse(
             response=HttpResponse(RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA, status=404)
         ) from e
+
+
+def is_caching_allowed(metadata, url_info):
+    is_public, has_copyright = img_is_public_copyright(
+        metadata, url_info["document_barcode"]
+    )
+    return is_public and not has_copyright
 
 
 def check_restricted_file(metadata, url_info):
