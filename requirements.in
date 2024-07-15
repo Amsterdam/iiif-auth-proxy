@@ -13,7 +13,7 @@ timeout-decorator
 toolz # Zero-dependency library with a set of utility functions for iterators, functions, and dictionaries.
 
 # Django
-django<4.2  # Django 4.2 does not support Postgres 11 anymore
+django
 django-cors-headers
 django-ratelimit
 
