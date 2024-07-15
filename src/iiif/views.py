@@ -15,25 +15,17 @@ from iiif.image_handling import (
     scale_image,
 )
 from iiif.metadata import get_metadata
-from main import settings, utils
+from main import utils
 
 log = logging.getLogger(__name__)
 HOUR = 3600
 
 
-def get_caching_strategy(scope):
-    if (
-        scope == settings.BOUWDOSSIER_READ_SCOPE
-        or scope == settings.BOUWDOSSIER_PUBLIC_SCOPE
-    ):
-        return partial(patch_cache_control, private=True, max_age=HOUR * 36)
-    return add_never_cache_headers
-
-
-def scoped_http_response(scope, *args, **kwargs):
-    response = HttpResponse(*args, **kwargs)
-    add_cache_headers = get_caching_strategy(scope)
-    add_cache_headers(response)
+def add_caching_headers(is_cacheable, response):
+    if is_cacheable:
+        patch_cache_control(response, private=True, max_age=HOUR * 36)
+    else:
+        add_never_cache_headers(response)
     return response
 
 
@@ -43,14 +35,16 @@ def index(request, iiif_url):
     try:
         authentication.check_auth_availability(request)
         mail_jwt_token, is_mail_login = authentication.read_out_mail_jwt_token(request)
-        scope = authentication.get_max_scope(request, mail_jwt_token)
+        user_scope = authentication.get_user_scope(request, mail_jwt_token)
 
         is_source_file_requested = utils.str_to_bool(request.GET.get("source_file"))
         url_info = parsing.get_url_info(iiif_url, is_source_file_requested)
 
         authentication.check_wabo_for_mail_login(is_mail_login, url_info)
         metadata, _ = get_metadata(url_info, iiif_url, {})
-        authentication.check_file_access_in_metadata(metadata, url_info, scope)
+
+        authentication.check_file_access_in_metadata(metadata, url_info, user_scope)
+        is_cacheable = authentication.is_caching_allowed(metadata, url_info)
 
         file_response, file_url = image_server.get_file(url_info, metadata)
         image_server.handle_file_response_codes(file_response, file_url)
@@ -59,7 +53,9 @@ def index(request, iiif_url):
         file_type = file_response.headers.get("Content-Type")
 
         if is_source_file_requested:
-            return scoped_http_response(scope, file_content, file_type)
+            return add_caching_headers(
+                is_cacheable, HttpResponse(file_content, file_type)
+            )
 
         if not is_image_content_type(file_type):
             raise utils.ImmediateHttpResponse(
@@ -74,8 +70,9 @@ def index(request, iiif_url):
                 file_content,
                 file_type,
             )
-            return scoped_http_response(
-                scope, response_content, content_type="application/json"
+            return add_caching_headers(
+                is_cacheable,
+                HttpResponse(response_content, content_type="application/json"),
             )
 
         crop = partial(
@@ -90,7 +87,7 @@ def index(request, iiif_url):
         )
         edited_image = pipe(file_content, crop, scale)
 
-        return scoped_http_response(scope, edited_image, file_type)
+        return add_caching_headers(is_cacheable, HttpResponse(edited_image, file_type))
     except utils.ImmediateHttpResponse as e:
         log.exception("ImmediateHttpResponse in index:")
         return e.response

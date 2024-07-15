@@ -21,7 +21,7 @@ def request_multiple_files_in_zip(request):
         parsing.check_for_post(request)
         authentication.check_auth_availability(request)
         read_jwt_token, is_mail_login = authentication.read_out_mail_jwt_token(request)
-        scope = authentication.get_max_scope(request, read_jwt_token)
+        scope = authentication.get_user_scope(request, read_jwt_token)
         email_address = parsing.get_email_address(request, read_jwt_token)
         payload = parsing.parse_payload(request)
         parsing.check_zip_payload(payload)
