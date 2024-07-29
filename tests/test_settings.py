@@ -1,7 +1,9 @@
 from django.conf import settings
 
-PRE_WABO_IMG_URL_BASE = "2/edepot:ST-00015-ST00000126_00001.jpg/"
+EDEPOT_PREFIX = "2/edepot:"
+WABO_PREFIX = "2/wabo:"
 
+PRE_WABO_IMG_URL_BASE = EDEPOT_PREFIX + "ST-00015-ST00000126_00001.jpg/"
 PRE_WABO_INFO_JSON_URL = PRE_WABO_IMG_URL_BASE + "info.json"
 
 PRE_WABO_IMG_URL_WITH_SCALING = PRE_WABO_IMG_URL_BASE + "full/50,50/0/default.jpg"
@@ -12,19 +14,21 @@ PRE_WABO_IMG_URL_WITH_REGION_NON_OVERLAPPING = (
     PRE_WABO_IMG_URL_BASE + "10000,10000,48,48/full/0/default.jpg"
 )
 
-
 PRE_WABO_IMG_URL_SOURCE_FILE = (
-    "2/edepot:ST-00015-ST00000126_00001.jpg/?source_file=true&"
+    EDEPOT_PREFIX + "ST-00015-ST00000126_00001.jpg/?source_file=true&"
 )
 PRE_WABO_IMG_URL_NO_SCALING = (
-    "2/edepot:ST-00015-ST00000126_00001.jpg/full/full/0/default.jpg"
+    EDEPOT_PREFIX + "ST-00015-ST00000126_00001.jpg/full/full/0/default.jpg"
 )
 
+PRE_WABO_IMG_URL_WITH_EXTRA_DOSSIER_DIGIT = (
+    EDEPOT_PREFIX + "SA-100732-SA00509506_00003.jpg/info.json"
+)
 PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE = (
-    "2/edepot:SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg/full/full/0/default.jpg"
+    EDEPOT_PREFIX + "SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg/full/full/0/default.jpg"
 )
 
-WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547/full/1000,900/0/default.jpg"
+WABO_IMG_URL = WABO_PREFIX + "SDZ-38657-4900487_628547/full/1000,900/0/default.jpg"
 
 with open("test-images/test-image-96x85.jpg", "rb") as file:
     IMAGE_BINARY_DATA = file.read()

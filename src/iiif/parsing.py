@@ -89,10 +89,10 @@ def get_info_from_iiif_url(iiif_url, source_file):
         }
         if source == "edepot":  # aka pre-wabo
             # ST-00015-ST00000126_00001.jpg=relevant_url_part  ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
-            # SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg=relevant_url_part  SQ=stadsdeel  01425=dossier  SQ100796511=document_barcode  00001=file/bestand
+            # SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg=relevant_url_part  SQ=stadsdeel  01452=dossier  SQ10079651=document_barcode  00001=file/bestand
             try:
                 stadsdeel, dossier, document_barcode, file = re.match(
-                    r"^.*?([A-Z]{2})-(\d{5}).*?-(.+)_(.*?)\.\w+$", relevant_url_part
+                    r"^.*?([A-Z]{2})-(\d{3,7}).*?-(.+)_(.*?)\.\w+$", relevant_url_part
                 ).groups()
             except Exception as e:
                 raise InvalidIIIFUrlError(
