@@ -93,7 +93,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
             # TODO: Decrease the flexibility of this regex, the ranges are most likely larger than necessary
             try:
                 stadsdeel, dossier, document_barcode, file = re.match(
-                    r"^.{0,15}?([A-Z]{2})-(\d{3,7}).{0,15}?-(.{5,15})_(\d{3,7}?)\.\w+$",
+                    r"^\S{0,15}?([A-Z]{2})-([a-zA-Z0-9]{3,12})\S{0,15}?-([a-zA-Z0-9]{5,15})_(\d{3,7}?)\.\w+$",
                     relevant_url_part,
                 ).groups()
             except Exception as e:
