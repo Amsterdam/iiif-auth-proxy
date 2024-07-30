@@ -17,6 +17,7 @@ from iiif.parsing import InvalidIIIFUrlError, get_email_address, get_info_from_i
 from main.utils import ImmediateHttpResponse
 from tests.test_settings import (
     PRE_WABO_IMG_URL_NO_SCALING,
+    PRE_WABO_IMG_URL_WITH_CHARS_IN_DOSSIER,
     PRE_WABO_IMG_URL_WITH_EXTRA_DOSSIER_DIGIT,
     PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
     PRE_WABO_IMG_URL_WITH_REGION,
@@ -81,6 +82,23 @@ class TestUtils:
             url_info["source_filename"] == "SQ1452/SQ/01452%20(2)-SQ10079651_00001.jpg"
         )
         assert url_info["filename"] == "SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg"
+        assert url_info["formatting"] == "full/full/0/default.jpg"
+        assert url_info["info_json"] is False
+
+    def test_get_info_json_from_pre_wabo_url_with_characters_in_dossier(self):
+        """SQ28276-SQ-file9EyinW-SQ10263352_00003.jpg/full/full/0/default.jpg"""
+        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_CHARS_IN_DOSSIER, False)
+        assert url_info["source"] == "edepot"
+        assert url_info["stadsdeel"] == "SQ"
+        assert url_info["dossier"] == "file9EyinW"
+        assert url_info["document_barcode"] == "SQ10263352"
+        assert url_info["file"] == "00003"
+        assert url_info["region"] == "full"
+        assert url_info["scaling"] == "full"
+        assert (
+            url_info["source_filename"] == "SQ28276/SQ/file9EyinW-SQ10263352_00003.jpg"
+        )
+        assert url_info["filename"] == "SQ28276-SQ-file9EyinW-SQ10263352_00003.jpg"
         assert url_info["formatting"] == "full/full/0/default.jpg"
         assert url_info["info_json"] is False
 
