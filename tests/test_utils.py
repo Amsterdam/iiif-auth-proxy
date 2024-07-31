@@ -69,7 +69,7 @@ class TestUtils:
         assert url_info["info_json"] is True
 
     def test_get_info_json_from_pre_wabo_url_with_extra_reference(self):
-        """2/edepot:SA-100732-SA00509506_00003.jpg/"""
+        """2/edepot:SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg"""
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE, False)
         assert url_info["source"] == "edepot"
         assert url_info["stadsdeel"] == "SQ"
@@ -79,7 +79,7 @@ class TestUtils:
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
         assert (
-            url_info["source_filename"] == "SQ1452/SQ/01452%20(2)-SQ10079651_00001.jpg"
+            url_info["source_filename"] == "SQ1452/SQ/01452%20(2)/SQ10079651_00001.jpg"
         )
         assert url_info["filename"] == "SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg"
         assert url_info["formatting"] == "full/full/0/default.jpg"
@@ -96,7 +96,7 @@ class TestUtils:
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
         assert (
-            url_info["source_filename"] == "SQ28276/SQ/file9EyinW-SQ10263352_00003.jpg"
+            url_info["source_filename"] == "SQ28276/SQ/file9EyinW/SQ10263352_00003.jpg"
         )
         assert url_info["filename"] == "SQ28276-SQ-file9EyinW-SQ10263352_00003.jpg"
         assert url_info["formatting"] == "full/full/0/default.jpg"
