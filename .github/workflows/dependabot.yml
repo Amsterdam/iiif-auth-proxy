@@ -2,7 +2,7 @@ name: Opdrachten Team Dependabot
 
 on:
   schedule: # Run the script on the 1st and 15th of every month
-    - cron: '0 6 1,15 * *'
+    - cron: '0 6 1 * *'
   workflow_dispatch: # Creates button on Github to trigger the workflow manually
 
 
