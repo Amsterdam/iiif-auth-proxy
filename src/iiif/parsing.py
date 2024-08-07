@@ -103,7 +103,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 **url_info,
                 "stadsdeel": stadsdeel,
                 "dossier": dossier,
-                "document_barcode": document_barcode,
+                "document_barcode": document_barcode.upper(),
                 "file": file,  # The file in the dossier
                 "source_filename": relevant_url_part.replace("-", "/"),
             }

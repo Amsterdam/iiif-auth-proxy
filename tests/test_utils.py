@@ -20,6 +20,7 @@ from tests.test_settings import (
     PRE_WABO_IMG_URL_WITH_CHARS_IN_DOSSIER,
     PRE_WABO_IMG_URL_WITH_EXTRA_DOSSIER_DIGIT,
     PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+    PRE_WABO_IMG_URL_WITH_LOWERCASE_IN_DOSSIER,
     PRE_WABO_IMG_URL_WITH_REGION,
     PRE_WABO_IMG_URL_WITH_SCALING,
     PRE_WABO_INFO_JSON_URL,
@@ -99,6 +100,23 @@ class TestUtils:
             url_info["source_filename"] == "SQ28276/SQ/file9EyinW/SQ10263352_00003.jpg"
         )
         assert url_info["filename"] == "SQ28276-SQ-file9EyinW-SQ10263352_00003.jpg"
+        assert url_info["formatting"] == "full/full/0/default.jpg"
+        assert url_info["info_json"] is False
+
+    def test_get_info_json_from_pre_wabo_url_with_lowercase_in_dossier(self):
+        """SQ-26614-sq10241283_00001.jpg/full/full/0/default.jpg"""
+        url_info = get_info_from_iiif_url(
+            PRE_WABO_IMG_URL_WITH_LOWERCASE_IN_DOSSIER, False
+        )
+        assert url_info["source"] == "edepot"
+        assert url_info["stadsdeel"] == "SQ"
+        assert url_info["dossier"] == "26614"
+        assert url_info["document_barcode"] == "SQ10241283"
+        assert url_info["file"] == "00001"
+        assert url_info["region"] == "full"
+        assert url_info["scaling"] == "full"
+        assert url_info["source_filename"] == "SQ/26614/sq10241283_00001.jpg"
+        assert url_info["filename"] == "SQ-26614-sq10241283_00001.jpg"
         assert url_info["formatting"] == "full/full/0/default.jpg"
         assert url_info["info_json"] is False
 
