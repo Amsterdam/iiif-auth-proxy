@@ -6,7 +6,7 @@
 #
 adal==1.2.7
     # via msrestazure
-antlr4-python3-runtime==4.13.1
+antlr4-python3-runtime==4.13.2
     # via azure-cli
 applicationinsights==0.11.10
     # via azure-cli-telemetry
@@ -22,9 +22,9 @@ azure-appconfiguration==1.1.1
     # via azure-cli
 azure-batch==14.2.0
     # via azure-cli
-azure-cli==2.62.0
+azure-cli==2.63.0
     # via -r requirements.in
-azure-cli-core==2.62.0
+azure-cli-core==2.63.0
     # via azure-cli
 azure-cli-telemetry==1.1.0
     # via azure-cli-core
@@ -182,7 +182,7 @@ azure-mgmt-containerinstance==10.1.0
     # via azure-cli
 azure-mgmt-containerregistry==10.3.0
     # via azure-cli
-azure-mgmt-containerservice==30.0.0
+azure-mgmt-containerservice==31.0.0
     # via azure-cli
 azure-mgmt-core==1.4.0
     # via
@@ -340,7 +340,7 @@ azure-monitor-query==1.2.0
     # via azure-cli
 azure-multiapi-storage==1.2.0
     # via azure-cli
-azure-storage-blob==12.21.0
+azure-storage-blob==12.22.0
     # via -r requirements.in
 azure-storage-common==1.4.2
     # via azure-cli
@@ -362,7 +362,7 @@ certifi==2024.7.4
     # via
     #   msrest
     #   requests
-cffi==1.16.0
+cffi==1.17.0
     # via
     #   azure-datalake-store
     #   cryptography
@@ -405,7 +405,7 @@ distro==1.9.0
     # via
     #   azure-cli
     #   azure-cli-core
-django==5.0.7
+django==5.1
     # via
     #   -r requirements.in
     #   datapunt-authorization-django
@@ -419,7 +419,7 @@ fabric==3.2.2
     # via azure-cli
 google-api-core==2.19.1
     # via opencensus
-google-auth==2.32.0
+google-auth==2.33.0
     # via google-api-core
 googleapis-common-protos==1.63.2
     # via google-api-core
@@ -487,13 +487,13 @@ keystoneauth1==5.7.0
     # via python-keystoneclient
 knack==0.11.0
     # via azure-cli-core
-msal[broker]==1.28.1
+msal[broker]==1.30.0
     # via
     #   azure-cli-core
     #   azure-datalake-store
     #   azure-identity
     #   msal-extensions
-msal-extensions==1.2.0b1
+msal-extensions==1.2.0
     # via
     #   azure-cli-core
     #   azure-identity
@@ -598,7 +598,7 @@ packaging==24.1
     #   knack
     #   oslo-utils
     #   python-keystoneclient
-paramiko==3.4.0
+paramiko==3.4.1
     # via
     #   azure-cli-core
     #   fabric
@@ -612,7 +612,7 @@ pbr==6.0.0
     #   oslo-serialization
     #   python-keystoneclient
     #   stevedore
-pillow-simd==9.0.0.post1
+pillow-simd==9.5.0.post0
     # via -r requirements.in
 pkginfo==1.11.1
     # via azure-cli-core
@@ -627,7 +627,7 @@ protobuf==5.27.3
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
-psutil==5.9.8
+psutil==6.0.0
     # via
     #   azure-cli-core
     #   opencensus-ext-azure
@@ -649,7 +649,7 @@ pygithub==1.59.1
     # via azure-cli
 pygments==2.18.0
     # via knack
-pyjwt[crypto]==2.8.0
+pyjwt[crypto]==2.9.0
     # via
     #   -r requirements.in
     #   adal
@@ -676,7 +676,7 @@ python-keystoneclient==5.4.0
     # via -r requirements.in
 python-swiftclient==4.6.0
     # via -r requirements.in
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via
     #   knack
     #   oslo-config
@@ -749,6 +749,7 @@ typing-extensions==4.12.2
     #   azure-keyvault-certificates
     #   azure-keyvault-keys
     #   azure-keyvault-secrets
+    #   azure-mgmt-containerservice
     #   azure-monitor-query
     #   azure-storage-blob
     #   azure-storage-queue
