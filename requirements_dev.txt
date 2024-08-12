@@ -8,7 +8,7 @@ adal==1.2.7
     # via
     #   -r ./requirements.txt
     #   msrestazure
-antlr4-python3-runtime==4.13.1
+antlr4-python3-runtime==4.13.2
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -36,9 +36,9 @@ azure-batch==14.2.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-cli==2.62.0
+azure-cli==2.63.0
     # via -r ./requirements.txt
-azure-cli-core==2.62.0
+azure-cli-core==2.63.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -243,7 +243,7 @@ azure-mgmt-containerregistry==10.3.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-mgmt-containerservice==30.0.0
+azure-mgmt-containerservice==31.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
@@ -498,7 +498,7 @@ azure-multiapi-storage==1.2.0
     # via
     #   -r ./requirements.txt
     #   azure-cli
-azure-storage-blob==12.21.0
+azure-storage-blob==12.22.0
     # via -r ./requirements.txt
 azure-storage-common==1.4.2
     # via
@@ -526,7 +526,7 @@ bcrypt==4.2.0
     # via
     #   -r ./requirements.txt
     #   paramiko
-black==24.4.2
+black==24.8.0
     # via -r requirements_dev.in
 build==1.2.1
     # via pip-tools
@@ -539,7 +539,7 @@ certifi==2024.7.4
     #   -r ./requirements.txt
     #   msrest
     #   requests
-cffi==1.16.0
+cffi==1.17.0
     # via
     #   -r ./requirements.txt
     #   azure-datalake-store
@@ -561,7 +561,7 @@ colorama==0.4.6
     # via
     #   -r ./requirements.txt
     #   azure-cli
-coverage[toml]==7.6.0
+coverage[toml]==7.6.1
     # via pytest-cov
 cryptography==43.0.0
     # via
@@ -601,7 +601,7 @@ distro==1.9.0
     #   -r ./requirements.txt
     #   azure-cli
     #   azure-cli-core
-django==5.0.7
+django==5.1
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
@@ -621,7 +621,7 @@ google-api-core==2.19.1
     # via
     #   -r ./requirements.txt
     #   opencensus
-google-auth==2.32.0
+google-auth==2.33.0
     # via
     #   -r ./requirements.txt
     #   google-api-core
@@ -716,14 +716,14 @@ knack==0.11.0
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
-msal[broker]==1.28.1
+msal[broker]==1.30.0
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
     #   azure-datalake-store
     #   azure-identity
     #   msal-extensions
-msal-extensions==1.2.0b1
+msal-extensions==1.2.0
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
@@ -855,7 +855,7 @@ packaging==24.1
     #   oslo-utils
     #   pytest
     #   python-keystoneclient
-paramiko==3.4.0
+paramiko==3.4.1
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
@@ -873,7 +873,7 @@ pbr==6.0.0
     #   oslo-serialization
     #   python-keystoneclient
     #   stevedore
-pillow-simd==9.0.0.post1
+pillow-simd==9.5.0.post0
     # via -r ./requirements.txt
 pip-tools==7.4.1
     # via -r requirements_dev.in
@@ -900,7 +900,7 @@ protobuf==5.27.3
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
-psutil==5.9.8
+psutil==6.0.0
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
@@ -936,7 +936,7 @@ pygments==2.18.0
     # via
     #   -r ./requirements.txt
     #   knack
-pyjwt[crypto]==2.8.0
+pyjwt[crypto]==2.9.0
     # via
     #   -r ./requirements.txt
     #   adal
@@ -987,7 +987,7 @@ python-swiftclient==4.6.0
     # via -r ./requirements.txt
 pytz==2024.1
     # via -r requirements_dev.in
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via
     #   -r ./requirements.txt
     #   knack
@@ -1066,7 +1066,7 @@ tabulate==0.9.0
     #   -r ./requirements.txt
     #   azure-cli
     #   knack
-time-machine==2.14.2
+time-machine==2.15.0
     # via -r requirements_dev.in
 timeout-decorator==0.5.0
     # via -r ./requirements.txt
@@ -1089,6 +1089,7 @@ typing-extensions==4.12.2
     #   azure-keyvault-certificates
     #   azure-keyvault-keys
     #   azure-keyvault-secrets
+    #   azure-mgmt-containerservice
     #   azure-monitor-query
     #   azure-storage-blob
     #   azure-storage-queue
@@ -1108,7 +1109,7 @@ websocket-client==1.3.3
     # via
     #   -r ./requirements.txt
     #   azure-cli
-wheel==0.43.0
+wheel==0.44.0
     # via pip-tools
 wrapt==1.16.0
     # via
