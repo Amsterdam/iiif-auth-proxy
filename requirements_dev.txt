@@ -530,11 +530,11 @@ black==24.8.0
     # via -r requirements_dev.in
 build==1.2.1
     # via pip-tools
-cachetools==5.4.0
+cachetools==5.5.0
     # via
     #   -r ./requirements.txt
     #   google-auth
-certifi==2024.7.4
+certifi==2024.8.30
     # via
     #   -r ./requirements.txt
     #   msrest
@@ -617,15 +617,15 @@ fabric==3.2.2
     # via
     #   -r ./requirements.txt
     #   azure-cli
-google-api-core==2.19.1
+google-api-core==2.19.2
     # via
     #   -r ./requirements.txt
     #   opencensus
-google-auth==2.33.0
+google-auth==2.34.0
     # via
     #   -r ./requirements.txt
     #   google-api-core
-googleapis-common-protos==1.63.2
+googleapis-common-protos==1.65.0
     # via
     #   -r ./requirements.txt
     #   google-api-core
@@ -633,7 +633,7 @@ humanfriendly==10.0
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
-idna==3.7
+idna==3.8
     # via
     #   -r ./requirements.txt
     #   requests
@@ -708,7 +708,7 @@ jwcrypto==1.5.6
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
-keystoneauth1==5.7.0
+keystoneauth1==5.8.0
     # via
     #   -r ./requirements.txt
     #   python-keystoneclient
@@ -825,21 +825,21 @@ os-service-types==1.7.0
     # via
     #   -r ./requirements.txt
     #   keystoneauth1
-oslo-config==9.5.0
+oslo-config==9.6.0
     # via
     #   -r ./requirements.txt
     #   python-keystoneclient
-oslo-i18n==6.3.0
+oslo-i18n==6.4.0
     # via
     #   -r ./requirements.txt
     #   oslo-config
     #   oslo-utils
     #   python-keystoneclient
-oslo-serialization==5.4.0
+oslo-serialization==5.5.0
     # via
     #   -r ./requirements.txt
     #   python-keystoneclient
-oslo-utils==7.2.0
+oslo-utils==7.3.0
     # via
     #   -r ./requirements.txt
     #   oslo-serialization
@@ -864,7 +864,7 @@ paramiko==3.4.1
     #   sshtunnel
 pathspec==0.12.1
     # via black
-pbr==6.0.0
+pbr==6.1.0
     # via
     #   -r ./requirements.txt
     #   keystoneauth1
@@ -873,7 +873,7 @@ pbr==6.0.0
     #   oslo-serialization
     #   python-keystoneclient
     #   stevedore
-pillow-simd==9.5.0.post0
+pillow-simd==9.5.0.post1
     # via -r ./requirements.txt
 pip-tools==7.4.1
     # via -r requirements_dev.in
@@ -894,7 +894,7 @@ proto-plus==1.24.0
     # via
     #   -r ./requirements.txt
     #   google-api-core
-protobuf==5.27.3
+protobuf==5.28.0
     # via
     #   -r ./requirements.txt
     #   google-api-core
@@ -953,7 +953,7 @@ pyopenssl==24.2.1
     # via
     #   -r ./requirements.txt
     #   azure-cli-core
-pyparsing==3.1.2
+pyparsing==3.1.4
     # via
     #   -r ./requirements.txt
     #   oslo-utils
@@ -981,7 +981,7 @@ python-dateutil==2.9.0.post0
     #   azure-multiapi-storage
     #   azure-storage-common
     #   time-machine
-python-keystoneclient==5.4.0
+python-keystoneclient==5.5.0
     # via -r ./requirements.txt
 python-swiftclient==4.6.0
     # via -r ./requirements.txt
@@ -1055,7 +1055,7 @@ sshtunnel==0.1.5
     # via
     #   -r ./requirements.txt
     #   azure-cli
-stevedore==5.2.0
+stevedore==5.3.0
     # via
     #   -r ./requirements.txt
     #   keystoneauth1
@@ -1125,7 +1125,7 @@ xmltodict==0.13.0
 # The following packages are considered to be unsafe in a requirements file:
 pip==24.2
     # via pip-tools
-setuptools==72.1.0
+setuptools==74.0.0
     # via
     #   -r ./requirements.txt
     #   pip-tools

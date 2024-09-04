@@ -356,9 +356,9 @@ azure-synapse-spark==0.2.0
     # via azure-cli
 bcrypt==4.2.0
     # via paramiko
-cachetools==5.4.0
+cachetools==5.5.0
     # via google-auth
-certifi==2024.7.4
+certifi==2024.8.30
     # via
     #   msrest
     #   requests
@@ -417,15 +417,15 @@ django-ratelimit==4.1.0
     # via -r requirements.in
 fabric==3.2.2
     # via azure-cli
-google-api-core==2.19.1
+google-api-core==2.19.2
     # via opencensus
-google-auth==2.33.0
+google-auth==2.34.0
     # via google-api-core
-googleapis-common-protos==1.63.2
+googleapis-common-protos==1.65.0
     # via google-api-core
 humanfriendly==10.0
     # via azure-cli-core
-idna==3.7
+idna==3.8
     # via requests
 invoke==2.2.0
     # via fabric
@@ -483,7 +483,7 @@ jsondiff==2.0.0
     # via azure-cli
 jwcrypto==1.5.6
     # via datapunt-authorization-django
-keystoneauth1==5.7.0
+keystoneauth1==5.8.0
     # via python-keystoneclient
 knack==0.11.0
     # via azure-cli-core
@@ -578,16 +578,16 @@ opencensus-ext-requests==0.8.0
     # via -r requirements.in
 os-service-types==1.7.0
     # via keystoneauth1
-oslo-config==9.5.0
+oslo-config==9.6.0
     # via python-keystoneclient
-oslo-i18n==6.3.0
+oslo-i18n==6.4.0
     # via
     #   oslo-config
     #   oslo-utils
     #   python-keystoneclient
-oslo-serialization==5.4.0
+oslo-serialization==5.5.0
     # via python-keystoneclient
-oslo-utils==7.2.0
+oslo-utils==7.3.0
     # via
     #   oslo-serialization
     #   python-keystoneclient
@@ -604,7 +604,7 @@ paramiko==3.4.1
     #   fabric
     #   scp
     #   sshtunnel
-pbr==6.0.0
+pbr==6.1.0
     # via
     #   keystoneauth1
     #   os-service-types
@@ -612,7 +612,7 @@ pbr==6.0.0
     #   oslo-serialization
     #   python-keystoneclient
     #   stevedore
-pillow-simd==9.5.0.post0
+pillow-simd==9.5.0.post1
     # via -r requirements.in
 pkginfo==1.11.1
     # via azure-cli-core
@@ -622,7 +622,7 @@ portalocker==2.10.1
     #   msal-extensions
 proto-plus==1.24.0
     # via google-api-core
-protobuf==5.27.3
+protobuf==5.28.0
     # via
     #   google-api-core
     #   googleapis-common-protos
@@ -663,7 +663,7 @@ pynacl==1.5.0
     #   pygithub
 pyopenssl==24.2.1
     # via azure-cli-core
-pyparsing==3.1.2
+pyparsing==3.1.4
     # via oslo-utils
 pysocks==1.7.1
     # via requests
@@ -672,7 +672,7 @@ python-dateutil==2.9.0.post0
     #   adal
     #   azure-multiapi-storage
     #   azure-storage-common
-python-keystoneclient==5.4.0
+python-keystoneclient==5.5.0
     # via -r requirements.in
 python-swiftclient==4.6.0
     # via -r requirements.in
@@ -728,7 +728,7 @@ sqlparse==0.5.1
     # via django
 sshtunnel==0.1.5
     # via azure-cli
-stevedore==5.2.0
+stevedore==5.3.0
     # via
     #   keystoneauth1
     #   oslo-config
@@ -773,5 +773,5 @@ xmltodict==0.13.0
     # via azure-cli
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==72.1.0
+setuptools==74.0.0
     # via -r requirements.in
