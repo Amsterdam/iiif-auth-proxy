@@ -95,9 +95,7 @@ def get_file(url_info, metadata):
 def handle_file_response_codes(file_response, file_url):
     if file_response.status_code == 404:
         raise ImmediateHttpResponse(
-            response=HttpResponse(
-                f"No source file could be found for the url {file_url}", status=404
-            )
+            response=HttpResponse(f"No source file could be found", status=404)
         )
 
     if file_response.status_code != 200:
@@ -108,7 +106,7 @@ def handle_file_response_codes(file_response, file_url):
         raise ImmediateHttpResponse(
             response=HttpResponse(
                 f"We had a problem retrieving the image. We got status "
-                f"code {file_response.status_code} for url {file_url}.",
+                f"code {file_response.status_code}",
                 status=502,
             )
         )
