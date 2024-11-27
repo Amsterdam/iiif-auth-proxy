@@ -4,801 +4,165 @@
 #
 #    pip-compile --allow-unsafe --output-file=requirements_dev.txt requirements_dev.in
 #
-adal==1.2.7
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   msrestazure
-antlr4-python3-runtime==4.13.2
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-applicationinsights==0.11.10
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-telemetry
-argcomplete==3.3.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
-    #   knack
 asgiref==3.8.1
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   django
     #   django-cors-headers
 autoflake==2.3.1
     # via -r requirements_dev.in
-azure-appconfiguration==1.7.1
+azure-core==1.32.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-batch==14.2.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-cli==2.65.0
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-azure-cli-core==2.65.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-cli-telemetry==1.1.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
-azure-common==1.1.28
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-batch
-    #   azure-graphrbac
-    #   azure-keyvault-administration
-    #   azure-keyvault-certificates
-    #   azure-keyvault-keys
-    #   azure-keyvault-secrets
-    #   azure-mgmt-advisor
-    #   azure-mgmt-apimanagement
-    #   azure-mgmt-appconfiguration
-    #   azure-mgmt-appcontainers
-    #   azure-mgmt-applicationinsights
-    #   azure-mgmt-authorization
-    #   azure-mgmt-batch
-    #   azure-mgmt-batchai
-    #   azure-mgmt-billing
-    #   azure-mgmt-botservice
-    #   azure-mgmt-cdn
-    #   azure-mgmt-cognitiveservices
-    #   azure-mgmt-compute
-    #   azure-mgmt-containerinstance
-    #   azure-mgmt-containerregistry
-    #   azure-mgmt-containerservice
-    #   azure-mgmt-cosmosdb
-    #   azure-mgmt-databoxedge
-    #   azure-mgmt-datamigration
-    #   azure-mgmt-devtestlabs
-    #   azure-mgmt-dns
-    #   azure-mgmt-eventgrid
-    #   azure-mgmt-eventhub
-    #   azure-mgmt-extendedlocation
-    #   azure-mgmt-hdinsight
-    #   azure-mgmt-imagebuilder
-    #   azure-mgmt-iotcentral
-    #   azure-mgmt-iothub
-    #   azure-mgmt-iothubprovisioningservices
-    #   azure-mgmt-keyvault
-    #   azure-mgmt-kusto
-    #   azure-mgmt-loganalytics
-    #   azure-mgmt-managementgroups
-    #   azure-mgmt-maps
-    #   azure-mgmt-marketplaceordering
-    #   azure-mgmt-media
-    #   azure-mgmt-monitor
-    #   azure-mgmt-msi
-    #   azure-mgmt-netapp
-    #   azure-mgmt-policyinsights
-    #   azure-mgmt-privatedns
-    #   azure-mgmt-rdbms
-    #   azure-mgmt-recoveryservices
-    #   azure-mgmt-recoveryservicesbackup
-    #   azure-mgmt-redhatopenshift
-    #   azure-mgmt-redis
-    #   azure-mgmt-resource
-    #   azure-mgmt-search
-    #   azure-mgmt-security
-    #   azure-mgmt-servicebus
-    #   azure-mgmt-servicefabric
-    #   azure-mgmt-servicefabricmanagedclusters
-    #   azure-mgmt-servicelinker
-    #   azure-mgmt-signalr
-    #   azure-mgmt-sql
-    #   azure-mgmt-sqlvirtualmachine
-    #   azure-mgmt-storage
-    #   azure-mgmt-synapse
-    #   azure-mgmt-trafficmanager
-    #   azure-mgmt-web
-    #   azure-multiapi-storage
-    #   azure-storage-common
-    #   azure-synapse-accesscontrol
-    #   azure-synapse-artifacts
-    #   azure-synapse-managedprivateendpoints
-    #   azure-synapse-spark
-azure-core==1.31.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-appconfiguration
-    #   azure-data-tables
+    #   -r ./requirements.txt
     #   azure-identity
-    #   azure-keyvault-administration
     #   azure-keyvault-certificates
     #   azure-keyvault-keys
     #   azure-keyvault-secrets
-    #   azure-mgmt-core
-    #   azure-monitor-query
-    #   azure-multiapi-storage
     #   azure-storage-blob
     #   azure-storage-queue
-    #   azure-synapse-accesscontrol
-    #   azure-synapse-managedprivateendpoints
-    #   azure-synapse-spark
-    #   msrest
     #   opencensus-ext-azure
-azure-cosmos==3.2.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-data-tables==12.4.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-datalake-store==0.0.53
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-graphrbac==0.60.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
 azure-identity==1.16.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   opencensus-ext-azure
 azure-keyvault==4.2.0
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-azure-keyvault-administration==4.4.0b2
+    # via -r ./requirements.txt
+azure-keyvault-certificates==4.9.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-keyvault-certificates==4.7.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
+    #   -r ./requirements.txt
     #   azure-keyvault
-azure-keyvault-keys==4.9.0b3
+azure-keyvault-keys==4.10.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
+    #   -r ./requirements.txt
     #   azure-keyvault
-azure-keyvault-secrets==4.7.0
+azure-keyvault-secrets==4.9.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
+    #   -r ./requirements.txt
     #   azure-keyvault
-azure-mgmt-advisor==9.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-apimanagement==4.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-appconfiguration==3.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-appcontainers==2.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-applicationinsights==1.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-authorization==4.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-batch==17.3.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-batchai==7.0.0b1
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-billing==6.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-botservice==2.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-cdn==12.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-cognitiveservices==13.5.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-compute==33.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-containerinstance==10.1.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-containerregistry==10.3.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-containerservice==32.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-core==1.4.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
-    #   azure-mgmt-advisor
-    #   azure-mgmt-apimanagement
-    #   azure-mgmt-appconfiguration
-    #   azure-mgmt-appcontainers
-    #   azure-mgmt-applicationinsights
-    #   azure-mgmt-authorization
-    #   azure-mgmt-batch
-    #   azure-mgmt-batchai
-    #   azure-mgmt-billing
-    #   azure-mgmt-botservice
-    #   azure-mgmt-cdn
-    #   azure-mgmt-cognitiveservices
-    #   azure-mgmt-compute
-    #   azure-mgmt-containerinstance
-    #   azure-mgmt-containerregistry
-    #   azure-mgmt-containerservice
-    #   azure-mgmt-cosmosdb
-    #   azure-mgmt-databoxedge
-    #   azure-mgmt-datamigration
-    #   azure-mgmt-dns
-    #   azure-mgmt-eventgrid
-    #   azure-mgmt-eventhub
-    #   azure-mgmt-extendedlocation
-    #   azure-mgmt-hdinsight
-    #   azure-mgmt-imagebuilder
-    #   azure-mgmt-iotcentral
-    #   azure-mgmt-iothub
-    #   azure-mgmt-iothubprovisioningservices
-    #   azure-mgmt-keyvault
-    #   azure-mgmt-loganalytics
-    #   azure-mgmt-managementgroups
-    #   azure-mgmt-maps
-    #   azure-mgmt-marketplaceordering
-    #   azure-mgmt-media
-    #   azure-mgmt-monitor
-    #   azure-mgmt-msi
-    #   azure-mgmt-netapp
-    #   azure-mgmt-policyinsights
-    #   azure-mgmt-privatedns
-    #   azure-mgmt-rdbms
-    #   azure-mgmt-recoveryservices
-    #   azure-mgmt-recoveryservicesbackup
-    #   azure-mgmt-redhatopenshift
-    #   azure-mgmt-redis
-    #   azure-mgmt-resource
-    #   azure-mgmt-search
-    #   azure-mgmt-security
-    #   azure-mgmt-servicebus
-    #   azure-mgmt-servicefabric
-    #   azure-mgmt-servicefabricmanagedclusters
-    #   azure-mgmt-servicelinker
-    #   azure-mgmt-signalr
-    #   azure-mgmt-sql
-    #   azure-mgmt-sqlvirtualmachine
-    #   azure-mgmt-storage
-    #   azure-mgmt-synapse
-    #   azure-mgmt-trafficmanager
-    #   azure-mgmt-web
-    #   azure-synapse-artifacts
-azure-mgmt-cosmosdb==9.6.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-databoxedge==1.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-datamigration==10.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-devtestlabs==4.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-dns==8.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-eventgrid==10.2.0b2
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-eventhub==10.1.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-extendedlocation==1.0.0b2
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-hdinsight==9.0.0b3
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-imagebuilder==1.3.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-iotcentral==10.0.0b2
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-iothub==3.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-iothubprovisioningservices==1.1.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-keyvault==10.3.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-kusto==0.3.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-loganalytics==13.0.0b4
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-managementgroups==1.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-maps==2.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-marketplaceordering==1.1.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-media==9.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-monitor==5.0.1
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-msi==7.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-netapp==10.1.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-policyinsights==1.1.0b4
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-privatedns==1.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-rdbms==10.2.0b18
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-recoveryservices==3.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-recoveryservicesbackup==9.1.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-redhatopenshift==1.5.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-redis==14.4.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-resource==23.1.1
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-search==9.1.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-security==6.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-servicebus==8.2.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-servicefabric==2.1.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-servicefabricmanagedclusters==2.0.0b6
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-servicelinker==1.2.0b2
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-signalr==2.0.0b1
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-sql==4.0.0b19
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-sqlvirtualmachine==1.0.0b5
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-storage==21.2.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-synapse==2.1.0b5
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-trafficmanager==1.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-mgmt-web==7.2.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-monitor-query==1.2.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-multiapi-storage==1.3.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-storage-blob==12.23.1
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-azure-storage-common==1.4.2
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
+azure-storage-blob==12.24.0
+    # via -r ./requirements.txt
 azure-storage-queue==12.12.0
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-azure-synapse-accesscontrol==0.5.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-synapse-artifacts==0.19.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-synapse-managedprivateendpoints==0.4.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-azure-synapse-spark==0.2.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-bcrypt==4.2.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   paramiko
+    # via -r ./requirements.txt
 black==24.10.0
     # via -r requirements_dev.in
 build==1.2.2.post1
     # via pip-tools
 cachetools==5.5.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   google-auth
 certifi==2024.8.30
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   msrest
+    #   -r ./requirements.txt
     #   requests
 cffi==1.17.1
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-datalake-store
+    #   -r ./requirements.txt
     #   cryptography
-    #   pynacl
-chardet==5.2.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
 charset-normalizer==3.4.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   requests
 click==8.1.7
     # via
     #   black
     #   pip-tools
-colorama==0.4.6
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-coverage[toml]==7.6.4
+coverage[toml]==7.6.8
     # via pytest-cov
 cryptography==43.0.3
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   adal
-    #   azure-cli-core
+    #   -r ./requirements.txt
     #   azure-identity
     #   azure-keyvault-keys
-    #   azure-multiapi-storage
     #   azure-storage-blob
-    #   azure-storage-common
     #   azure-storage-queue
     #   jwcrypto
     #   msal
-    #   paramiko
     #   pyjwt
-    #   pyopenssl
 datapunt-authorization-django==1.3.3
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    # via -r ./requirements.txt
 debtcollector==3.0.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   oslo-config
     #   oslo-utils
     #   python-keystoneclient
-decorator==5.1.1
+django==5.1.3
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   fabric
-deprecated==1.2.14
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   fabric
-    #   pygithub
-distro==1.9.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-    #   azure-cli-core
-django==5.1.2
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   datapunt-authorization-django
     #   django-cors-headers
     #   opencensus-ext-django
 django-cors-headers==4.6.0
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    # via -r ./requirements.txt
 django-ratelimit==4.1.0
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    # via -r ./requirements.txt
 exceptiongroup==1.2.2
     # via pytest
-fabric==3.2.2
+google-api-core==2.23.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-google-api-core==2.22.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   opencensus
-google-auth==2.35.0
+google-auth==2.36.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   google-api-core
-googleapis-common-protos==1.65.0
+googleapis-common-protos==1.66.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   google-api-core
-humanfriendly==10.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
 idna==3.10
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   requests
 iniconfig==2.0.0
     # via pytest
-invoke==2.2.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   fabric
 iso8601==2.1.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   keystoneauth1
     #   oslo-utils
 isodate==0.7.2
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-appconfiguration
-    #   azure-keyvault-administration
+    #   -r ./requirements.txt
     #   azure-keyvault-certificates
     #   azure-keyvault-keys
     #   azure-keyvault-secrets
-    #   azure-mgmt-apimanagement
-    #   azure-mgmt-appconfiguration
-    #   azure-mgmt-authorization
-    #   azure-mgmt-batch
-    #   azure-mgmt-cognitiveservices
-    #   azure-mgmt-compute
-    #   azure-mgmt-containerinstance
-    #   azure-mgmt-containerregistry
-    #   azure-mgmt-containerservice
-    #   azure-mgmt-cosmosdb
-    #   azure-mgmt-hdinsight
-    #   azure-mgmt-imagebuilder
-    #   azure-mgmt-iothub
-    #   azure-mgmt-keyvault
-    #   azure-mgmt-netapp
-    #   azure-mgmt-rdbms
-    #   azure-mgmt-recoveryservices
-    #   azure-mgmt-recoveryservicesbackup
-    #   azure-mgmt-redhatopenshift
-    #   azure-mgmt-redis
-    #   azure-mgmt-resource
-    #   azure-mgmt-search
-    #   azure-mgmt-security
-    #   azure-mgmt-servicefabric
-    #   azure-mgmt-servicefabricmanagedclusters
-    #   azure-mgmt-servicelinker
-    #   azure-mgmt-signalr
-    #   azure-mgmt-sql
-    #   azure-mgmt-storage
-    #   azure-mgmt-web
-    #   azure-monitor-query
     #   azure-storage-blob
     #   azure-storage-queue
-    #   azure-synapse-artifacts
-    #   msrest
 isort==5.13.2
     # via -r requirements_dev.in
-javaproperties==0.5.2
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-jmespath==1.0.1
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
-    #   knack
-jsondiff==2.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
 jwcrypto==1.5.6
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   datapunt-authorization-django
-keystoneauth1==5.8.0
+keystoneauth1==5.9.1
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   python-keystoneclient
-knack==0.11.0
+msal==1.31.1
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
-microsoft-security-utilities-secret-masker==1.0.0b3
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
-msal[broker]==1.31.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
-    #   azure-datalake-store
+    #   -r ./requirements.txt
     #   azure-identity
     #   msal-extensions
 msal-extensions==1.2.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
+    #   -r ./requirements.txt
     #   azure-identity
 msgpack==1.1.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   oslo-serialization
-msrest==0.7.1
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-data-tables
-    #   azure-graphrbac
-    #   azure-mgmt-advisor
-    #   azure-mgmt-appcontainers
-    #   azure-mgmt-applicationinsights
-    #   azure-mgmt-batchai
-    #   azure-mgmt-billing
-    #   azure-mgmt-botservice
-    #   azure-mgmt-cdn
-    #   azure-mgmt-databoxedge
-    #   azure-mgmt-datamigration
-    #   azure-mgmt-devtestlabs
-    #   azure-mgmt-dns
-    #   azure-mgmt-eventgrid
-    #   azure-mgmt-eventhub
-    #   azure-mgmt-extendedlocation
-    #   azure-mgmt-iotcentral
-    #   azure-mgmt-iothubprovisioningservices
-    #   azure-mgmt-kusto
-    #   azure-mgmt-loganalytics
-    #   azure-mgmt-managementgroups
-    #   azure-mgmt-maps
-    #   azure-mgmt-marketplaceordering
-    #   azure-mgmt-media
-    #   azure-mgmt-monitor
-    #   azure-mgmt-msi
-    #   azure-mgmt-policyinsights
-    #   azure-mgmt-privatedns
-    #   azure-mgmt-servicebus
-    #   azure-mgmt-sqlvirtualmachine
-    #   azure-mgmt-synapse
-    #   azure-mgmt-trafficmanager
-    #   azure-multiapi-storage
-    #   azure-synapse-accesscontrol
-    #   azure-synapse-managedprivateendpoints
-    #   azure-synapse-spark
-    #   msrestazure
-msrestazure==0.6.4.post1
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-batch
-    #   azure-cli-core
-    #   azure-graphrbac
-    #   azure-mgmt-devtestlabs
-    #   azure-mgmt-kusto
 mypy-extensions==1.0.0
     # via black
 netaddr==1.3.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   oslo-config
     #   oslo-utils
-netifaces==0.11.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   oslo-utils
-oauthlib==3.2.2
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   requests-oauthlib
 opencensus==0.11.4
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   opencensus-ext-azure
     #   opencensus-ext-django
     #   opencensus-ext-logging
@@ -806,64 +170,54 @@ opencensus==0.11.4
     #   opencensus-ext-requests
 opencensus-context==0.1.3
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   opencensus
 opencensus-ext-azure==1.1.13
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    # via -r ./requirements.txt
 opencensus-ext-django==0.8.0
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    # via -r ./requirements.txt
 opencensus-ext-logging==0.1.1
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    # via -r ./requirements.txt
 opencensus-ext-postgresql==0.1.3
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    # via -r ./requirements.txt
 opencensus-ext-requests==0.8.0
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    # via -r ./requirements.txt
 os-service-types==1.7.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   keystoneauth1
-oslo-config==9.6.0
+oslo-config==9.7.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   python-keystoneclient
-oslo-i18n==6.4.0
+oslo-i18n==6.5.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   oslo-config
     #   oslo-utils
     #   python-keystoneclient
-oslo-serialization==5.5.0
+oslo-serialization==5.6.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   python-keystoneclient
-oslo-utils==7.3.0
+oslo-utils==7.4.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   oslo-serialization
     #   python-keystoneclient
-packaging==24.1
+packaging==24.2
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-    #   azure-cli-core
+    #   -r ./requirements.txt
     #   black
     #   build
-    #   knack
     #   oslo-utils
     #   pytest
     #   python-keystoneclient
-paramiko==3.5.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
-    #   fabric
-    #   scp
-    #   sshtunnel
 pathspec==0.12.1
     # via black
 pbr==6.1.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   keystoneauth1
     #   os-service-types
     #   oslo-i18n
@@ -871,97 +225,63 @@ pbr==6.1.0
     #   python-keystoneclient
     #   stevedore
 pillow-simd==9.5.0.post2
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    # via -r ./requirements.txt
 pip-tools==7.4.1
     # via -r requirements_dev.in
-pkginfo==1.11.2
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
 platformdirs==4.3.6
     # via black
 pluggy==1.5.0
     # via pytest
 portalocker==2.10.1
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-telemetry
+    #   -r ./requirements.txt
     #   msal-extensions
 proto-plus==1.25.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   google-api-core
 protobuf==5.28.3
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
 psutil==6.1.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
+    #   -r ./requirements.txt
     #   opencensus-ext-azure
+    #   oslo-utils
 psycopg2-binary==2.9.10
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   opencensus-ext-postgresql
 pyasn1==0.6.1
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   pyasn1-modules
     #   rsa
 pyasn1-modules==0.4.1
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   google-auth
-pycomposefile==0.0.32
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
 pycparser==2.22
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   cffi
 pyflakes==3.2.0
     # via autoflake
-pygithub==1.59.1
+pyjwt[crypto]==2.10.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-pygments==2.18.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   knack
-pyjwt[crypto]==2.9.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   adal
-    #   azure-cli-core
+    #   -r ./requirements.txt
     #   msal
-    #   pygithub
-pynacl==1.5.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-    #   paramiko
-    #   pygithub
-pyopenssl==24.2.1
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli-core
 pyparsing==3.2.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   oslo-utils
 pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
-pysocks==1.7.1
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   requests
 pytest==8.3.3
     # via
     #   -r requirements_dev.in
@@ -972,101 +292,60 @@ pytest-cov==6.0.0
 pytest-django==4.9.0
     # via -r requirements_dev.in
 python-dateutil==2.9.0.post0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   adal
-    #   azure-multiapi-storage
-    #   azure-storage-common
-    #   time-machine
+    # via time-machine
 python-keystoneclient==5.5.0
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    # via -r ./requirements.txt
 python-swiftclient==4.6.0
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    # via -r ./requirements.txt
 pytz==2024.2
     # via -r requirements_dev.in
 pyyaml==6.0.2
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   knack
+    #   -r ./requirements.txt
     #   oslo-config
     #   oslo-utils
-    #   pycomposefile
-requests[socks]==2.32.3
+requests==2.32.3
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   adal
-    #   azure-cli-core
+    #   -r ./requirements.txt
     #   azure-core
-    #   azure-cosmos
-    #   azure-datalake-store
-    #   azure-multiapi-storage
-    #   azure-storage-common
     #   datapunt-authorization-django
     #   google-api-core
     #   keystoneauth1
     #   msal
-    #   msrest
     #   opencensus-ext-azure
     #   opencensus-ext-requests
     #   oslo-config
-    #   pygithub
     #   python-keystoneclient
     #   python-swiftclient
-    #   requests-oauthlib
-requests-oauthlib==2.0.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   msrest
 rfc3986==2.0.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   oslo-config
 rsa==4.9
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   google-auth
-scp==0.13.6
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-semver==2.13.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
 six==1.16.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
+    #   -r ./requirements.txt
     #   azure-core
-    #   azure-cosmos
-    #   javaproperties
-    #   msrestazure
     #   opencensus
     #   python-dateutil
-sqlparse==0.5.1
+sqlparse==0.5.2
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   django
-sshtunnel==0.1.5
+stevedore==5.4.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-stevedore==5.3.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   keystoneauth1
     #   oslo-config
     #   python-keystoneclient
-tabulate==0.9.0
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-    #   knack
 time-machine==2.16.0
     # via -r requirements_dev.in
 timeout-decorator==0.5.0
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-tomli==2.0.2
+    # via -r ./requirements.txt
+tomli==2.1.0
     # via
     #   autoflake
     #   black
@@ -1075,60 +354,41 @@ tomli==2.0.2
     #   pip-tools
     #   pytest
 toolz==1.0.0
-    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    # via -r ./requirements.txt
 typing-extensions==4.12.2
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   asgiref
     #   azure-core
-    #   azure-keyvault-administration
     #   azure-keyvault-certificates
     #   azure-keyvault-keys
     #   azure-keyvault-secrets
-    #   azure-mgmt-compute
-    #   azure-mgmt-containerservice
-    #   azure-mgmt-cosmosdb
-    #   azure-mgmt-hdinsight
-    #   azure-mgmt-rdbms
-    #   azure-mgmt-redhatopenshift
-    #   azure-mgmt-sql
-    #   azure-monitor-query
     #   azure-storage-blob
     #   azure-storage-queue
     #   black
     #   jwcrypto
+    #   keystoneauth1
 tzdata==2024.2
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   oslo-serialization
     #   oslo-utils
 urllib3==2.2.3
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
+    #   -r ./requirements.txt
     #   requests
-websocket-client==1.3.3
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
-wheel==0.44.0
+wheel==0.45.1
     # via pip-tools
-wrapt==1.16.0
+wrapt==1.17.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
+    #   -r ./requirements.txt
     #   debtcollector
-    #   deprecated
     #   opencensus-ext-requests
-xmltodict==0.14.2
-    # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
 
 # The following packages are considered to be unsafe in a requirements file:
 pip==24.3.1
     # via pip-tools
-setuptools==75.3.0
+setuptools==75.6.0
     # via
-    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
-    #   azure-cli
+    #   -r ./requirements.txt
     #   pip-tools
