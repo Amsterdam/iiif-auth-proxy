@@ -29,5 +29,3 @@ opencensus-ext-azure
 opencensus-ext-postgresql
 opencensus-ext-logging
 opencensus-ext-requests
-
-setuptools
