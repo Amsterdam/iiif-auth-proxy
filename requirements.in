@@ -8,7 +8,6 @@ six # Needed by jwcrypto, which mistakenly doesn't include it. PR with fix here:
 psycopg2-binary
 python-swiftclient
 python-keystoneclient  # Although it is not directly imported anywhere, it is needed for the connection with the objectstore to work
-setuptools  # Needed to solve Trivy security risk
 timeout-decorator
 toolz # Zero-dependency library with a set of utility functions for iterators, functions, and dictionaries.
 

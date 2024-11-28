@@ -389,6 +389,4 @@ wrapt==1.17.0
 pip==24.3.1
     # via pip-tools
 setuptools==75.6.0
-    # via
-    #   -r ./requirements.txt
-    #   pip-tools
+    # via pip-tools

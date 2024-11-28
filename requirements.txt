@@ -245,7 +245,3 @@ wrapt==1.17.0
     # via
     #   debtcollector
     #   opencensus-ext-requests
-
-# The following packages are considered to be unsafe in a requirements file:
-setuptools==75.6.0
-    # via -r requirements.in
