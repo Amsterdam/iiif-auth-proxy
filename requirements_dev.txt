@@ -6,14 +6,14 @@
 #
 asgiref==3.8.1
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   django
     #   django-cors-headers
 autoflake==2.3.1
     # via -r requirements_dev.in
 azure-core==1.32.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   azure-identity
     #   azure-keyvault-certificates
     #   azure-keyvault-keys
@@ -23,45 +23,45 @@ azure-core==1.32.0
     #   opencensus-ext-azure
 azure-identity==1.16.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   opencensus-ext-azure
 azure-keyvault==4.2.0
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 azure-keyvault-certificates==4.9.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   azure-keyvault
 azure-keyvault-keys==4.10.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   azure-keyvault
 azure-keyvault-secrets==4.9.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   azure-keyvault
 azure-storage-blob==12.24.0
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 azure-storage-queue==12.12.0
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 black==24.10.0
     # via -r requirements_dev.in
 build==1.2.2.post1
     # via pip-tools
 cachetools==5.5.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   google-auth
 certifi==2024.8.30
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   requests
 cffi==1.17.1
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   cryptography
 charset-normalizer==3.4.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   requests
 click==8.1.7
     # via
@@ -71,7 +71,7 @@ coverage[toml]==7.6.8
     # via pytest-cov
 cryptography==44.0.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   azure-identity
     #   azure-keyvault-keys
     #   azure-storage-blob
@@ -80,51 +80,51 @@ cryptography==44.0.0
     #   msal
     #   pyjwt
 datapunt-authorization-django==1.3.3
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 debtcollector==3.0.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   oslo-config
     #   oslo-utils
     #   python-keystoneclient
 django==5.1.3
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   datapunt-authorization-django
     #   django-cors-headers
     #   opencensus-ext-django
 django-cors-headers==4.6.0
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 django-ratelimit==4.1.0
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 exceptiongroup==1.2.2
     # via pytest
 google-api-core==2.23.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   opencensus
 google-auth==2.36.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   google-api-core
 googleapis-common-protos==1.66.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   google-api-core
 idna==3.10
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   requests
 iniconfig==2.0.0
     # via pytest
 iso8601==2.1.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   keystoneauth1
     #   oslo-utils
 isodate==0.7.2
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   azure-keyvault-certificates
     #   azure-keyvault-keys
     #   azure-keyvault-secrets
@@ -134,35 +134,35 @@ isort==5.13.2
     # via -r requirements_dev.in
 jwcrypto==1.5.6
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   datapunt-authorization-django
 keystoneauth1==5.9.1
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   python-keystoneclient
 msal==1.31.1
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   azure-identity
     #   msal-extensions
 msal-extensions==1.2.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   azure-identity
 msgpack==1.1.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   oslo-serialization
 mypy-extensions==1.0.0
     # via black
 netaddr==1.3.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   oslo-config
     #   oslo-utils
 opencensus==0.11.4
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   opencensus-ext-azure
     #   opencensus-ext-django
     #   opencensus-ext-logging
@@ -170,44 +170,44 @@ opencensus==0.11.4
     #   opencensus-ext-requests
 opencensus-context==0.1.3
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   opencensus
 opencensus-ext-azure==1.1.13
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 opencensus-ext-django==0.8.0
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 opencensus-ext-logging==0.1.1
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 opencensus-ext-postgresql==0.1.3
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 opencensus-ext-requests==0.8.0
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 os-service-types==1.7.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   keystoneauth1
 oslo-config==9.7.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   python-keystoneclient
 oslo-i18n==6.5.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   oslo-config
     #   oslo-utils
     #   python-keystoneclient
 oslo-serialization==5.6.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   python-keystoneclient
 oslo-utils==7.4.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   oslo-serialization
     #   python-keystoneclient
 packaging==24.2
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   black
     #   build
     #   oslo-utils
@@ -217,7 +217,7 @@ pathspec==0.12.1
     # via black
 pbr==6.1.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   keystoneauth1
     #   os-service-types
     #   oslo-i18n
@@ -225,7 +225,7 @@ pbr==6.1.0
     #   python-keystoneclient
     #   stevedore
 pillow-simd==9.5.0.post2
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 pip-tools==7.4.1
     # via -r requirements_dev.in
 platformdirs==4.3.6
@@ -234,55 +234,55 @@ pluggy==1.5.0
     # via pytest
 portalocker==2.10.1
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   msal-extensions
 proto-plus==1.25.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   google-api-core
 protobuf==5.29.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
 psutil==6.1.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   opencensus-ext-azure
     #   oslo-utils
 psycopg2-binary==2.9.10
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   opencensus-ext-postgresql
 pyasn1==0.6.1
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   pyasn1-modules
     #   rsa
 pyasn1-modules==0.4.1
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   google-auth
 pycparser==2.22
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   cffi
 pyflakes==3.2.0
     # via autoflake
 pyjwt[crypto]==2.10.1
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   msal
 pyparsing==3.2.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   oslo-utils
 pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
-pytest==8.3.3
+pytest==8.3.4
     # via
     #   -r requirements_dev.in
     #   pytest-cov
@@ -294,19 +294,19 @@ pytest-django==4.9.0
 python-dateutil==2.9.0.post0
     # via time-machine
 python-keystoneclient==5.5.0
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 python-swiftclient==4.6.0
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 pytz==2024.2
     # via -r requirements_dev.in
 pyyaml==6.0.2
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   oslo-config
     #   oslo-utils
 requests==2.32.3
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   azure-core
     #   datapunt-authorization-django
     #   google-api-core
@@ -319,32 +319,32 @@ requests==2.32.3
     #   python-swiftclient
 rfc3986==2.0.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   oslo-config
 rsa==4.9
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   google-auth
 six==1.16.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   azure-core
     #   opencensus
     #   python-dateutil
 sqlparse==0.5.2
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   django
 stevedore==5.4.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   keystoneauth1
     #   oslo-config
     #   python-keystoneclient
 time-machine==2.16.0
     # via -r requirements_dev.in
 timeout-decorator==0.5.0
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 tomli==2.2.1
     # via
     #   autoflake
@@ -354,10 +354,10 @@ tomli==2.2.1
     #   pip-tools
     #   pytest
 toolz==1.0.0
-    # via -r ./requirements.txt
+    # via -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
 typing-extensions==4.12.2
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   asgiref
     #   azure-core
     #   azure-keyvault-certificates
@@ -370,18 +370,18 @@ typing-extensions==4.12.2
     #   keystoneauth1
 tzdata==2024.2
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   oslo-serialization
     #   oslo-utils
 urllib3==2.2.3
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   requests
 wheel==0.45.1
     # via pip-tools
 wrapt==1.17.0
     # via
-    #   -r ./requirements.txt
+    #   -r /home/runner/work/iiif-auth-proxy/iiif-auth-proxy/requirements.txt
     #   debtcollector
     #   opencensus-ext-requests
 
