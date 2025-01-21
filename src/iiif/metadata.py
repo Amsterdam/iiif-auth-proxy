@@ -17,7 +17,7 @@ RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER = (
 def get_metadata_url(url_info):
     # Test with:
     # curl -i -H "Accept: application/json" http://app-iiif-metadata-server/iiif-metadata/bouwdossier/SA85385/
-    return f"{settings.METADATA_SERVER_BASE_URL}/iiif-metadata/bouwdossier/{url_info['stadsdeel']}{url_info['dossier']}/"
+    return f"{settings.METADATA_SERVER_BASE_URL}/iiif-metadata/bouwdossier/{url_info['stadsdeel']}_{url_info['dossier']}/"
 
 
 def do_metadata_request(metadata_url):
