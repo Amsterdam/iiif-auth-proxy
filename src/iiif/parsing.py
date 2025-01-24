@@ -90,10 +90,9 @@ def get_info_from_iiif_url(iiif_url, source_file):
             # SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg=relevant_url_part  SQ=stadsdeel  01452=dossier  SQ10079651=document_barcode  00001=file/bestand
             # TODO: Decrease the flexibility of this regex, the ranges are most likely larger than necessary
             try:
-                stadsdeel, dossier, document_barcode, file = re.match(
-                    r"^\S{0,15}?([A-Z]{2})-([a-zA-Z0-9]{3,12})\S{0,15}?-([a-zA-Z0-9]{5,15})_(\d{3,7}?)\.\w+$",
-                    relevant_url_part,
-                ).groups()
+                stadsdeel_dossier, barcode_file = relevant_url_part.split("~")
+                stadsdeel, dossier = stadsdeel_dossier.split("_")
+                document_barcode, file = barcode_file.split("_")
             except Exception as e:
                 raise InvalidIIIFUrlError(
                     f"Invalid iiif url (no valid source): {iiif_url}"
@@ -109,8 +108,9 @@ def get_info_from_iiif_url(iiif_url, source_file):
             }
 
         if source == "wabo":
-            stadsdeel, dossier, olo_and_document = relevant_url_part.split("-", 2)
-            olo, document_barcode = olo_and_document.split("_", 1)
+            stadsdeel_dossier, olo_and_document = relevant_url_part.split("~")
+            stadsdeel, dossier = stadsdeel_dossier.split("_")
+            olo, document_barcode = olo_and_document.split("_")
             return {
                 **url_info,
                 "stadsdeel": stadsdeel,
