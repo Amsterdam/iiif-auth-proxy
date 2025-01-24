@@ -70,7 +70,9 @@ EDEPOT_BASE_URL = os.getenv(
     "EDEPOT_BASE_URL", "https://bwt.uitplaatsing.shcp03.archivingondemand.nl/rest/"
 )
 WABO_BASE_URL = os.getenv(
-    "WABO_BASE_URL", "https://bwt.hs3-saa-bwt.shcp04.archivingondemand.nl/rest/"
+    "WABO_BASE_URL",
+    "https://bwt.hs3-saa-bwt.shcp04.archivingondemand.nl/rest/",
+    # TODO VERVANGEN? "https://hs3-saa-bwt.shcp04.archivingondemand.nl/bwt/"
 )
 EDEPOT_AUTHORIZATION = os.getenv("EDEPOT_AUTHORIZATION", "dummy")
 WABO_AUTHORIZATION = os.getenv("WABO_AUTHORIZATION", "dummy")
