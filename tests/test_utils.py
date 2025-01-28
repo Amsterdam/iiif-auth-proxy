@@ -47,7 +47,7 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] is None
         assert url_info["scaling"] is None
-        assert url_info["source_filename"] == "ST_00015/ST00000126_00001.jpg"
+        assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
         assert url_info["filename"] == "ST_00015~ST00000126_00001.jpg"
         assert url_info["formatting"] is None
         assert url_info["info_json"] is True
@@ -64,7 +64,7 @@ class TestUtils:
         assert url_info["file"] == "00003"
         assert url_info["region"] is None
         assert url_info["scaling"] is None
-        assert url_info["source_filename"] == "SA_100732/SA00509506_00003.jpg"
+        assert url_info["source_filename"] == "SA/100732/SA00509506_00003.jpg"
         assert url_info["filename"] == "SA_100732~SA00509506_00003.jpg"
         assert url_info["formatting"] is None
         assert url_info["info_json"] is True
@@ -79,7 +79,7 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
-        assert url_info["source_filename"] == "SQ_01452/SQ10079651_00001.jpg"
+        assert url_info["source_filename"] == "SQ/01452/SQ10079651_00001.jpg"
         assert url_info["filename"] == "SQ_01452~SQ10079651_00001.jpg"
         assert url_info["formatting"] == "full/full/0/default.jpg"
         assert url_info["info_json"] is False
@@ -95,7 +95,7 @@ class TestUtils:
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
         assert (
-            url_info["source_filename"] == "SQ_28276-SQ-file9EyinW/SQ10263352_00003.jpg"
+            url_info["source_filename"] == "SQ/28276-SQ-file9EyinW/SQ10263352_00003.jpg"
         )
         assert url_info["filename"] == "SQ_28276-SQ-file9EyinW~SQ10263352_00003.jpg"
         assert url_info["formatting"] == "full/full/0/default.jpg"
@@ -113,7 +113,7 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
-        assert url_info["source_filename"] == "SQ_26614/sq10241283_00001.jpg"
+        assert url_info["source_filename"] == "SQ/26614/sq10241283_00001.jpg"
         assert url_info["filename"] == "SQ_26614~sq10241283_00001.jpg"
         assert url_info["formatting"] == "full/full/0/default.jpg"
         assert url_info["info_json"] is False
@@ -127,7 +127,7 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "50,50"
-        assert url_info["source_filename"] == "ST_00015/ST00000126_00001.jpg"
+        assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
         assert url_info["filename"] == "ST_00015~ST00000126_00001.jpg"
         assert url_info["formatting"] == "full/50,50/0/default.jpg"
         assert url_info["info_json"] is False
@@ -141,7 +141,7 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "50,50"
-        assert url_info["source_filename"] == "ST_00015/ST00000126_00001.jpg"
+        assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
         assert url_info["filename"] == "ST_00015~ST00000126_00001.jpg"
         assert url_info["formatting"] == "full/50,50/0/default.jpg"
         assert url_info["info_json"] is False
@@ -155,7 +155,7 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
-        assert url_info["source_filename"] == "ST_00015/ST00000126_00001.jpg"
+        assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
         assert url_info["filename"] == "ST_00015~ST00000126_00001.jpg"
         assert url_info["formatting"] == "full/full/0/default.jpg"
         assert url_info["info_json"] is False
@@ -169,7 +169,7 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] == "24,24,48,48"
         assert url_info["scaling"] == "full"
-        assert url_info["source_filename"] == "ST_00015/ST00000126_00001.jpg"
+        assert url_info["source_filename"] == "ST/00015/ST00000126_00001.jpg"
         assert url_info["filename"] == "ST_00015~ST00000126_00001.jpg"
         assert url_info["formatting"] == "24,24,48,48/full/0/default.jpg"
         assert url_info["info_json"] is False
@@ -187,7 +187,7 @@ class TestUtils:
         assert url_info["document_barcode"] == "628547"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "1000,900"
-        assert url_info["source_filename"] == "SDZ_TA-38657/4900487_628547"
+        assert url_info["source_filename"] == "SDZ/TA-38657/4900487_628547"
         assert url_info["filename"] == "SDZ_TA-38657~4900487_628547"
         assert url_info["formatting"] == "full/1000,900/0/default.jpg"
         assert url_info["info_json"] is False
@@ -201,7 +201,7 @@ class TestUtils:
         assert url_info["document_barcode"] == "628547"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "1000,900"
-        assert url_info["source_filename"] == "SDZ_TA-38657/4900487_628547"
+        assert url_info["source_filename"] == "SDZ/TA-38657/4900487_628547"
         assert url_info["filename"] == "SDZ_TA-38657~4900487_628547"
         assert url_info["formatting"] == "full/1000,900/0/default.jpg"
         assert url_info["info_json"] is False
@@ -218,7 +218,7 @@ class TestUtils:
         assert url_info["region"] is None
         assert url_info["scaling"] is None
         assert (
-            url_info["source_filename"] == "SDO_T-10316333/3304_ECS0000004420_000_000"
+            url_info["source_filename"] == "SDO/T-10316333/3304_ECS0000004420_000_000"
         )
         assert url_info["filename"] == "SDO_T-10316333~3304_ECS0000004420_000_000"
         assert url_info["formatting"] is None
@@ -236,7 +236,7 @@ class TestUtils:
         assert url_info["region"] is None
         assert url_info["scaling"] is None
         assert (
-            url_info["source_filename"] == "SDO_10316333/3304_ECS0000004420-000_00-00"
+            url_info["source_filename"] == "SDO/10316333/3304_ECS0000004420-000_00-00"
         )
         assert url_info["filename"] == "SDO_10316333~3304_ECS0000004420-000_00-00"
         assert url_info["formatting"] is None

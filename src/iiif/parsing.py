@@ -105,7 +105,9 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "dossier": dossier,
                 "document_barcode": document_barcode.upper(),
                 "file": m_file.group(1),  # The file in the dossier without .extension
-                "source_filename": relevant_url_part.replace("~", "/"),
+                "source_filename": relevant_url_part.replace("_", "/", 1).replace(
+                    "~", "/"
+                ),
             }
 
         if source == "wabo":
@@ -118,7 +120,9 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "dossier": dossier,
                 "olo": olo,
                 "document_barcode": document_barcode,
-                "source_filename": relevant_url_part.replace("~", "/"),
+                "source_filename": relevant_url_part.replace("_", "/", 1).replace(
+                    "~", "/"
+                ),
             }
 
         raise InvalidIIIFUrlError(f"Invalid iiif url (no valid source): {iiif_url}")
