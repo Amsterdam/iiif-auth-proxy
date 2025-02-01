@@ -39,19 +39,19 @@ azure-keyvault-secrets==4.9.0
     # via
     #   -r ./requirements.txt
     #   azure-keyvault
-azure-storage-blob==12.24.0
+azure-storage-blob==12.24.1
     # via -r ./requirements.txt
 azure-storage-queue==12.12.0
     # via -r ./requirements.txt
-black==24.10.0
+black==25.1.0
     # via -r requirements_dev.in
 build==1.2.2.post1
     # via pip-tools
-cachetools==5.5.0
+cachetools==5.5.1
     # via
     #   -r ./requirements.txt
     #   google-auth
-certifi==2024.12.14
+certifi==2025.1.31
     # via
     #   -r ./requirements.txt
     #   requests
@@ -87,7 +87,7 @@ debtcollector==3.0.0
     #   oslo-config
     #   oslo-utils
     #   python-keystoneclient
-django==5.1.4
+django==5.1.5
     # via
     #   -r ./requirements.txt
     #   datapunt-authorization-django
@@ -97,11 +97,11 @@ django-cors-headers==4.6.0
     # via -r ./requirements.txt
 django-ratelimit==4.1.0
     # via -r ./requirements.txt
-google-api-core==2.24.0
+google-api-core==2.24.1
     # via
     #   -r ./requirements.txt
     #   opencensus
-google-auth==2.37.0
+google-auth==2.38.0
     # via
     #   -r ./requirements.txt
     #   google-api-core
@@ -128,7 +128,7 @@ isodate==0.7.2
     #   azure-keyvault-secrets
     #   azure-storage-blob
     #   azure-storage-queue
-isort==5.13.2
+isort==6.0.0
     # via -r requirements_dev.in
 jwcrypto==1.5.6
     # via
@@ -170,7 +170,7 @@ opencensus-context==0.1.3
     # via
     #   -r ./requirements.txt
     #   opencensus
-opencensus-ext-azure==1.1.13
+opencensus-ext-azure==1.1.14
     # via -r ./requirements.txt
 opencensus-ext-django==0.8.0
     # via -r ./requirements.txt
@@ -234,11 +234,11 @@ portalocker==2.10.1
     # via
     #   -r ./requirements.txt
     #   msal-extensions
-proto-plus==1.25.0
+proto-plus==1.26.0
     # via
     #   -r ./requirements.txt
     #   google-api-core
-protobuf==5.29.2
+protobuf==5.29.3
     # via
     #   -r ./requirements.txt
     #   google-api-core
@@ -295,7 +295,7 @@ python-keystoneclient==5.5.0
     # via -r ./requirements.txt
 python-swiftclient==4.6.0
     # via -r ./requirements.txt
-pytz==2024.2
+pytz==2025.1
     # via -r requirements_dev.in
 pyyaml==6.0.2
     # via
@@ -356,7 +356,7 @@ typing-extensions==4.12.2
     #   azure-storage-queue
     #   jwcrypto
     #   keystoneauth1
-tzdata==2024.2
+tzdata==2025.1
     # via
     #   -r ./requirements.txt
     #   oslo-serialization
@@ -367,14 +367,14 @@ urllib3==2.3.0
     #   requests
 wheel==0.45.1
     # via pip-tools
-wrapt==1.17.0
+wrapt==1.17.2
     # via
     #   -r ./requirements.txt
     #   debtcollector
     #   opencensus-ext-requests
 
 # The following packages are considered to be unsafe in a requirements file:
-pip==24.3.1
+pip==25.0
     # via pip-tools
-setuptools==75.6.0
+setuptools==75.8.0
     # via pip-tools
