@@ -111,15 +111,17 @@ def get_info_from_iiif_url(iiif_url, source_file):
             }
 
         if source == "wabo":
+            # SDW_WABO-2014-004546~1198113_SJ20852745_00001
             stadsdeel_dossier, olo_and_document = relevant_url_part.split("~")
             stadsdeel, dossier = stadsdeel_dossier.split("_")
-            olo, document_barcode = olo_and_document.split("_", 1)
+            olo, document_barcode, filenr = olo_and_document.split("_")
             return {
                 **url_info,
                 "stadsdeel": stadsdeel,
                 "dossier": dossier,
                 "olo": olo,
                 "document_barcode": document_barcode,
+                "filenr": filenr,
                 "source_filename": relevant_url_part.replace("_", "/", 1).replace(
                     "~", "/"
                 ),

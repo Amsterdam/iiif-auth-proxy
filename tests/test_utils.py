@@ -25,6 +25,7 @@ from tests.test_settings import (
     PRE_WABO_IMG_URL_WITH_SCALING,
     PRE_WABO_INFO_JSON_URL,
     WABO_IMG_URL,
+    WABO_IMG_URL2,
 )
 from tests.tools import filename_from_url, source_filename_from_url
 from zip_consumer.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER, create_local_zip_file
@@ -187,8 +188,8 @@ class TestUtils:
         assert url_info["document_barcode"] == "628547"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "1000,900"
-        assert url_info["source_filename"] == "SDZ/TA-38657/4900487_628547"
-        assert url_info["filename"] == "SDZ_TA-38657~4900487_628547"
+        assert url_info["source_filename"] == "SDZ/TA-38657/4900487_628547_1"
+        assert url_info["filename"] == "SDZ_TA-38657~4900487_628547_1"
         assert url_info["formatting"] == "full/1000,900/0/default.jpg"
         assert url_info["info_json"] is False
 
@@ -201,11 +202,14 @@ class TestUtils:
         assert url_info["document_barcode"] == "628547"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "1000,900"
-        assert url_info["source_filename"] == "SDZ/TA-38657/4900487_628547"
-        assert url_info["filename"] == "SDZ_TA-38657~4900487_628547"
+        assert url_info["source_filename"] == "SDZ/TA-38657/4900487_628547_1"
+        assert url_info["filename"] == "SDZ_TA-38657~4900487_628547_1"
         assert url_info["formatting"] == "full/1000,900/0/default.jpg"
         assert url_info["info_json"] is False
 
+    @pytest.mark.xfail(
+        reason="WABO dossiers barcodes don't have underscores see metadata-server batch.py"
+    )
     def test_get_info_from_wabo_url_with_underscores_in_barcode(self):
         url_info = get_info_from_iiif_url(
             "2/wabo:SDO_T-10316333~3304_ECS0000004420_000_000/info.json", False
@@ -224,21 +228,22 @@ class TestUtils:
         assert url_info["formatting"] is None
         assert url_info["info_json"] is True
 
-    def test_get_info_from_wabo_url_with_underscores_and_hyphens_in_barcode(self):
+    def test_get_info_from_wabo_url_with_hyphens_in_barcode(self):
         url_info = get_info_from_iiif_url(
-            "2/wabo:SDO_10316333~3304_ECS0000004420-000_00-00/info.json", False
+            "2/wabo:SDO_10316333~3304_ECS0000004420-000-00-00_2/info.json", False
         )
         assert url_info["source"] == "wabo"
         assert url_info["stadsdeel"] == "SDO"
         assert url_info["dossier"] == "10316333"
         assert url_info["olo"] == "3304"
-        assert url_info["document_barcode"] == "ECS0000004420-000_00-00"
+        assert url_info["document_barcode"] == "ECS0000004420-000-00-00"
+        assert url_info["filenr"] == "2"
         assert url_info["region"] is None
         assert url_info["scaling"] is None
         assert (
-            url_info["source_filename"] == "SDO/10316333/3304_ECS0000004420-000_00-00"
+            url_info["source_filename"] == "SDO/10316333/3304_ECS0000004420-000-00-00_2"
         )
-        assert url_info["filename"] == "SDO_10316333~3304_ECS0000004420-000_00-00"
+        assert url_info["filename"] == "SDO_10316333~3304_ECS0000004420-000-00-00_2"
         assert url_info["formatting"] is None
         assert url_info["info_json"] is True
 
@@ -252,35 +257,44 @@ class TestUtils:
             "documenten": [
                 {
                     "barcode": "628547",
-                    "bestanden": [{"filename": "SDZ/UIT/COH/628547.PDF"}],
+                    "bestanden": [
+                        {"filename": "SDZ/UIT/COH/628547_00001.PDF"},
+                        {"filename": "SDZ/UIT/COH/628547_11119.jpg"},
+                    ],
                 }
             ]
         }
 
         wabo_url = create_wabo_url(metadata=metadata, url_info=url_info)
-        assert wabo_url == "SDZ/UIT/COH/628547.PDF"
+        assert wabo_url == "SDZ/UIT/COH/628547_00001.PDF"
 
     def test_create_wabo_url_source_file(self):
-        url_info = get_info_from_iiif_url(WABO_IMG_URL, True)
+        url_info = get_info_from_iiif_url(WABO_IMG_URL2, True)
         metadata = {
             "documenten": [
                 {
                     "barcode": "628547",
-                    "bestanden": [{"filename": "SDZ/UIT/COH/628547.PDF"}],
+                    "bestanden": [
+                        {"filename": "SDZ/UIT/COH/628547_00001.PDF"},
+                        {"filename": "SDZ/UIT/COH/628547_11119.jpg"},
+                    ],
                 }
             ]
         }
 
         wabo_url = create_wabo_url(metadata=metadata, url_info=url_info)
-        assert wabo_url == "SDZ/UIT/COH/628547.PDF"
+        assert wabo_url == "SDZ/UIT/COH/628547_11119.jpg"
 
     def test_create_file_url_and_headers(self):
         metadata = {
             "documenten": [
                 {
                     "barcode": "628547",
-                    "bestanden": [{"filename": "SDZ/UIT/COH/628547.PDF"}],
-                }
+                    "bestanden": [
+                        {"filename": "SDZ/UIT/COH/628547_00001.PDF"},
+                        {"filename": "SDZ/UIT/COH/628547_11119.jpg"},
+                    ],
+                },
             ]
         }
 
@@ -351,37 +365,31 @@ class TestUtils:
             == f"{settings.EDEPOT_BASE_URL}{source_filename_from_url(PRE_WABO_INFO_JSON_URL).replace('SQ11426/', '')}"
         )
 
+        # wabo source get file 2 from metadata
         url, headers = create_file_url_and_headers(
             {
                 "source": "wabo",
                 "document_barcode": "628547",
+                "filenr": "2",
                 "formatting": "full/1000,1000/0/default.jpg",
             },
             metadata,
         )
-        # WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547/full/1000,900/0/default.jpg"
-        assert url == f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF"
+        # WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547_2/full/1000,900/0/default.jpg"
+        assert url == f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547_11119.jpg"
 
+        # wabo source get file 1 from metadata
         url, headers = create_file_url_and_headers(
             {
                 "source": "wabo",
                 "document_barcode": "628547",
+                "filenr": "1",
                 "formatting": "full/1000,1000/0/default.jpg",
             },
             metadata,
         )
-        assert url == f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF"
-
-        # wabo with source_file
-        url, headers = create_file_url_and_headers(
-            {
-                "source": "wabo",
-                "document_barcode": "628547",
-                "formatting": "full/1000,1000/0/default.jpg",
-            },
-            metadata,
-        )
-        assert url == f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547.PDF"
+        # WABO_IMG_URL = "2/wabo:SDZ-38657-4900487_628547_2/full/1000,900/0/default.jpg"
+        assert url == f"{settings.WABO_BASE_URL}SDZ/UIT/COH/628547_00001.PDF"
 
     def test_get_authentication_jwt(self):
         token = create_mail_login_token("jwttest@amsterdam.nl", settings.SECRET_KEY)

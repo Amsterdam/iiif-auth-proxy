@@ -39,7 +39,10 @@ PRE_WABO_IMG_URL_WITH_LOWERCASE_IN_DOSSIER = (
     EDEPOT_PREFIX + "SQ_26614~sq10241283_00001.jpg/full/full/0/default.jpg"
 )
 
-WABO_IMG_URL = WABO_PREFIX + "SDZ_TA-38657~4900487_628547/full/1000,900/0/default.jpg"
+WABO_IMG_URL = WABO_PREFIX + "SDZ_TA-38657~4900487_628547_1/full/1000,900/0/default.jpg"
+WABO_IMG_URL2 = (
+    WABO_PREFIX + "SDZ_TA-38657~4900487_628547_2/full/1000,900/0/default.jpg"
+)
 
 with open("test-images/test-image-96x85.jpg", "rb") as file:
     IMAGE_BINARY_DATA = file.read()

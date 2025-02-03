@@ -36,7 +36,8 @@ def create_prewabo_url(url_info):
 def create_wabo_url(url_info, metadata):
     for document in metadata["documenten"]:
         if document["barcode"] == url_info["document_barcode"]:
-            return document["bestanden"][0][
+            position = int(url_info["filenr"]) - 1
+            return document["bestanden"][position][
                 "filename"
             ]  # there is always only one filename per bestand
     raise FilenameNotFoundInDocumentInMetadataError(
