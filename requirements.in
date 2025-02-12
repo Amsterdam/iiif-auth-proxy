@@ -15,6 +15,7 @@ toolz # Zero-dependency library with a set of utility functions for iterators, f
 django
 django-cors-headers
 django-ratelimit
+uwsgi
 
 # Azure
 azure-core
