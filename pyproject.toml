@@ -1,2 +1,21 @@
 [tool.isort]
 profile = "black"
+
+[tool.autoflake]
+ignore_init_module_imports = true
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "src.main.settings"
+pythonpath = [".", "./src", "./tests"]
+addopts = "--cov --cov-report term-missing --no-cov-on-fail"
+
+[tool.coverage.run]
+source = ["/app/src"]
+branch = true
+omit = [
+    "*/apps.py",
+    "/app/src/manage.py",
+    "/app/src/main/wsgi.py",
+    "*/migrations/*",
+    "*/factories.py"
+]

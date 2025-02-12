@@ -52,3 +52,7 @@ coverage.xml
 *.sqlite3
 
 docker-compose.override.yml
+compose.override.yml
+
+# pyenv
+.python-version

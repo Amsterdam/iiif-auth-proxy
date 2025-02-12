@@ -5,5 +5,5 @@ set -e  # stop on any error
 set -x  # print what we are doing
 
 # run uwsgi
-cd /src
+cd /app/src
 exec uwsgi --ini main/uwsgi.ini
