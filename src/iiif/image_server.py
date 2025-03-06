@@ -37,9 +37,7 @@ def create_wabo_url(url_info, metadata):
     for document in metadata["documenten"]:
         if document["barcode"] == url_info["document_barcode"]:
             position = int(url_info["filenr"]) - 1
-            return document["bestanden"][position][
-                "filename"
-            ]  # there is always only one filename per bestand
+            return document["bestanden"][position]["filename"]
     raise FilenameNotFoundInDocumentInMetadataError(
         f'Filename for document {url_info["document_barcode"]} not found'
     )
@@ -100,7 +98,7 @@ def handle_file_response_codes(file_response, file_url):
         )
 
     if file_response.status_code != 200:
-        log.info(
+        log.error(
             f"Got response code {file_response.status_code} while retrieving "
             f"the image {file_url} from the image server."
         )

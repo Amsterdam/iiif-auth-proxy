@@ -71,8 +71,7 @@ EDEPOT_BASE_URL = os.getenv(
 )
 WABO_BASE_URL = os.getenv(
     "WABO_BASE_URL",
-    # vervangen door onderstaande prefix "https://bwt.hs3-saa-bwt.shcp04.archivingondemand.nl/rest/",
-    "https://hs3-saa-bwt.shcp04.archivingondemand.nl/bwt/",
+    "https://bwt.hs3-saa-bwt.shcp04.archivingondemand.nl/rest/",
 )
 EDEPOT_AUTHORIZATION = os.getenv("EDEPOT_AUTHORIZATION", "dummy")
 WABO_AUTHORIZATION = os.getenv("WABO_AUTHORIZATION", "dummy")
