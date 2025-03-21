@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from iiif.image_handling import (
@@ -9,24 +11,55 @@ from iiif.image_handling import (
 )
 from main.utils import ImmediateHttpResponse
 
+CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+
 
 class TestImageFormatting:
     def setup_method(self):
-        with open("test-images/test-image-96x85.jpg", "rb") as f:
+        with open(
+            os.path.join(CURRENT_DIRECTORY, "test-images/test-image-96x85.jpg"), "rb"
+        ) as f:
             self.img_96x85 = f.read()
-        with open("test-images/test-image-50x44.jpg", "rb") as f:
+        with open(
+            os.path.join(CURRENT_DIRECTORY, "test-images/test-image-50x44.jpg"), "rb"
+        ) as f:
             self.img_50x44 = f.read()
-        with open("test-images/test-image-49x44.jpg", "rb") as f:
+        with open(
+            os.path.join(CURRENT_DIRECTORY, "test-images/test-image-49x44.jpg"), "rb"
+        ) as f:
             self.img_49x44 = f.read()
-        with open("test-images/test-image-cropped-0x0x50x44.jpg", "rb") as f:
+        with open(
+            os.path.join(
+                CURRENT_DIRECTORY, "test-images/test-image-cropped-0x0x50x44.jpg"
+            ),
+            "rb",
+        ) as f:
             self.img_0x0x50x44 = f.read()
-        with open("test-images/test-image-cropped-0x41x96x44.jpg", "rb") as f:
+        with open(
+            os.path.join(
+                CURRENT_DIRECTORY, "test-images/test-image-cropped-0x41x96x44.jpg"
+            ),
+            "rb",
+        ) as f:
             self.img_0x41x96x44 = f.read()
-        with open("test-images/test-image-cropped-24x24x72x72.jpg", "rb") as f:
+        with open(
+            os.path.join(
+                CURRENT_DIRECTORY, "test-images/test-image-cropped-24x24x72x72.jpg"
+            ),
+            "rb",
+        ) as f:
             self.img_24x24x72x72 = f.read()
-        with open("test-images/test-image-cropped-48x0x48x85.jpg", "rb") as f:
+        with open(
+            os.path.join(
+                CURRENT_DIRECTORY, "test-images/test-image-cropped-48x0x48x85.jpg"
+            ),
+            "rb",
+        ) as f:
             self.img_48x0x48x85 = f.read()
-        with open("test-images/test-image-cropped-85x85.jpg", "rb") as f:
+        with open(
+            os.path.join(CURRENT_DIRECTORY, "test-images/test-image-cropped-85x85.jpg"),
+            "rb",
+        ) as f:
             self.img_85x85 = f.read()
 
     @pytest.mark.parametrize("param", [None, "", ",", "w,h"])

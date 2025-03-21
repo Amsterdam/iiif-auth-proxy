@@ -8,8 +8,6 @@
 # Usage: copy this file, name it ".docker-compose.override.yml" and
 # set your own values.
 
-version: "3.5"
-
 networks:
   amsterdam-bouwdossiers:
     name: amsterdam-bouwdossiers
