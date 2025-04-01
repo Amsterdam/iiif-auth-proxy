@@ -24,15 +24,15 @@ def get_info_from_iiif_url(iiif_url, source_file):
     """
     # PRE-WABO
 
-    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/edepot:ST-00015-ST00000126_00001.jpg/info.json"
+    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/edepot:ST_00015~ST00000126_00001.jpg/info.json"
 
     For the url above it means they request just the info.json, nothing else. More info about the rest
     of this url see the explanation below.
 
-    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/edepot:ST-00015-ST00000126_00001.jpg/full/1000,900/0/default.jpg"
+    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/edepot:ST_00015~ST00000126_00001.jpg/full/1000,900/0/default.jpg"
 
     For the url above, the following information can be extracted:
-    - ST-00015-ST00000126_00001.jpg=filename  ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
+    - ST_00015~ST00000126_00001.jpg=filename  ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
     - full: no cropping
     - 1000,900: scaling the image to fit within a 1000x900 (1000 width, 900 height) pixel bounding box, preserving its aspect ratio
     - 0: rotation angle in degrees
@@ -40,10 +40,10 @@ def get_info_from_iiif_url(iiif_url, source_file):
 
     # WABO
 
-    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/wabo:SDZ-38657-4900487_628547/full/full/0/default.jpg""
-    - SDZ-38657-4900487_628547=filename
+    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/wabo:SDZ_TA-38657~4900487_628547/full/full/0/default.jpg""
+    - SDZ_TA-38657~4900487_628547=filename
     - SDZ=stadsdeel
-    - 38657=dossier
+    - TA-38657=dossier
     4900487=olo_liaan_nummer
     628547=document_barcode
 
@@ -86,14 +86,14 @@ def get_info_from_iiif_url(iiif_url, source_file):
             "info_json": info_json,  # Whether the info.json is requested instead of the image itself
         }
         if source == "edepot":  # aka pre-wabo
-            # ST-00015-ST00000126_00001.jpg=relevant_url_part  ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
-            # SQ1452-SQ-01452%20(2)-SQ10079651_00001.jpg=relevant_url_part  SQ=stadsdeel  01452=dossier  SQ10079651=document_barcode  00001=file/bestand
+            # ST_00015~ST00000126_00001.jpg=relevant_url_part  ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
+            # SQ_01452~SQ10079651_00001.jpg=relevant_url_part  SQ=stadsdeel  01452=dossier  SQ10079651=document_barcode  00001=file/bestand
             # TODO: Decrease the flexibility of this regex, the ranges are most likely larger than necessary
             try:
-                stadsdeel, dossier, document_barcode, file = re.match(
-                    r"^\S{0,15}?([A-Z]{2})-([a-zA-Z0-9]{3,12})\S{0,15}?-([a-zA-Z0-9]{5,15})_(\d{3,7}?)\.\w+$",
-                    relevant_url_part,
-                ).groups()
+                stadsdeel_dossier, barcode_file = relevant_url_part.split("~")
+                stadsdeel, dossier = stadsdeel_dossier.split("_")
+                document_barcode, file = barcode_file.split("_", 1)
+                m_file = re.match("^(\d{3,7}?)\.\w{3,4}$", file)
             except Exception as e:
                 raise InvalidIIIFUrlError(
                     f"Invalid iiif url (no valid source): {iiif_url}"
@@ -104,20 +104,27 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "stadsdeel": stadsdeel,
                 "dossier": dossier,
                 "document_barcode": document_barcode.upper(),
-                "file": file,  # The file in the dossier
-                "source_filename": relevant_url_part.replace("-", "/"),
+                "file": m_file.group(1),  # The file in the dossier without .extension
+                "source_filename": relevant_url_part.replace("_", "/", 1).replace(
+                    "~", "/"
+                ),
             }
 
         if source == "wabo":
-            stadsdeel, dossier, olo_and_document = relevant_url_part.split("-", 2)
-            olo, document_barcode = olo_and_document.split("_", 1)
+            # SDW_WABO-2014-004546~1198113_SJ20852745_00001
+            stadsdeel_dossier, olo_and_document = relevant_url_part.split("~")
+            stadsdeel, dossier = stadsdeel_dossier.split("_")
+            olo, document_barcode, filenr = olo_and_document.split("_")
             return {
                 **url_info,
                 "stadsdeel": stadsdeel,
                 "dossier": dossier,
                 "olo": olo,
                 "document_barcode": document_barcode,
-                "source_filename": relevant_url_part.replace("-", "/", 2),
+                "filenr": filenr,
+                "source_filename": relevant_url_part.replace("_", "/", 1).replace(
+                    "~", "/"
+                ),
             }
 
         raise InvalidIIIFUrlError(f"Invalid iiif url (no valid source): {iiif_url}")
