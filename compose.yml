@@ -10,6 +10,8 @@ x-app: &base-app
   ports:
     - "8000:8000"
   environment: &base-app-env
+    LOG_LEVEL: "WARNING"
+    DJANGO_LOG_LEVEL: "WARNING"
     SECRET_KEY: "insecure"
     JWT_SECRET_KEY: "insecure"
     DATABASE_HOST: "database"
@@ -45,6 +47,8 @@ services:
       target: dev
     environment:
       <<: *base-app-env
+      LOG_LEVEL: "DEBUG"
+      DJANGO_LOG_LEVEL: "DEBUG"
       DEBUG: "true"
       USE_JWKS_TEST_KEY: "true"
       MOCK_GET_IMAGE_FROM_SERVER: "true"
