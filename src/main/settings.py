@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import json
 import os
-import sys
 
 from corsheaders.defaults import default_headers
 from opencensus.trace import config_integration
