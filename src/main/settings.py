@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import json
 import os
-import sys
 
 from corsheaders.defaults import default_headers
 from opencensus.trace import config_integration
@@ -250,6 +249,9 @@ STATIC_IMAGE = os.path.join(STATIC_URL, "example.jpg")
 
 
 # Django Logging settings
+LOG_LEVEL = os.getenv("LOG_LEVEL", "WARNING").upper()
+DJANGO_LOG_LEVEL = os.getenv("DJANGO_LOG_LEVEL", "WARNING").upper()
+
 base_log_fmt = {"time": "%(asctime)s", "name": "%(name)s", "level": "%(levelname)s"}
 log_fmt = base_log_fmt.copy()
 log_fmt["message"] = "%(message)s"
@@ -258,7 +260,7 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "root": {
-        "level": "INFO",
+        "level": LOG_LEVEL,
         "handlers": ["console"],
     },
     "formatters": {
@@ -266,39 +268,37 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "level": "INFO",
+            "level": LOG_LEVEL,
             "class": "logging.StreamHandler",
             "formatter": "json",
         },
     },
     "loggers": {
         "iiif": {
-            "level": "WARNING",
+            "level": LOG_LEVEL,
             "handlers": ["console"],
             "propagate": False,
         },
         "main": {
-            "level": "WARNING",
+            "level": LOG_LEVEL,
             "handlers": ["console"],
             "propagate": False,
         },
         "django": {
             "handlers": ["console"],
-            "level": os.getenv(
-                "DJANGO_LOG_LEVEL", "ERROR" if "pytest" in sys.argv[0] else "INFO"
-            ).upper(),
+            "level": DJANGO_LOG_LEVEL,
             "propagate": False,
         },
         # Log all unhandled exceptions
         "django.request": {
-            "level": "ERROR",
+            "level": LOG_LEVEL,
             "handlers": ["console"],
             "propagate": False,
         },
-        "opencensus": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+        "opencensus": {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False},
         "azure.core.pipeline.policies.http_logging_policy": {
             "handlers": ["console"],
-            "level": "WARNING",
+            "level": LOG_LEVEL,
             "propagate": False,
         },
     },
