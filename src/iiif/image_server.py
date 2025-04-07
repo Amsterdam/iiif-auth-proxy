@@ -1,5 +1,6 @@
 import logging
 import re
+from functools import partial
 from io import BytesIO
 
 import requests
@@ -57,11 +58,26 @@ def create_file_url_and_headers(url_info, metadata):
     raise FileSourceNotValidError(f'File source: {url_info["source"]} invalid')
 
 
-def create_mock_image(image_format):
-    img = Image.new("RGB", (32, 32), color="green")
+def _create_image(
+    file_format: str | None = None,
+    size: tuple[int, int] | None = None,
+    color: str | int | float = 0,
+) -> bytes:
+    # Use the given values or the default values
+    size = size or (32, 32)
+
+    # Create the mock image
+    img = Image.new("RGB", size=size, color=color)
     buf = BytesIO()
-    img.save(buf, format=image_format)
+    img.save(buf, format=file_format)
     return buf.getvalue()
+
+
+# Used for testing and development
+create_mock_image = partial(_create_image, size=(32, 32), color="green")
+
+# Used to create a "default thumbnail" for files that are requested and are not an image itself
+create_non_image_file_thumbnail = partial(_create_image, size=(180, 180), color="green")
 
 
 # For develop/test environments where we don't have access to the upstream server
