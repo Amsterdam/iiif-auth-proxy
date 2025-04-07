@@ -9,11 +9,13 @@ from toolz import partial, pipe
 from auth_mail import authentication
 from iiif import image_server, parsing
 from iiif.image_handling import (
+    can_generate_default_thumbnail_for,
     crop_image,
     generate_info_json,
     is_image_content_type,
     scale_image,
 )
+from iiif.image_server import create_non_image_file_thumbnail
 from iiif.metadata import get_metadata
 from main import utils
 
@@ -57,7 +59,12 @@ def index(request, iiif_url):
                 is_cacheable, HttpResponse(file_content, file_type)
             )
 
-        if not is_image_content_type(file_type):
+        if can_generate_default_thumbnail_for(content_type=file_type):
+            # The requested file is NOT an image itself, but we can create a thumbnail for it so let's create it.
+            file_content = create_non_image_file_thumbnail(file_format="jpeg")
+            file_type = "image/jpeg"
+        elif not is_image_content_type(file_type):
+            # Not an image return a 400
             raise utils.ImmediateHttpResponse(
                 response=HttpResponse(
                     "Content-type of requested file not supported", status=400

@@ -100,6 +100,17 @@ def is_image_content_type(content_type):
     return content_type.split("/")[0] == "image"
 
 
+def can_generate_default_thumbnail_for(content_type: str) -> bool:
+    """
+    Currently only PDF files are supported.
+    """
+    return content_type.lower() in [
+        "application/pdf",
+        "application/x-pdf",
+        "applications/pdf",
+    ]
+
+
 def content_type_to_format(content_type):
     return content_type.split("/")[1]
 
