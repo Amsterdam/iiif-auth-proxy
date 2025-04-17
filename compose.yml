@@ -7,8 +7,9 @@ x-app: &base-app
     - azurite
   volumes:
     - .:/app/
-  ports:
-    - "8000:8000"
+  networks:
+    - amsterdam-bouwdossiers
+    - default
   environment: &base-app-env
     LOG_LEVEL: "WARNING"
     DJANGO_LOG_LEVEL: "WARNING"
@@ -37,6 +38,8 @@ services:
     build:
       context: .
       target: app
+    ports:
+      - "8000:8000"
     image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-opdrachten/iiif-auth-proxy}:${VERSION:-latest}
     command: /app/deploy/docker-run.sh
 
@@ -45,6 +48,8 @@ services:
     build:
       context: .
       target: dev
+    ports:
+      - "8001:8000"
     environment:
       <<: *base-app-env
       LOG_LEVEL: "DEBUG"
@@ -71,3 +76,8 @@ services:
       target: linting
     volumes:
       - .:/app/
+
+networks:
+  amsterdam-bouwdossiers:
+    name: amsterdam-bouwdossiers
+    driver: bridge

@@ -14,6 +14,7 @@ from iiif.image_handling import (
     is_image_content_type,
     scale_image,
 )
+from iiif.image_server import create_non_image_file_thumbnail
 from iiif.metadata import get_metadata
 from main import utils
 
@@ -58,11 +59,9 @@ def index(request, iiif_url):
             )
 
         if not is_image_content_type(file_type):
-            raise utils.ImmediateHttpResponse(
-                response=HttpResponse(
-                    "Content-type of requested file not supported", status=400
-                )
-            )
+            # The requested file is NOT an image itself, but we can create a thumbnail for it so let's create it.
+            file_content = create_non_image_file_thumbnail(file_format="jpeg")
+            file_type = "image/jpeg"
 
         if url_info["info_json"]:
             response_content = generate_info_json(
