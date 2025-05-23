@@ -26,11 +26,15 @@ PRE_WABO_IMG_URL_NO_SCALING = (
 PRE_WABO_IMG_URL_WITH_EXTRA_DOSSIER_DIGIT = (
     EDEPOT_PREFIX + "SA_100732~SA00509506_00003.jpg/info.json"
 )
-# TODO kan als het goed is niet meer voorkomen door nieuwe opzet metadata-server; test inbouwen voor check
-PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE = (
-    # EDEPOT_PREFIX + "SQ_1452~SQ_01452%20(2)-SQ10079651_00001.jpg/full/full/0/default.jpg"
+
+PRE_WABO_IMG_URL_DOUBLE_DOSSIER = (
     EDEPOT_PREFIX
-    + "SQ_01452~SQ10079651_00001.jpg/full/full/0/default.jpg"
+    + "SQ_01452X~SQ-01452-SQ10079651_00001.jpg/full/full/0/default.jpg"
+)
+
+PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE = (
+    EDEPOT_PREFIX
+    + "SQ_01452~SQ-01452%20(2)-SQ10079651_00001.jpg/full/full/0/default.jpg"
 )
 PRE_WABO_IMG_URL_WITH_CHARS_IN_DOSSIER = (
     EDEPOT_PREFIX
