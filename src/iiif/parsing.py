@@ -93,7 +93,6 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 stadsdeel, dossier = stadsdeel_dossier.split("_")
                 _barcode, file = barcode_file.split("_", 1)
                 parts = _barcode.split("-")
-                print('parts = ', parts)
                 m_file = re.match("^(\d{3,7}?)\.\w{3,4}$", file)
             except Exception as e:
                 raise InvalidIIIFUrlError(
@@ -101,8 +100,8 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 ) from e
 
             if len(parts) >= 2:
-                # if iiif url contains a reference to dossier like SQ-1421...- 
-                # it's because the path is different than stadsdeel/dossier/
+                # if iiif url contains a reference like SQ-1452 (2)-
+                # it's because the path to the source_file is different than stadsdeel/dossier/
                 # so use the reference in the barcode_file instead of stadsdeel/dossier/ from url
                 document_barcode = parts[2]
                 source_file = barcode_file.replace("-", "/")
