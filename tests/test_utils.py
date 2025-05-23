@@ -17,6 +17,7 @@ from iiif.parsing import InvalidIIIFUrlError, get_email_address, get_info_from_i
 from main.utils import ImmediateHttpResponse
 from tests.test_settings import (
     PRE_WABO_IMG_URL_NO_SCALING,
+    PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
     PRE_WABO_IMG_URL_WITH_CHARS_IN_DOSSIER,
     PRE_WABO_IMG_URL_WITH_EXTRA_DOSSIER_DIGIT,
     PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
@@ -70,6 +71,21 @@ class TestUtils:
         assert url_info["formatting"] is None
         assert url_info["info_json"] is True
 
+    def test_get_info_json_from_pre_wabo_url_double_dossier(self):
+        """2/edepot:SQ_01452X~SQ-01452-SQ10079651_00001.jpg"""
+        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_DOUBLE_DOSSIER, False)
+        assert url_info["source"] == "edepot"
+        assert url_info["stadsdeel"] == "SQ"
+        assert url_info["dossier"] == "01452X"
+        assert url_info["document_barcode"] == "SQ10079651"
+        assert url_info["file"] == "00001"
+        assert url_info["region"] == "full"
+        assert url_info["scaling"] == "full"
+        assert url_info["source_filename"] == "SQ/01452/SQ10079651_00001.jpg"
+        assert url_info["filename"] == "SQ_01452X~SQ-01452-SQ10079651_00001.jpg"
+        assert url_info["formatting"] == "full/full/0/default.jpg"
+        assert url_info["info_json"] is False
+
     def test_get_info_json_from_pre_wabo_url_with_extra_reference(self):
         """2/edepot:SQ_01452~SQ-01452%20(2)-SQ10079651_00001.jpg"""
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE, False)
@@ -80,8 +96,8 @@ class TestUtils:
         assert url_info["file"] == "00001"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
-        assert url_info["source_filename"] == "SQ/01452/SQ10079651_00001.jpg"
-        assert url_info["filename"] == "SQ_01452~SQ10079651_00001.jpg"
+        assert url_info["source_filename"] == "SQ/01452%20(2)/SQ10079651_00001.jpg"
+        assert url_info["filename"] == "SQ_01452~SQ-01452%20(2)-SQ10079651_00001.jpg"
         assert url_info["formatting"] == "full/full/0/default.jpg"
         assert url_info["info_json"] is False
 
