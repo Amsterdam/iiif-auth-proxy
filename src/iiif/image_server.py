@@ -1,5 +1,4 @@
 import logging
-import re
 from functools import partial
 from io import BytesIO
 
@@ -28,10 +27,7 @@ class FileSourceNotValidError(Exception):
 
 
 def create_prewabo_url(url_info):
-    # If the iiif url contains a reference to dossier like SQ_1421 without a '-' or '/' between the letters
-    # and the numbers, then this was added as a reference to stadsdeel and dossiernumber and
-    # it should be removed. The line below does exactly that.
-    return re.sub(r"[A-Z]{2,4}_\d+/", "", url_info["source_filename"])
+    return url_info["source_filename"]
 
 
 def create_wabo_url(url_info, metadata):
