@@ -107,9 +107,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 source_file = barcode_file.replace("-", "/")
             else:
                 document_barcode = parts[0]
-                source_file = relevant_url_part.replace("_", "/", 1).replace(
-                        "~", "/"
-                    )
+                source_file = relevant_url_part.replace("_", "/", 1).replace("~", "/")
 
             return {
                 **url_info,
@@ -117,7 +115,7 @@ def get_info_from_iiif_url(iiif_url, source_file):
                 "dossier": dossier,
                 "document_barcode": document_barcode.upper(),
                 "file": m_file.group(1),  # The file in the dossier without .extension
-                "source_filename": source_file
+                "source_filename": source_file,
             }
 
         if source == "wabo":
