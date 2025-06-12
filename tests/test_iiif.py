@@ -21,11 +21,12 @@ from auth_mail.generate_token import create_authz_token
 from iiif.image_server import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER
 from iiif.metadata import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
 from tests.test_settings import (
+    DEFAULT_META_BESTAND,
     IMAGE_BINARY_DATA,
+    PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
     PRE_WABO_IMG_URL_NO_SCALING,
     PRE_WABO_IMG_URL_SOURCE_FILE,
     PRE_WABO_IMG_URL_WITH_EMPTY_SCALING,
-    PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
     PRE_WABO_IMG_URL_WITH_REGION,
     PRE_WABO_IMG_URL_WITH_REGION_NON_OVERLAPPING,
     PRE_WABO_IMG_URL_WITH_SCALING,
@@ -34,7 +35,6 @@ from tests.test_settings import (
     WABO_IMG_URL,
     IMAGE_BINARY_DATA_24x24x72x72,
     IMAGE_BINARY_DATA_50x44,
-    DEFAULT_META_BESTAND,
 )
 from tests.tools import MockResponse
 
@@ -105,10 +105,13 @@ class TestFileRetrievalWithAuthz:
             json_content={
                 "access": settings.ACCESS_PUBLIC,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_PUBLIC, 
-                     "bestanden": [ DEFAULT_META_BESTAND, ],
-                     }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [
+                            DEFAULT_META_BESTAND,
+                        ],
+                    }
                 ],
             },
         )
@@ -135,10 +138,13 @@ class TestFileRetrievalWithAuthz:
             json_content={
                 "access": settings.ACCESS_PUBLIC,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_PUBLIC, 
-                     "bestanden": [ DEFAULT_META_BESTAND, ],
-                     }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [
+                            DEFAULT_META_BESTAND,
+                        ],
+                    }
                 ],
             },
         )
@@ -193,10 +199,11 @@ class TestFileRetrievalWithAuthz:
             json_content={
                 "access": settings.ACCESS_PUBLIC,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_PUBLIC,
-                     "bestanden": [ DEFAULT_META_BESTAND ],
-                     }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [DEFAULT_META_BESTAND],
+                    }
                 ],
             },
         )
@@ -218,10 +225,11 @@ class TestFileRetrievalWithAuthz:
             json_content={
                 "access": settings.ACCESS_RESTRICTED,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_RESTRICTED,
-                     "bestanden": [ DEFAULT_META_BESTAND ],
-                     }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_RESTRICTED,
+                        "bestanden": [DEFAULT_META_BESTAND],
+                    }
                 ],
             },
         )
@@ -243,10 +251,11 @@ class TestFileRetrievalWithAuthz:
             json_content={
                 "access": settings.ACCESS_PUBLIC,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_RESTRICTED,
-                     "bestanden": [ DEFAULT_META_BESTAND ],
-                     }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_RESTRICTED,
+                        "bestanden": [DEFAULT_META_BESTAND],
+                    }
                 ],
             },
         )
@@ -268,10 +277,11 @@ class TestFileRetrievalWithAuthz:
             json_content={
                 "access": settings.ACCESS_RESTRICTED,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_PUBLIC,
-                     "bestanden": [ DEFAULT_META_BESTAND ],
-                     }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [DEFAULT_META_BESTAND],
+                    }
                 ],
             },
         )
@@ -306,9 +316,7 @@ class TestFileRetrievalWithAuthz:
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
-        response = client.get(
-            self.url + PRE_WABO_IMG_URL_DOUBLE_DOSSIER, **header
-        )
+        response = client.get(self.url + PRE_WABO_IMG_URL_DOUBLE_DOSSIER, **header)
         print(response)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
@@ -323,10 +331,11 @@ class TestFileRetrievalWithAuthz:
             json_content={
                 "access": settings.ACCESS_RESTRICTED,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_RESTRICTED,
-                     "bestanden": [ DEFAULT_META_BESTAND ],
-                     }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_RESTRICTED,
+                        "bestanden": [DEFAULT_META_BESTAND],
+                    }
                 ],
             },
         )
@@ -352,10 +361,11 @@ class TestFileRetrievalWithAuthz:
             json_content={
                 "access": settings.ACCESS_PUBLIC,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_PUBLIC,
-                     "bestanden": [ DEFAULT_META_BESTAND ],
-                     }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [DEFAULT_META_BESTAND],
+                    }
                 ],
             },
         )
@@ -383,10 +393,11 @@ class TestFileRetrievalWithAuthz:
             json_content={
                 "access": settings.ACCESS_RESTRICTED,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_RESTRICTED,
-                     "bestanden": [ DEFAULT_META_BESTAND ],
-                     }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_RESTRICTED,
+                        "bestanden": [DEFAULT_META_BESTAND],
+                    }
                 ],
             },
         )
@@ -414,10 +425,11 @@ class TestFileRetrievalWithAuthz:
             json_content={
                 "access": settings.ACCESS_PUBLIC,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_RESTRICTED,
-                     "bestanden": [ DEFAULT_META_BESTAND ],
-                     }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_RESTRICTED,
+                        "bestanden": [DEFAULT_META_BESTAND],
+                    }
                 ],
             },
         )
@@ -445,10 +457,11 @@ class TestFileRetrievalWithAuthz:
             json_content={
                 "access": settings.ACCESS_PUBLIC,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_PUBLIC,
-                     "bestanden": [ DEFAULT_META_BESTAND ],
-                     }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [DEFAULT_META_BESTAND],
+                    }
                 ],
             },
         )
@@ -474,10 +487,11 @@ class TestFileRetrievalWithAuthz:
             json_content={
                 "access": settings.ACCESS_RESTRICTED,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_RESTRICTED,
-                     "bestanden": [ DEFAULT_META_BESTAND ],
-                     }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_RESTRICTED,
+                        "bestanden": [DEFAULT_META_BESTAND],
+                    }
                 ],
             },
         )
@@ -705,15 +719,17 @@ class TestFileRetrievalWithMailJWT:
             json_content={
                 "access": settings.ACCESS_PUBLIC,
                 "documenten": [
-                    {   "barcode": "ST00000126", 
+                    {
+                        "barcode": "ST00000126",
                         "access": settings.ACCESS_PUBLIC,
                         "bestanden": [
                             {
                                 "filename": "ST00000126.jpg",
                                 "file_pad": "ST/15/ST00000126.jpg",
-                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST00000126_1"
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST00000126_1",
                             }
-                        ],},
+                        ],
+                    },
                     {
                         "barcode": "SQ10079651",
                         "access": settings.ACCESS_PUBLIC,
@@ -722,19 +738,21 @@ class TestFileRetrievalWithMailJWT:
                             {
                                 "filename": "ST00000126.doc",
                                 "file_pad": "ST/15/ST00000126.doc",
-                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST000001266_1"
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST000001266_1",
                             }
                         ],
                     },
-                    {   "barcode": "SQ10092307", 
+                    {
+                        "barcode": "SQ10092307",
                         "access": settings.ACCESS_PUBLIC,
                         "bestanden": [
                             {
                                 "filename": "ST000001266.doc",
                                 "file_pad": "ST/15/ST000001266.doc",
-                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST00000126_1"
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST00000126_1",
                             }
-                        ],},
+                        ],
+                    },
                 ],
             },
         )

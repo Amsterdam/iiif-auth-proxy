@@ -95,7 +95,6 @@ def get_info_from_iiif_url(iiif_url, source_file):
             "filenr": filenr,
         }
 
-
     except Exception as e:
         log.error(f"Invalid iiif url: {iiif_url} ({e})")
         raise InvalidIIIFUrlError(f"Invalid iiif url: {iiif_url}") from e

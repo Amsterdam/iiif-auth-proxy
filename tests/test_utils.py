@@ -25,7 +25,7 @@ from tests.test_settings import (
     PRE_WABO_IMG_URL_WITH_SCALING,
     PRE_WABO_INFO_JSON_URL,
     WABO_IMG_URL,
-    WABO_IMG_URL2
+    WABO_IMG_URL2,
 )
 from zip_consumer.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER, create_local_zip_file
 
@@ -50,7 +50,6 @@ class TestUtils:
         assert url_info["formatting"] is None
         assert url_info["info_json"] is True
 
-
     def test_get_info_json_from_pre_wabo_url_double_dossier(self):
         """2/edepot:SQ_01452X~SQ10079651_1/full/full/0/default.jpg"""
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_DOUBLE_DOSSIER, False)
@@ -65,13 +64,13 @@ class TestUtils:
         assert url_info["info_json"] is False
 
     def test_get_info_json_from_pre_wabo_url_with_extra_reference(self):
-        """"SQ_01452~SQ-01452%20(2)-SQ10079651_1/full/full/0/default.jpg"""
+        """ "SQ_01452~SQ-01452%20(2)-SQ10079651_1/full/full/0/default.jpg"""
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE, False)
         assert url_info["source"] == "edepot"
         assert url_info["stadsdeel"] == "SQ"
         assert url_info["dossier"] == "01452"
         assert url_info["document_barcode"] == "SQ-01452%20(2)-SQ10079651"
-        assert url_info["filenr"] == '1'
+        assert url_info["filenr"] == "1"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
         assert url_info["formatting"] == "full/full/0/default.jpg"
@@ -82,22 +81,22 @@ class TestUtils:
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_CHARS_IN_DOSSIER, False)
         assert url_info["source"] == "edepot"
         assert url_info["stadsdeel"] == "SQ"
-        assert url_info["dossier"] == "28276-SQ-file9EyinW"       
+        assert url_info["dossier"] == "28276-SQ-file9EyinW"
         assert url_info["document_barcode"] == "SQ10263352"
-        assert url_info["filenr"] == '3'
+        assert url_info["filenr"] == "3"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
         assert url_info["formatting"] == "full/full/0/default.jpg"
         assert url_info["info_json"] is False
 
     def test_get_info_json_from_pre_wabo_url_with_lowercase_in_dossier(self):
-        """"SQ_26614abc~sq10241283_1/full/full/0/default.jpg"""
+        """ "SQ_26614abc~sq10241283_1/full/full/0/default.jpg"""
         url_info = get_info_from_iiif_url(
             PRE_WABO_IMG_URL_WITH_LOWERCASE_IN_DOSSIER, False
         )
         assert url_info["source"] == "edepot"
         assert url_info["stadsdeel"] == "SQ"
-        assert url_info["dossier"] == "26614abc"      
+        assert url_info["dossier"] == "26614abc"
         assert url_info["document_barcode"] == "sq10241283"
         assert url_info["filenr"] == "1"
         assert url_info["region"] == "full"
@@ -109,7 +108,7 @@ class TestUtils:
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_SCALING, False)
         assert url_info["source"] == "edepot"
         assert url_info["stadsdeel"] == "ST"
-        assert url_info["dossier"] == "00015"       
+        assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["filenr"] == "1"
         assert url_info["region"] == "full"
@@ -122,7 +121,7 @@ class TestUtils:
         print(PRE_WABO_IMG_URL_NO_SCALING)
         assert url_info["source"] == "edepot"
         assert url_info["stadsdeel"] == "ST"
-        assert url_info["dossier"] == "00015"       
+        assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["filenr"] == "1"
         assert url_info["region"] == "full"
@@ -134,7 +133,7 @@ class TestUtils:
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_REGION, True)
         assert url_info["source"] == "edepot"
         assert url_info["stadsdeel"] == "ST"
-        assert url_info["dossier"] == "00015"       
+        assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
         assert url_info["filenr"] == "1"
         assert url_info["region"] == "24,24,48,48"
@@ -152,7 +151,7 @@ class TestUtils:
         assert url_info["stadsdeel"] == "SDZ"
         assert url_info["dossier"] == "TA-38657"
         assert url_info["document_barcode"] == "628547"
-        assert url_info["filenr"] == "1"        
+        assert url_info["filenr"] == "1"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "1000,900"
         assert url_info["formatting"] == "full/1000,900/0/default.jpg"
@@ -199,8 +198,14 @@ class TestUtils:
                 {
                     "barcode": "628547",
                     "bestanden": [
-                        {"filename": "628547_00001.PDF", "file_pad": "SDZ/UIT/COH/628547_00001.PDF"},
-                        {"filename": "628547_11119.jpg", "file_pad": "SDZ/UIT/COH/628547_11119.jpg"},
+                        {
+                            "filename": "628547_00001.PDF",
+                            "file_pad": "SDZ/UIT/COH/628547_00001.PDF",
+                        },
+                        {
+                            "filename": "628547_11119.jpg",
+                            "file_pad": "SDZ/UIT/COH/628547_11119.jpg",
+                        },
                     ],
                 }
             ]
@@ -216,8 +221,14 @@ class TestUtils:
                 {
                     "barcode": "628547",
                     "bestanden": [
-                        {"filename": "628547_00001.PDF", "file_pad": "SDZ/UIT/COH/628547_00001.PDF"},
-                        {"filename": "628547_11119.PDF", "file_pad": "SDZ/UIT/COH/628547_11119.jpg"},
+                        {
+                            "filename": "628547_00001.PDF",
+                            "file_pad": "SDZ/UIT/COH/628547_00001.PDF",
+                        },
+                        {
+                            "filename": "628547_11119.PDF",
+                            "file_pad": "SDZ/UIT/COH/628547_11119.jpg",
+                        },
                     ],
                 }
             ]
@@ -232,8 +243,14 @@ class TestUtils:
                 {
                     "barcode": "ST00000126",
                     "bestanden": [
-                        {"filename": "628547_00001.PDF", "file_pad": "SDZ/UIT/COH/628547_00001.PDF"},
-                        {"filename": "628547_11119.jpg", "file_pad": "SDZ/UIT/COH/628547_11119.jpg"},
+                        {
+                            "filename": "628547_00001.PDF",
+                            "file_pad": "SDZ/UIT/COH/628547_00001.PDF",
+                        },
+                        {
+                            "filename": "628547_11119.jpg",
+                            "file_pad": "SDZ/UIT/COH/628547_11119.jpg",
+                        },
                     ],
                 },
             ]
@@ -241,12 +258,9 @@ class TestUtils:
 
         # pre-wabo with no headers
         edepot_url = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_SCALING, True)
-        url, headers = create_file_url_and_headers( edepot_url, metadata_edepot)
+        url, headers = create_file_url_and_headers(edepot_url, metadata_edepot)
 
-        assert (
-            url
-            == f"{settings.EDEPOT_BASE_URL}SDZ/UIT/COH/628547_00001.PDF"
-        )
+        assert url == f"{settings.EDEPOT_BASE_URL}SDZ/UIT/COH/628547_00001.PDF"
         assert headers == {"Authorization": settings.EDEPOT_AUTHORIZATION}
 
         # pre-wabo with json url
@@ -260,25 +274,28 @@ class TestUtils:
             metadata_edepot,
         )
 
-        assert (
-            url
-            == f"{settings.EDEPOT_BASE_URL}SDZ/UIT/COH/628547_11119.jpg"
-        )
+        assert url == f"{settings.EDEPOT_BASE_URL}SDZ/UIT/COH/628547_11119.jpg"
 
-        #wabo
+        # wabo
         metadata_wabo = {
             "documenten": [
                 {
                     "barcode": "628547",
                     "bestanden": [
-                        {"filename": "628547_00001.PDF", "file_pad": "SDZ/UIT/COH/628547_00001.PDF"},
-                        {"filename": "628547_11119.jpg", "file_pad": "SDZ/UIT/COH/628547_11119.jpg"},
+                        {
+                            "filename": "628547_00001.PDF",
+                            "file_pad": "SDZ/UIT/COH/628547_00001.PDF",
+                        },
+                        {
+                            "filename": "628547_11119.jpg",
+                            "file_pad": "SDZ/UIT/COH/628547_11119.jpg",
+                        },
                     ],
                 },
             ]
         }
 
-        # wabo source get file 2 from metadata        
+        # wabo source get file 2 from metadata
         url, headers = create_file_url_and_headers(
             {
                 "source": "wabo",

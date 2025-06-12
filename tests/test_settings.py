@@ -16,24 +16,18 @@ PRE_WABO_IMG_URL_WITH_REGION_NON_OVERLAPPING = (
     PRE_WABO_IMG_URL_BASE + "10000,10000,48,48/full/0/default.jpg"
 )
 
-PRE_WABO_IMG_URL_SOURCE_FILE = (
-    PRE_WABO_IMG_URL_BASE+"?source_file=true&"
-)
-PRE_WABO_IMG_URL_NO_SCALING = (
-    PRE_WABO_IMG_URL_BASE+"full/full/0/default.jpg"
-)
+PRE_WABO_IMG_URL_SOURCE_FILE = PRE_WABO_IMG_URL_BASE + "?source_file=true&"
+PRE_WABO_IMG_URL_NO_SCALING = PRE_WABO_IMG_URL_BASE + "full/full/0/default.jpg"
 
 PRE_WABO_IMG_URL_DOUBLE_DOSSIER = (
     EDEPOT_PREFIX + "SQ_01452X~SQ10079651_1/full/full/0/default.jpg"
 )
 
 PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE = (
-    EDEPOT_PREFIX
-    + "SQ_01452~SQ-01452%20(2)-SQ10079651_1/full/full/0/default.jpg"
+    EDEPOT_PREFIX + "SQ_01452~SQ-01452%20(2)-SQ10079651_1/full/full/0/default.jpg"
 )
 PRE_WABO_IMG_URL_WITH_CHARS_IN_DOSSIER = (
-    EDEPOT_PREFIX
-    + "SQ_28276-SQ-file9EyinW~SQ10263352_3/full/full/0/default.jpg"
+    EDEPOT_PREFIX + "SQ_28276-SQ-file9EyinW~SQ10263352_3/full/full/0/default.jpg"
 )
 
 PRE_WABO_IMG_URL_WITH_LOWERCASE_IN_DOSSIER = (
@@ -41,9 +35,7 @@ PRE_WABO_IMG_URL_WITH_LOWERCASE_IN_DOSSIER = (
 )
 
 WABO_IMG_URL = WABO_PREFIX + "SDZ_TA-38657~628547_1/full/1000,900/0/default.jpg"
-WABO_IMG_URL2 = (
-    WABO_PREFIX + "SDZ_TA-38657~628547_2/full/1000,900/0/default.jpg"
-)
+WABO_IMG_URL2 = WABO_PREFIX + "SDZ_TA-38657~628547_2/full/1000,900/0/default.jpg"
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -62,10 +54,10 @@ with open(
     IMAGE_BINARY_DATA_24x24x72x72 = file.read()
 
 DEFAULT_META_BESTAND = {
-                            "filename": "ST00000126.jpg",
-                            "file_pad": 'SDC/BWT/ST00000126.jpg',
-                            "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST00000126_1"
-                        }
+    "filename": "ST00000126.jpg",
+    "file_pad": "SDC/BWT/ST00000126.jpg",
+    "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST00000126_1",
+}
 
 PRE_WABO_METADATA_CONTENT = {
     "access": settings.ACCESS_PUBLIC,
@@ -75,35 +67,35 @@ PRE_WABO_METADATA_CONTENT = {
             "access": settings.ACCESS_PUBLIC,
             "copyright": settings.COPYRIGHT_YES,
             "bestanden": [
-                    {
-                        "filename": "test.doc",
-                        "file_pad": "ST/15/test.doc",
-                        "url": "https://bouwdossiers.amsterdam.nl/iiif/2/edepot:ST_00015~ST00000126_1"
-                    }
-                ],
+                {
+                    "filename": "test.doc",
+                    "file_pad": "ST/15/test.doc",
+                    "url": "https://bouwdossiers.amsterdam.nl/iiif/2/edepot:ST_00015~ST00000126_1",
+                }
+            ],
         },
         {
             "barcode": "SQ10079651",
             "access": settings.ACCESS_PUBLIC,
             "copyright": settings.COPYRIGHT_YES,
             "bestanden": [
-                    {
-                        "filename": "SQ10079651.jpg",
-                        "file_pad": "SQ/01452 (2)/SQ10079651.jpg",
-                        "url": "https://bouwdossiers.amsterdam.nl/iiif/2/edepot:SQ_01452~SQ10079651_1"
-                    }
-                ],            
+                {
+                    "filename": "SQ10079651.jpg",
+                    "file_pad": "SQ/01452 (2)/SQ10079651.jpg",
+                    "url": "https://bouwdossiers.amsterdam.nl/iiif/2/edepot:SQ_01452~SQ10079651_1",
+                }
+            ],
         },
         {
-            "barcode": "SQ10092307", 
+            "barcode": "SQ10092307",
             "access": settings.ACCESS_PUBLIC,
             "bestanden": [
-                    {
-                        "filename": "test.jpg",
-                        "file_pad": "SDC/00003/KEY2/test.jpg",
-                        "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_3~NAA%2002111056_1"
-                    }
-                ],
+                {
+                    "filename": "test.jpg",
+                    "file_pad": "SDC/00003/KEY2/test.jpg",
+                    "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_3~NAA%2002111056_1",
+                }
+            ],
         },
     ],
 }

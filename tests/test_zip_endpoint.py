@@ -71,34 +71,37 @@ class TestZipEndpoint:
             json_content={
                 "access": settings.ACCESS_PUBLIC,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_PUBLIC,           
-                     "bestanden": [
-                        {
-                            "filename": "test.doc",
-                            "file_pad": "SDC/00001/KEY2/test.doc",
-                            "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1"
-                        }
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [
+                            {
+                                "filename": "test.doc",
+                                "file_pad": "SDC/00001/KEY2/test.doc",
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1",
+                            }
                         ],
                     },
-                    {"barcode": "SQ10079651", 
-                     "access": settings.ACCESS_PUBLIC,           
-                     "bestanden": [
-                        {
-                            "filename": "test1.doc",
-                            "file_pad": "SDC/00001/KEY2/test1.doc",
-                            "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1"
-                        }
+                    {
+                        "barcode": "SQ10079651",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [
+                            {
+                                "filename": "test1.doc",
+                                "file_pad": "SDC/00001/KEY2/test1.doc",
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1",
+                            }
                         ],
                     },
-                    {"barcode": "SQ-01452%20(2)-SQ10079651", 
-                     "access": settings.ACCESS_PUBLIC,           
-                     "bestanden": [
-                        {
-                            "filename": "test2.doc",
-                            "file_pad": "SDC/00001/KEY2/test2.doc",
-                            "url": "https://bouwdossiers.amsterdam.nl/iiif/2/edepot:SQ_01452~SQ-01452%20(2)-SQ10079651_1"
-                        }
+                    {
+                        "barcode": "SQ-01452%20(2)-SQ10079651",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [
+                            {
+                                "filename": "test2.doc",
+                                "file_pad": "SDC/00001/KEY2/test2.doc",
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/edepot:SQ_01452~SQ-01452%20(2)-SQ10079651_1",
+                            }
                         ],
                     },
                 ],
@@ -429,25 +432,28 @@ class TestZipEndpoint:
             json_content={
                 "access": settings.ACCESS_PUBLIC,
                 "documenten": [
-                    {"barcode": "ST00000126", 
-                     "access": settings.ACCESS_PUBLIC,
-                     "bestanden": [
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [
                             {
                                 "filename": "test.jpg",
                                 "file_pad": "SDC/00001/KEY2/test.jpg",
-                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1"
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1",
                             }
                         ],
                     },
-                    {"barcode": "SQ10079651", 
-                     "access": second_image_access,
-                     "bestanden": [
+                    {
+                        "barcode": "SQ10079651",
+                        "access": second_image_access,
+                        "bestanden": [
                             {
                                 "filename": "test2.jpg",
                                 "file_pad": "SDC/00001/KEY2/test2.jpg",
-                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1"
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1",
                             }
-                        ],},
+                        ],
+                    },
                     {
                         "barcode": "SQ10092307",
                         "access": settings.ACCESS_RESTRICTED,
@@ -455,7 +461,7 @@ class TestZipEndpoint:
                             {
                                 "filename": "test3.jpg",
                                 "file_pad": "SDC/00001/KEY2/test3.jpg",
-                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1"
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1",
                             }
                         ],
                     },  # Not requested in zip
