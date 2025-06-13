@@ -41,7 +41,6 @@ def get_info_from_iiif_url(iiif_url, source_file):
     # WABO
 
     "https://acc.bouwdossiers.amsterdam.nl/iiif/2/wabo:SDZ_TA-38657~4900487_628547/full/full/0/default.jpg""
-    - SDZ_TA-38657~4900487_628547=filename
     - SDZ=stadsdeel
     - TA-38657=dossier
     4900487=olo_liaan_nummer
@@ -85,57 +84,16 @@ def get_info_from_iiif_url(iiif_url, source_file):
             "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
             "info_json": info_json,  # Whether the info.json is requested instead of the image itself
         }
-        if source == "edepot":  # aka pre-wabo
-            # ST_00015~ST00000126_00001.jpg=relevant_url_part  ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
-            # SQ_01452~SQ-01452%20(2)-SQ10079651_00001.jpg=relevant_url_part  SQ=stadsdeel  01452=dossier  SQ10079651=document_barcode  00001=file/bestand
-            try:
-                stadsdeel_dossier, barcode_file = relevant_url_part.split("~")
-                stadsdeel, dossier = stadsdeel_dossier.split("_")
-                _barcode, file = barcode_file.split("_", 1)
-                parts = _barcode.split("-")
-                m_file = re.match("^(\d{3,7}?)\.\w{3,4}$", file)
-            except Exception as e:
-                raise InvalidIIIFUrlError(
-                    f"Invalid iiif url (no valid source): {iiif_url}"
-                ) from e
-
-            if len(parts) >= 2:
-                # if iiif url contains a reference like SQ-1452 (2)-
-                # it's because the path to the source_file is different than stadsdeel/dossier/
-                # so use the reference in the barcode_file instead of stadsdeel/dossier/ from url
-                document_barcode = parts[2]
-                source_file = barcode_file.replace("-", "/")
-            else:
-                document_barcode = parts[0]
-                source_file = relevant_url_part.replace("_", "/", 1).replace("~", "/")
-
-            return {
-                **url_info,
-                "stadsdeel": stadsdeel,
-                "dossier": dossier,
-                "document_barcode": document_barcode.upper(),
-                "file": m_file.group(1),  # The file in the dossier without .extension
-                "source_filename": source_file,
-            }
-
-        if source == "wabo":
-            # SDW_WABO-2014-004546~1198113_SJ20852745_00001
-            stadsdeel_dossier, olo_and_document = relevant_url_part.split("~")
-            stadsdeel, dossier = stadsdeel_dossier.split("_")
-            olo, document_barcode, filenr = olo_and_document.split("_")
-            return {
-                **url_info,
-                "stadsdeel": stadsdeel,
-                "dossier": dossier,
-                "olo": olo,
-                "document_barcode": document_barcode,
-                "filenr": filenr,
-                "source_filename": relevant_url_part.replace("_", "/", 1).replace(
-                    "~", "/"
-                ),
-            }
-
-        raise InvalidIIIFUrlError(f"Invalid iiif url (no valid source): {iiif_url}")
+        stadsdeel_dossier, olo_and_document = relevant_url_part.split("~")
+        stadsdeel, dossier = stadsdeel_dossier.split("_")
+        document_barcode, filenr = olo_and_document.split("_")
+        return {
+            **url_info,
+            "stadsdeel": stadsdeel,
+            "dossier": dossier,
+            "document_barcode": document_barcode,
+            "filenr": filenr,
+        }
 
     except Exception as e:
         log.error(f"Invalid iiif url: {iiif_url} ({e})")

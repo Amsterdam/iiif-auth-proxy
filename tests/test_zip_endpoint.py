@@ -19,7 +19,7 @@ from main.utils_azure_storage import get_blob_from_storage_account, get_queue_cl
 from tests.test_settings import (
     IMAGE_BINARY_DATA,
     PRE_WABO_IMG_URL_BASE,
-    PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+    PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
     PRE_WABO_IMG_URL_WITH_SCALING,
     WABO_IMG_URL,
 )
@@ -71,9 +71,39 @@ class TestZipEndpoint:
             json_content={
                 "access": settings.ACCESS_PUBLIC,
                 "documenten": [
-                    {"barcode": "ST00000126", "access": settings.ACCESS_PUBLIC},
-                    {"barcode": "SQ10079651", "access": settings.ACCESS_PUBLIC},
-                    {"barcode": "SQ10092307", "access": settings.ACCESS_PUBLIC},
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [
+                            {
+                                "filename": "test.doc",
+                                "file_pad": "SDC/00001/KEY2/test.doc",
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1",
+                            }
+                        ],
+                    },
+                    {
+                        "barcode": "SQ10079651",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [
+                            {
+                                "filename": "test1.doc",
+                                "file_pad": "SDC/00001/KEY2/test1.doc",
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1",
+                            }
+                        ],
+                    },
+                    {
+                        "barcode": "SQ-01452%20(2)-SQ10079651",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [
+                            {
+                                "filename": "test2.doc",
+                                "file_pad": "SDC/00001/KEY2/test2.doc",
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/edepot:SQ_01452~SQ-01452%20(2)-SQ10079651_1",
+                            }
+                        ],
+                    },
                 ],
             },
         )
@@ -85,7 +115,7 @@ class TestZipEndpoint:
                     "urls": [
                         self.BASE_URL + PRE_WABO_IMG_URL_BASE,
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
-                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+                        self.BASE_URL + PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
                     ]
                 }
             ),
@@ -166,7 +196,7 @@ class TestZipEndpoint:
                     "urls": [
                         self.BASE_URL + PRE_WABO_IMG_URL_BASE,
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
-                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+                        self.BASE_URL + PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
                     ]
                 }
             ),
@@ -198,7 +228,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
-                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+                        self.BASE_URL + PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
                     ]
                 }
             ),
@@ -232,7 +262,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         PRE_WABO_IMG_URL_WITH_SCALING,  # NO BASE URL HERE, SO IT'S MISFORMED
-                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+                        self.BASE_URL + PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
                     ]
                 }
             ),
@@ -291,7 +321,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
-                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+                        self.BASE_URL + PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
                     ]
                 }
             ),
@@ -342,7 +372,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
-                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+                        self.BASE_URL + PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
                     ]
                 }
             ),
@@ -402,11 +432,38 @@ class TestZipEndpoint:
             json_content={
                 "access": settings.ACCESS_PUBLIC,
                 "documenten": [
-                    {"barcode": "ST00000126", "access": settings.ACCESS_PUBLIC},
-                    {"barcode": "SQ10079651", "access": second_image_access},
+                    {
+                        "barcode": "ST00000126",
+                        "access": settings.ACCESS_PUBLIC,
+                        "bestanden": [
+                            {
+                                "filename": "test.jpg",
+                                "file_pad": "SDC/00001/KEY2/test.jpg",
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1",
+                            }
+                        ],
+                    },
+                    {
+                        "barcode": "SQ10079651",
+                        "access": second_image_access,
+                        "bestanden": [
+                            {
+                                "filename": "test2.jpg",
+                                "file_pad": "SDC/00001/KEY2/test2.jpg",
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1",
+                            }
+                        ],
+                    },
                     {
                         "barcode": "SQ10092307",
                         "access": settings.ACCESS_RESTRICTED,
+                        "bestanden": [
+                            {
+                                "filename": "test3.jpg",
+                                "file_pad": "SDC/00001/KEY2/test3.jpg",
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~NAA_1",
+                            }
+                        ],
                     },  # Not requested in zip
                 ],
             },
@@ -424,7 +481,7 @@ class TestZipEndpoint:
                 {
                     "urls": [
                         self.BASE_URL + PRE_WABO_IMG_URL_WITH_SCALING,
-                        self.BASE_URL + PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE,
+                        self.BASE_URL + PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
                     ]
                 }
             ),

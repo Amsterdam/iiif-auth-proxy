@@ -26,15 +26,11 @@ class FileSourceNotValidError(Exception):
     pass
 
 
-def create_prewabo_url(url_info):
-    return url_info["source_filename"]
-
-
-def create_wabo_url(url_info, metadata):
+def create_url(url_info, metadata):
     for document in metadata["documenten"]:
         if document["barcode"] == url_info["document_barcode"]:
             position = int(url_info["filenr"]) - 1
-            return document["bestanden"][position]["filename"]
+            return document["bestanden"][position]["file_pad"]
     raise FilenameNotFoundInDocumentInMetadataError(
         f'Filename for document {url_info["document_barcode"]} not found'
     )
@@ -42,12 +38,12 @@ def create_wabo_url(url_info, metadata):
 
 def create_file_url_and_headers(url_info, metadata):
     if url_info["source"] == "edepot":
-        iiif_url_edepot = create_prewabo_url(url_info)
+        iiif_url_edepot = create_url(url_info, metadata)
         iiif_image_url = f"{settings.EDEPOT_BASE_URL}{iiif_url_edepot}"
         return iiif_image_url, {"Authorization": settings.EDEPOT_AUTHORIZATION}
 
     if url_info["source"] == "wabo":
-        wabo_url = create_wabo_url(url_info, metadata)
+        wabo_url = create_url(url_info, metadata)
         iiif_image_url = f"{settings.WABO_BASE_URL}{wabo_url}"
         return iiif_image_url, {"Authorization": settings.WABO_AUTHORIZATION}
 
