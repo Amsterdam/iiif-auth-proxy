@@ -24,15 +24,15 @@ def get_info_from_iiif_url(iiif_url, source_file):
     """
     # PRE-WABO
 
-    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/edepot:ST_00015~ST00000126_00001.jpg/info.json"
+    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/edepot:ST_00015~ST00000126_1.jpg/info.json"
 
     For the url above it means they request just the info.json, nothing else. More info about the rest
     of this url see the explanation below.
 
-    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/edepot:ST_00015~ST00000126_00001.jpg/full/1000,900/0/default.jpg"
+    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/edepot:ST_00015~ST00000126_1.jpg/full/1000,900/0/default.jpg"
 
     For the url above, the following information can be extracted:
-    - ST_00015~ST00000126_00001.jpg=filename  ST=stadsdeel  00015=dossier  ST00000126=document_barcode  00001=file/bestand
+    - ST=stadsdeel  00015=dossier  ST00000126=document_barcode  1=file/bestand
     - full: no cropping
     - 1000,900: scaling the image to fit within a 1000x900 (1000 width, 900 height) pixel bounding box, preserving its aspect ratio
     - 0: rotation angle in degrees
@@ -40,12 +40,10 @@ def get_info_from_iiif_url(iiif_url, source_file):
 
     # WABO
 
-    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/wabo:SDZ_TA-38657~4900487_628547/full/full/0/default.jpg""
-    - SDZ=stadsdeel
-    - TA-38657=dossier
-    4900487=olo_liaan_nummer
-    628547=document_barcode
+    "https://acc.bouwdossiers.amsterdam.nl/iiif/2/wabo:SDZ_TA-38657~628547_1/full/full/0/default.jpg""
+    - SDZ=stadsdeel TA-38657=dossier 628547=document_barcode 1=file/bestand
 
+    # TODO: rewrite, don't think this still works.
     At the end of the url, this can be appended '?source_file=true', which means we'll bypass
     all image related code and go directly for the source file. This can be needed when the file is
     not an image, but for example a txt, xls, zip or something else.
