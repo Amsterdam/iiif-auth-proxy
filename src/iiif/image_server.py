@@ -26,13 +26,23 @@ class FileSourceNotValidError(Exception):
     pass
 
 
+def get_filename(url_info, metadata):
+    # The filename if this file needs to be stored on disc
+    for document in metadata["documenten"]:
+        if document["barcode"] == url_info["document_barcode"]:
+            position = int(url_info["filenr"]) - 1
+            return document["bestanden"][position]["filename"]
+    raise FilenameNotFoundInDocumentInMetadataError(
+        f'Filename for document {url_info["document_barcode"]} not found'
+    )
+
 def create_url(url_info, metadata):
     for document in metadata["documenten"]:
         if document["barcode"] == url_info["document_barcode"]:
             position = int(url_info["filenr"]) - 1
             return document["bestanden"][position]["file_pad"]
     raise FilenameNotFoundInDocumentInMetadataError(
-        f'Filename for document {url_info["document_barcode"]} not found'
+        f'File_pad for document {url_info["document_barcode"]} not found'
     )
 
 
@@ -166,8 +176,9 @@ def download_file_for_zip(
         return info_txt_contents
 
     # Save image file to tmp folder
+    filename = get_filename(url_info, metadata)
     zip_tools.save_file_to_folder(
-        tmp_folder_path, url_info["filename"], file_response.content
+        tmp_folder_path, filename, file_response.content
     )
     info_txt_contents += "included\n"
 

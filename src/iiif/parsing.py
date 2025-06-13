@@ -81,7 +81,6 @@ def get_info_from_iiif_url(iiif_url, source_file):
             "formatting": formatting,
             "region": region,
             "scaling": scaling,
-            "filename": relevant_url_part,  # The filename if this file needs to be stored on disc
             "info_json": info_json,  # Whether the info.json is requested instead of the image itself
         }
         stadsdeel_dossier, olo_and_document = relevant_url_part.split("~")
