@@ -12,7 +12,7 @@ import pytz
 from django.conf import settings
 
 from auth_mail.authentication import create_mail_login_token, img_is_public_copyright
-from iiif.image_server import create_file_url_and_headers, create_url
+from iiif.image_server import create_file_url_and_headers, create_url, get_filename
 from iiif.parsing import InvalidIIIFUrlError, get_email_address, get_info_from_iiif_url
 from main.utils import ImmediateHttpResponse
 from tests.test_settings import (
@@ -213,6 +213,29 @@ class TestUtils:
 
         wabo_url = create_url(metadata=metadata, url_info=url_info)
         assert wabo_url == "SDZ/UIT/COH/628547_00001.PDF"
+
+    def test_get_filename(self):
+        url_info = get_info_from_iiif_url(WABO_IMG_URL, False)
+        metadata = {
+            "documenten": [
+                {
+                    "barcode": "628547",
+                    "bestanden": [
+                        {
+                            "filename": "628547_00001.PDF",
+                            "file_pad": "SDZ/UIT/COH/628547_00001.PDF",
+                        },
+                        {
+                            "filename": "628547_11119.jpg",
+                            "file_pad": "SDZ/UIT/COH/628547_11119.jpg",
+                        },
+                    ],
+                }
+            ]
+        }
+
+        filename = get_filename(metadata=metadata, url_info=url_info)
+        assert filename == "628547_00001.PDF"
 
     def test_create_url_source_file(self):
         url_info = get_info_from_iiif_url(WABO_IMG_URL2, True)
