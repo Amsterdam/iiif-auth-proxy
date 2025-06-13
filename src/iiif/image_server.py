@@ -36,6 +36,7 @@ def get_filename(url_info, metadata):
         f'Filename for document {url_info["document_barcode"]} not found'
     )
 
+
 def create_url(url_info, metadata):
     for document in metadata["documenten"]:
         if document["barcode"] == url_info["document_barcode"]:
@@ -177,9 +178,7 @@ def download_file_for_zip(
 
     # Save image file to tmp folder
     filename = get_filename(url_info, metadata)
-    zip_tools.save_file_to_folder(
-        tmp_folder_path, filename, file_response.content
-    )
+    zip_tools.save_file_to_folder(tmp_folder_path, filename, file_response.content)
     info_txt_contents += "included\n"
 
     return info_txt_contents
