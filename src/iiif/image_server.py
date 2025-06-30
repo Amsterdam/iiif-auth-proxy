@@ -30,7 +30,7 @@ def get_filename(url_info, metadata):
     # The filename if this file needs to be stored on disc
     for document in metadata["documenten"]:
         if document["barcode"] == url_info["document_barcode"]:
-            position = int(url_info["filenr"]) - 1
+            position = int(url_info["filenr"])
             return document["bestanden"][position]["filename"]
     raise FilenameNotFoundInDocumentInMetadataError(
         f'Filename for document {url_info["document_barcode"]} not found'
@@ -40,7 +40,7 @@ def get_filename(url_info, metadata):
 def create_url(url_info, metadata):
     for document in metadata["documenten"]:
         if document["barcode"] == url_info["document_barcode"]:
-            position = int(url_info["filenr"]) - 1
+            position = int(url_info["filenr"])
             return document["bestanden"][position]["file_pad"]
     raise FilenameNotFoundInDocumentInMetadataError(
         f'File_pad for document {url_info["document_barcode"]} not found'
