@@ -5,7 +5,7 @@ from django.conf import settings
 EDEPOT_PREFIX = "2/edepot:"
 WABO_PREFIX = "2/wabo:"
 
-PRE_WABO_IMG_URL_BASE = EDEPOT_PREFIX + "ST_00015~ST00000126_1/"
+PRE_WABO_IMG_URL_BASE = EDEPOT_PREFIX + "ST_00015~ST00000126_0/"
 PRE_WABO_INFO_JSON_URL = PRE_WABO_IMG_URL_BASE + "info.json"
 
 PRE_WABO_IMG_URL_WITH_SCALING = PRE_WABO_IMG_URL_BASE + "full/50,50/0/default.jpg"
@@ -20,7 +20,7 @@ PRE_WABO_IMG_URL_SOURCE_FILE = PRE_WABO_IMG_URL_BASE + "?source_file=true&"
 PRE_WABO_IMG_URL_NO_SCALING = PRE_WABO_IMG_URL_BASE + "full/full/0/default.jpg"
 
 PRE_WABO_IMG_URL_DOUBLE_DOSSIER = (
-    EDEPOT_PREFIX + "SQ_01452X~SQ10079651_1/full/full/0/default.jpg"
+    EDEPOT_PREFIX + "SQ_01452X~SQ10079651_0/full/full/0/default.jpg"
 )
 
 PRE_WABO_IMG_URL_WITH_EXTRA_REFERENCE = (
@@ -34,8 +34,8 @@ PRE_WABO_IMG_URL_WITH_LOWERCASE_IN_DOSSIER = (
     EDEPOT_PREFIX + "SQ_26614abc~sq10241283_1/full/full/0/default.jpg"
 )
 
-WABO_IMG_URL = WABO_PREFIX + "SDZ_TA-38657~628547_1/full/1000,900/0/default.jpg"
-WABO_IMG_URL2 = WABO_PREFIX + "SDZ_TA-38657~628547_2/full/1000,900/0/default.jpg"
+WABO_IMG_URL = WABO_PREFIX + "SDZ_TA-38657~628547_0/full/1000,900/0/default.jpg"
+WABO_IMG_URL2 = WABO_PREFIX + "SDZ_TA-38657~628547_1/full/1000,900/0/default.jpg"
 
 CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -56,7 +56,7 @@ with open(
 DEFAULT_META_BESTAND = {
     "filename": "ST00000126.jpg",
     "file_pad": "SDC/BWT/ST00000126.jpg",
-    "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST00000126_1",
+    "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST00000126_0",
 }
 
 PRE_WABO_METADATA_CONTENT = {
@@ -70,7 +70,7 @@ PRE_WABO_METADATA_CONTENT = {
                 {
                     "filename": "test.doc",
                     "file_pad": "ST/15/test.doc",
-                    "url": "https://bouwdossiers.amsterdam.nl/iiif/2/edepot:ST_00015~ST00000126_1",
+                    "url": "https://bouwdossiers.amsterdam.nl/iiif/2/edepot:ST_00015~ST00000126_0",
                 }
             ],
         },
@@ -82,7 +82,7 @@ PRE_WABO_METADATA_CONTENT = {
                 {
                     "filename": "SQ10079651.jpg",
                     "file_pad": "SQ/01452 (2)/SQ10079651.jpg",
-                    "url": "https://bouwdossiers.amsterdam.nl/iiif/2/edepot:SQ_01452~SQ10079651_1",
+                    "url": "https://bouwdossiers.amsterdam.nl/iiif/2/edepot:SQ_01452~SQ10079651_0",
                 }
             ],
         },
@@ -93,7 +93,7 @@ PRE_WABO_METADATA_CONTENT = {
                 {
                     "filename": "test.jpg",
                     "file_pad": "SDC/00003/KEY2/test.jpg",
-                    "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_3~NAA%2002111056_1",
+                    "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_3~NAA%2002111056_0",
                 }
             ],
         },
