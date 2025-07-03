@@ -38,13 +38,13 @@ class TestUtils:
         self.test_email_address = "toolstest@amsterdam.nl"
 
     def test_get_info_json_from_pre_wabo_url(self):
-        """2/edepot:ST_00015~ST00000126_1.jpg/"""
+        """2/edepot:ST_00015~ST00000126_0.jpg/"""
         url_info = get_info_from_iiif_url(PRE_WABO_INFO_JSON_URL, False)
         assert url_info["source"] == "edepot"
         assert url_info["stadsdeel"] == "ST"
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
-        assert url_info["filenr"] == "1"
+        assert url_info["filenr"] == "0"
         assert url_info["region"] is None
         assert url_info["scaling"] is None
         assert url_info["formatting"] is None
@@ -57,7 +57,7 @@ class TestUtils:
         assert url_info["stadsdeel"] == "SQ"
         assert url_info["dossier"] == "01452X"
         assert url_info["document_barcode"] == "SQ10079651"
-        assert url_info["filenr"] == "1"
+        assert url_info["filenr"] == "0"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
         assert url_info["formatting"] == "full/full/0/default.jpg"
@@ -110,7 +110,7 @@ class TestUtils:
         assert url_info["stadsdeel"] == "ST"
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
-        assert url_info["filenr"] == "1"
+        assert url_info["filenr"] == "0"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "50,50"
         assert url_info["formatting"] == "full/50,50/0/default.jpg"
@@ -123,7 +123,7 @@ class TestUtils:
         assert url_info["stadsdeel"] == "ST"
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
-        assert url_info["filenr"] == "1"
+        assert url_info["filenr"] == "0"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "full"
         assert url_info["formatting"] == "full/full/0/default.jpg"
@@ -135,7 +135,7 @@ class TestUtils:
         assert url_info["stadsdeel"] == "ST"
         assert url_info["dossier"] == "00015"
         assert url_info["document_barcode"] == "ST00000126"
-        assert url_info["filenr"] == "1"
+        assert url_info["filenr"] == "0"
         assert url_info["region"] == "24,24,48,48"
         assert url_info["scaling"] == "full"
         assert url_info["formatting"] == "24,24,48,48/full/0/default.jpg"
@@ -151,7 +151,7 @@ class TestUtils:
         assert url_info["stadsdeel"] == "SDZ"
         assert url_info["dossier"] == "TA-38657"
         assert url_info["document_barcode"] == "628547"
-        assert url_info["filenr"] == "1"
+        assert url_info["filenr"] == "0"
         assert url_info["region"] == "full"
         assert url_info["scaling"] == "1000,900"
         assert url_info["formatting"] == "full/1000,900/0/default.jpg"
@@ -291,7 +291,7 @@ class TestUtils:
             {
                 "source": "edepot",
                 "document_barcode": "ST00000126",
-                "filenr": "2",
+                "filenr": "1",
                 "formatting": "full/1000,1000/0/default.jpg",
             },
             metadata_edepot,
@@ -323,7 +323,7 @@ class TestUtils:
             {
                 "source": "wabo",
                 "document_barcode": "628547",
-                "filenr": "2",
+                "filenr": "1",
                 "formatting": "full/1000,1000/0/default.jpg",
             },
             metadata_wabo,
@@ -336,7 +336,7 @@ class TestUtils:
             {
                 "source": "wabo",
                 "document_barcode": "628547",
-                "filenr": "1",
+                "filenr": "0",
                 "formatting": "full/1000,1000/0/default.jpg",
             },
             metadata_wabo,

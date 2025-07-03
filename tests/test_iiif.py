@@ -726,7 +726,7 @@ class TestFileRetrievalWithMailJWT:
                             {
                                 "filename": "ST00000126.jpg",
                                 "file_pad": "ST/15/ST00000126.jpg",
-                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST00000126_1",
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST00000126_0",
                             }
                         ],
                     },
@@ -738,7 +738,7 @@ class TestFileRetrievalWithMailJWT:
                             {
                                 "filename": "ST00000126.doc",
                                 "file_pad": "ST/15/ST00000126.doc",
-                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST000001266_1",
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST000001266_0",
                             }
                         ],
                     },
@@ -749,7 +749,7 @@ class TestFileRetrievalWithMailJWT:
                             {
                                 "filename": "ST000001266.doc",
                                 "file_pad": "ST/15/ST000001266.doc",
-                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST00000126_1",
+                                "url": "https://bouwdossiers.amsterdam.nl/iiif/2/wabo:SDC_1~ST00000126_0",
                             }
                         ],
                     },
