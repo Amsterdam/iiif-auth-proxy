@@ -59,7 +59,7 @@ debtcollector==3.0.0
     # via
     #   oslo-utils
     #   python-keystoneclient
-django==5.2.5
+django==5.2.6
     # via
     #   -r requirements.in
     #   datapunt-authorization-django
