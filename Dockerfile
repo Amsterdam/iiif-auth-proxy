@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION=3.13
 
 # Builder
 FROM python:${PYTHON_VERSION}-slim-bookworm AS builder
@@ -49,7 +49,7 @@ RUN sed -i "s|MinProtocol = TLSv1.2|MinProtocol = None|g" /etc/ssl/openssl.cnf
 RUN sed -i "s|CipherString = DEFAULT@SECLEVEL=2|CipherString = DEFAULT|g" /etc/ssl/openssl.cnf
 
 # Copy the Python dependencies from the builder stage
-COPY --from=builder /usr/local/lib/python3.12/site-packages/ /usr/local/lib/python3.12/site-packages/
+COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/python3.13/site-packages/
 COPY --from=builder /usr/local/bin/ /usr/local/bin
 
 WORKDIR /app
