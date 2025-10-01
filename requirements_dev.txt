@@ -6,9 +6,9 @@
 #
 build==1.3.0
     # via pip-tools
-click==8.2.1
+click==8.3.0
     # via pip-tools
-coverage[toml]==7.10.6
+coverage[toml]==7.10.7
     # via pytest-cov
 iniconfig==2.1.0
     # via pytest
@@ -28,12 +28,12 @@ pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
-pytest==8.4.1
+pytest==8.4.2
     # via
     #   -r requirements_dev.in
     #   pytest-cov
     #   pytest-django
-pytest-cov==6.2.1
+pytest-cov==7.0.0
     # via -r requirements_dev.in
 pytest-django==4.11.1
     # via -r requirements_dev.in

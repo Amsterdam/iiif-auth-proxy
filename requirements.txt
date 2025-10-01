@@ -4,11 +4,11 @@
 #
 #    pip-compile --allow-unsafe --output-file=requirements.txt requirements.in
 #
-asgiref==3.9.1
+asgiref==3.9.2
     # via
     #   django
     #   django-cors-headers
-azure-core==1.35.0
+azure-core==1.35.1
     # via
     #   -r requirements.in
     #   azure-identity
@@ -36,15 +36,15 @@ azure-storage-blob==12.26.0
     # via -r requirements.in
 azure-storage-queue==12.13.0
     # via -r requirements.in
-cachetools==5.5.2
+cachetools==6.2.0
     # via google-auth
 certifi==2025.8.3
     # via requests
-cffi==1.17.1
+cffi==2.0.0
     # via cryptography
 charset-normalizer==3.4.3
     # via requests
-cryptography==45.0.6
+cryptography==46.0.2
     # via
     #   azure-identity
     #   azure-keyvault-keys
@@ -65,13 +65,13 @@ django==5.2.6
     #   datapunt-authorization-django
     #   django-cors-headers
     #   opencensus-ext-django
-django-cors-headers==4.7.0
+django-cors-headers==4.9.0
     # via -r requirements.in
 django-ratelimit==4.1.0
     # via -r requirements.in
 google-api-core==2.25.1
     # via opencensus
-google-auth==2.40.3
+google-auth==2.41.1
     # via google-api-core
 googleapis-common-protos==1.70.0
     # via google-api-core
@@ -92,7 +92,7 @@ jwcrypto==1.5.6
     # via datapunt-authorization-django
 keystoneauth1==5.12.0
     # via python-keystoneclient
-msal==1.33.0
+msal==1.34.0
     # via
     #   azure-identity
     #   msal-extensions
@@ -153,12 +153,12 @@ pillow-simd==9.5.0.post2
     # via -r requirements.in
 proto-plus==1.26.1
     # via google-api-core
-protobuf==6.32.0
+protobuf==6.32.1
     # via
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
-psutil==7.0.0
+psutil==7.1.0
     # via
     #   opencensus-ext-azure
     #   oslo-utils
@@ -172,19 +172,19 @@ pyasn1==0.6.1
     #   rsa
 pyasn1-modules==0.4.2
     # via google-auth
-pycparser==2.22
+pycparser==2.23
     # via cffi
 pyjwt[crypto]==2.10.1
     # via
     #   -r requirements.in
     #   msal
-pyparsing==3.2.3
+pyparsing==3.2.5
     # via oslo-utils
 python-keystoneclient==5.7.0
     # via -r requirements.in
 python-swiftclient==4.8.0
     # via -r requirements.in
-pyyaml==6.0.2
+pyyaml==6.0.3
     # via
     #   oslo-config
     #   oslo-utils
