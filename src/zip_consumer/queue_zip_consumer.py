@@ -70,8 +70,9 @@ class AzureZipQueueConsumer:
                 try:
                     self.process_message(message)
                 except Exception as e:
+                    _job_content = json.loads(message.content)
                     logger.error(
-                        f"An exception occurred during processing of message #{message.id}: {e}"
+                        f"An exception occurred during processing of message data uuid {_job_content["data"]}: {e}"
                     )
                     if message.dequeue_count > 5:
                         logger.info(
