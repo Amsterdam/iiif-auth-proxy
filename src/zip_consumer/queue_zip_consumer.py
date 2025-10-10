@@ -67,13 +67,33 @@ class AzureZipQueueConsumer:
                 )
 
             for message in message_iterator:
-                self.process_message(message)
-                self.queue_client.delete_message(message.id, message.pop_receipt)
+                try:
+                    self.process_message(message)
+                except Exception as e:
+                    _job_content = json.loads(message.content)
+                    logger.error(
+                        f"An exception occurred during processing of message data uuid {_job_content["data"]}: {e}"
+                    )
+                    if message.dequeue_count > 5:
+                        logger.info(
+                            f"Deleting the message, dequeue count is too high. {message.dequeue_count=}"
+                        )
+                        self.queue_client.delete_message(
+                            message.id, message.pop_receipt
+                        )
+                else:
+                    self.queue_client.delete_message(message.id, message.pop_receipt)
 
     @timeout_decorator.timeout(MESSAGE_VISIBILITY_TIMEOUT)
     def process_message(self, message):
 
         logger.info("Started process_message")
+
+        if message.dequeue_count > 5:
+            logger.info(
+                f"Skipping the message, dequeue count is too high. {message.dequeue_count=}"
+            )
+            return
 
         job = json.loads(message.content)
         if not job["version"] == self.MESSAGE_VERSION_NAME:
