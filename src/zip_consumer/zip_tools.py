@@ -23,9 +23,9 @@ def store_zip_job(job_name):
     queue_client.send_message(zip_job)
 
 
-def create_tmp_folder():
+def create_tmp_folder(job_blob_name=None):
     os.makedirs(TMP_BOUWDOSSIER_ZIP_FOLDER, exist_ok=True)
-    zipjob_uuid = str(uuid4())
+    zipjob_uuid = job_blob_name if job_blob_name is not None else str(uuid4())
     tmp_folder_path = os.path.join(TMP_BOUWDOSSIER_ZIP_FOLDER, zipjob_uuid)
     os.mkdir(tmp_folder_path)
     return zipjob_uuid, tmp_folder_path

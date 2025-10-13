@@ -111,7 +111,7 @@ class AzureZipQueueConsumer:
             zipjob_uuid,
             tmp_folder_path,
             info_txt_contents,
-        ) = image_server.prepare_zip_downloads()
+        ) = image_server.prepare_zip_downloads(job_blob_name)
 
         # Get metadata and files from image servers
         metadata_cache = {}

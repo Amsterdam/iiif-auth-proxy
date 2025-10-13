@@ -130,9 +130,9 @@ def handle_file_response_codes(file_response, file_url):
         )
 
 
-def prepare_zip_downloads():
+def prepare_zip_downloads(job_blob_name=None):
     # Create a tmp folder to store downloaded source files
-    zipjob_uuid, tmp_folder_path = zip_tools.create_tmp_folder()
+    zipjob_uuid, tmp_folder_path = zip_tools.create_tmp_folder(job_blob_name)
 
     # Init contents of txt info file which is sent along in the zip
     info_txt_contents = "The following files were requested:\n"
