@@ -297,12 +297,12 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
-        "opencensus": {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False},
-        "azure.core.pipeline.policies.http_logging_policy": {
-            "handlers": ["console"],
-            "level": LOG_LEVEL,
-            "propagate": False,
-        },
+        # "opencensus": {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False},
+        # "azure.core.pipeline.policies.http_logging_policy": {
+        #     "handlers": ["console"],
+        #     "level": LOG_LEVEL,
+        #     "propagate": False,
+        # },
     },
 }
 
@@ -311,16 +311,17 @@ APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv(
 )
 
 if APPLICATIONINSIGHTS_CONNECTION_STRING:
-    MIDDLEWARE.append("opencensus.ext.django.middleware.OpencensusMiddleware")
+    # MIDDLEWARE.append("opencensus.ext.django.middleware.OpencensusMiddleware")
 
-    OPENCENSUS = create_azure_trace_config(
-        APPLICATIONINSIGHTS_CONNECTION_STRING, APP_NAME
-    )
-    LOGGING["handlers"]["azure"] = create_azure_log_handler_config(
-        APPLICATIONINSIGHTS_CONNECTION_STRING, APP_NAME
-    )
-    config_integration.trace_integrations(["logging"])
+    # OPENCENSUS = create_azure_trace_config(
+    #     APPLICATIONINSIGHTS_CONNECTION_STRING, APP_NAME
+    # )
+    # LOGGING["handlers"]["azure"] = create_azure_log_handler_config(
+    #     APPLICATIONINSIGHTS_CONNECTION_STRING, APP_NAME
+    # )
+    #config_integration.trace_integrations(["logging"])
 
-    LOGGING["root"]["handlers"].append("azure")
-    for logger_name, logger_details in LOGGING["loggers"].items():
-        LOGGING["loggers"][logger_name]["handlers"].append("azure")
+    # LOGGING["root"]["handlers"].append("azure")
+    # for logger_name, logger_details in LOGGING["loggers"].items():
+    #     LOGGING["loggers"][logger_name]["handlers"].append("azure")
+    pass
