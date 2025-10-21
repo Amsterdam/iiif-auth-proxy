@@ -88,5 +88,7 @@ def index(request, iiif_url):
 
         return add_caching_headers(is_cacheable, HttpResponse(edited_image, file_type))
     except utils.ImmediateHttpResponse as e:
-        #log.exception(f"ImmediateHttpResponse in index:{e.response.content}")
+        log.error(
+            f"ImmediateHttpResponse in index: {e.response.content, e.response.status_code}"
+        )
         return e.response

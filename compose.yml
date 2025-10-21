@@ -67,6 +67,8 @@ services:
       target: tests
     environment:
       <<: *base-app-env
+      LOG_LEVEL: "DEBUG"
+      DJANGO_LOG_LEVEL: "DEBUG"
       DJANGO_SETTINGS_MODULE: "main.settings"
       USE_JWKS_TEST_KEY: "true"
 

@@ -105,16 +105,14 @@ def get_file(url_info, metadata):
     except RequestException as e:
         message = f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {e.__class__.__name__}"
         log.error(message)
-        raise ImmediateHttpResponse(response=HttpResponse(message, status=502)) from e
+        raise ImmediateHttpResponse(response=HttpResponse(message, status=502))
 
     return file_response, file_url
 
 
 def handle_file_response_codes(file_response, file_url):
     if file_response.status_code == 404:
-        #log.error(
-        #    f"Source file not found on server"
-        #)        
+        log.error(f"Source file not found on server")
         raise ImmediateHttpResponse(
             response=HttpResponse(f"No source file could be found", status=404)
         )
