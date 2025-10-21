@@ -312,12 +312,10 @@ class TestFileRetrievalWithAuthz:
         }
 
         response = client.get(self.url + PRE_WABO_IMG_URL_NO_SCALING, **header)
-        print(response)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
         response = client.get(self.url + PRE_WABO_IMG_URL_DOUBLE_DOSSIER, **header)
-        print(response)
         assert response.status_code == 200
         assert response.content == IMAGE_BINARY_DATA
 
