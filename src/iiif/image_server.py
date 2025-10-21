@@ -112,9 +112,9 @@ def get_file(url_info, metadata):
 
 def handle_file_response_codes(file_response, file_url):
     if file_response.status_code == 404:
-        log.error(
-            f"Source file not found on server"
-        )        
+        #log.error(
+        #    f"Source file not found on server"
+        #)        
         raise ImmediateHttpResponse(
             response=HttpResponse(f"No source file could be found", status=404)
         )
