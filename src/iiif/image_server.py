@@ -148,7 +148,8 @@ def download_file_for_zip(
     metadata,
     tmp_folder_path,
 ):
-    info_txt_contents += f"{iiif_url}: "
+    filename = get_filename(url_info, metadata)
+    info_txt_contents += f"{filename}: "
 
     if fail_reason:
         info_txt_contents += f"Not included in this zip because {fail_reason}\n"
@@ -177,7 +178,6 @@ def download_file_for_zip(
         return info_txt_contents
 
     # Save image file to tmp folder
-    filename = get_filename(url_info, metadata)
     zip_tools.save_file_to_folder(tmp_folder_path, filename, file_response.content)
     info_txt_contents += "included\n"
 
