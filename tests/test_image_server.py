@@ -44,6 +44,6 @@ def test_get_file_404retry(mock_get_image_from_server):
     fileresponse, file_url = image_server.get_file(url_info, metadata)
 
     assert fileresponse.status_code == 200
-    assert file_url[-17:] == "ST/15/st_test.doc"
+    assert file_url[-17:] == "ST/15/ST_TEST.doc"
 
     assert mock_get_image_from_server.call_count == 3

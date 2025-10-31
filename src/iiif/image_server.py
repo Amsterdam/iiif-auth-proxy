@@ -101,11 +101,12 @@ def get_image_from_server(file_url, headers):
 def get_upper_lower_filename_in_file_url(file_url, mode):
     file_url_array = file_url.rsplit(sep="/", maxsplit=1)
     base_file_url = file_url_array[0] + "/"
+    filename, extensie = file_url_array[1].rsplit(sep=".", maxsplit=1)
     match mode:
         case "UP":
-            return base_file_url + file_url_array[1].upper()
+            return base_file_url + filename.upper() + "." + extensie
         case "LO":
-            return base_file_url + file_url_array[1].lower()
+            return base_file_url + filename.lower() + "." + extensie
         case _:
             return file_url
 
