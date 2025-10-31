@@ -18,7 +18,7 @@ x-app: &base-app
     DATABASE_HOST: "database"
     AZURITE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
     AZURITE_QUEUE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;"
-
+   
 services:
   database:
     image: postgres:15
@@ -67,6 +67,8 @@ services:
       target: tests
     environment:
       <<: *base-app-env
+      LOG_LEVEL: "DEBUG"
+      DJANGO_LOG_LEVEL: "DEBUG"      
       DJANGO_SETTINGS_MODULE: "main.settings"
       USE_JWKS_TEST_KEY: "true"
 

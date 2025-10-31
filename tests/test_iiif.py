@@ -617,6 +617,26 @@ class TestFileRetrievalWithAuthz:
         )
         assert response.status_code == 400
 
+    @patch("iiif.image_server.get_image_from_server")
+    @patch("iiif.metadata.do_metadata_request")
+    def test_file_not_on_server(
+        self, mock_do_metadata_request, mock_get_image_from_server, client
+    ):
+        mock_do_metadata_request.return_value = MockResponse(
+            200,
+            json_content=PRE_WABO_METADATA_CONTENT,
+        )
+        mock_get_image_from_server.return_value = MockResponse(404)
+
+        header = {
+            "HTTP_AUTHORIZATION": "Bearer "
+            + create_authz_token(settings.BOUWDOSSIER_READ_SCOPE)
+        }
+
+        response = client.get(self.url + PRE_WABO_INFO_JSON_URL, **header)
+        assert response.status_code == 404
+        assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+
 
 class TestFileRetrievalWithMailJWT:
     def setup_method(self):

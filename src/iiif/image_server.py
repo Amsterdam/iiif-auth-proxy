@@ -98,36 +98,59 @@ def get_image_from_server(file_url, headers):
     return requests.get(file_url, headers=headers, verify=False, timeout=(15, 25))
 
 
+def get_upper_lower_filename_in_file_url(file_url, mode):
+    file_url_array = file_url.rsplit(sep="/", maxsplit=1)
+    base_file_url = file_url_array[0] + "/"
+    filename, extensie = file_url_array[1].rsplit(sep=".", maxsplit=1)
+    match mode:
+        case "UP":
+            return base_file_url + filename.upper() + "." + extensie
+        case "LO":
+            return base_file_url + filename.lower() + "." + extensie
+        case _:
+            return file_url
+
+
 def get_file(url_info, metadata):
     file_url, headers = create_file_url_and_headers(url_info, metadata)
     try:
-        file_response = get_image_from_server(file_url, headers)
+        for i in ["_", "LO", "UP"]:
+            file_url = get_upper_lower_filename_in_file_url(file_url, i)
+            file_response = get_image_from_server(file_url, headers)
+            if file_response.status_code != 404:
+                break
+
     except RequestException as e:
         message = f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {e.__class__.__name__}"
         log.error(message)
-        raise ImmediateHttpResponse(response=HttpResponse(message, status=502)) from e
+        file_response = HttpResponse(message, status=502)
+        raise ImmediateHttpResponse(response=file_response) from e
 
-    return file_response, file_url
+    finally:
+        return file_response, file_url
 
 
 def handle_file_response_codes(file_response, file_url):
-    if file_response.status_code == 404:
-        raise ImmediateHttpResponse(
-            response=HttpResponse(f"No source file could be found", status=404)
-        )
 
-    if file_response.status_code != 200:
-        log.error(
-            f"Got response code {file_response.status_code} while retrieving "
-            f"the image {file_url} from the image server."
-        )
-        raise ImmediateHttpResponse(
-            response=HttpResponse(
-                f"We had a problem retrieving the image. We got status "
-                f"code {file_response.status_code}",
-                status=502,
+    match file_response.status_code:
+        case 404:
+            raise ImmediateHttpResponse(
+                response=HttpResponse(f"No source file could be found", status=404)
             )
-        )
+        case 502:
+            raise ImmediateHttpResponse(response=file_response)
+        case _ if file_response.status_code != 200:
+            log.error(
+                f"Got response code {file_response.status_code} while retrieving "
+                f"the image {file_url} from the image server."
+            )
+            raise ImmediateHttpResponse(
+                response=HttpResponse(
+                    f"We had a problem retrieving the image. We got status "
+                    f"code {file_response.status_code}",
+                    status=502,
+                )
+            )
 
 
 def prepare_zip_downloads():
