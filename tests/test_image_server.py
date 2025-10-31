@@ -26,6 +26,7 @@ ONE_PRE_WABO_METADATA_CONTENT = {
     ],
 }
 
+
 @patch("iiif.image_server.get_image_from_server")
 def test_get_file_404retry(mock_get_image_from_server):
 
@@ -34,11 +35,15 @@ def test_get_file_404retry(mock_get_image_from_server):
 
     metadata = ONE_PRE_WABO_METADATA_CONTENT
 
-    mock_get_image_from_server.side_effect = [MockResponse(404), MockResponse(404), MockResponse(200)]
+    mock_get_image_from_server.side_effect = [
+        MockResponse(404),
+        MockResponse(404),
+        MockResponse(200),
+    ]
 
     fileresponse, file_url = image_server.get_file(url_info, metadata)
 
     assert fileresponse.status_code == 200
-    assert file_url[-17:] == 'ST/15/st_test.doc'
+    assert file_url[-17:] == "ST/15/st_test.doc"
 
     assert mock_get_image_from_server.call_count == 3
