@@ -106,19 +106,19 @@ def get_upper_lower_filename_in_file_url(file_url, mode):
             return base_file_url + file_url_array[1].upper()
         case "LO":
             return base_file_url + file_url_array[1].lower()
-        case "_":
+        case _:
             return file_url
 
 
 def get_file(url_info, metadata):
     file_url, headers = create_file_url_and_headers(url_info, metadata)
     try:
-        for i in ["_", "UP", "LO"]:
+        for i in ["_", "LO", "UP"]:
             file_url = get_upper_lower_filename_in_file_url(file_url, i)
             file_response = get_image_from_server(file_url, headers)
             if file_response.status_code != 404:
                 break
-        
+
     except RequestException as e:
         message = f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {e.__class__.__name__}"
         log.error(message)
