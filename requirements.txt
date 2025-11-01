@@ -4,11 +4,11 @@
 #
 #    pip-compile --allow-unsafe --output-file=requirements.txt requirements.in
 #
-asgiref==3.9.2
+asgiref==3.10.0
     # via
     #   django
     #   django-cors-headers
-azure-core==1.35.1
+azure-core==1.36.0
     # via
     #   -r requirements.in
     #   azure-identity
@@ -32,19 +32,19 @@ azure-keyvault-secrets==4.10.0
     # via
     #   -r requirements.in
     #   azure-keyvault
-azure-storage-blob==12.26.0
+azure-storage-blob==12.27.1
     # via -r requirements.in
-azure-storage-queue==12.13.0
+azure-storage-queue==12.14.1
     # via -r requirements.in
-cachetools==6.2.0
+cachetools==6.2.1
     # via google-auth
-certifi==2025.8.3
+certifi==2025.10.5
     # via requests
 cffi==2.0.0
     # via cryptography
-charset-normalizer==3.4.3
+charset-normalizer==3.4.4
     # via requests
-cryptography==46.0.2
+cryptography==46.0.3
     # via
     #   azure-identity
     #   azure-keyvault-keys
@@ -69,13 +69,13 @@ django-cors-headers==4.9.0
     # via -r requirements.in
 django-ratelimit==4.1.0
     # via -r requirements.in
-google-api-core==2.25.1
+google-api-core==2.28.1
     # via opencensus
-google-auth==2.41.1
+google-auth==2.42.1
     # via google-api-core
-googleapis-common-protos==1.70.0
+googleapis-common-protos==1.71.0
     # via google-api-core
-idna==3.10
+idna==3.11
     # via requests
 iso8601==2.1.0
     # via
@@ -98,7 +98,7 @@ msal==1.34.0
     #   msal-extensions
 msal-extensions==1.3.1
     # via azure-identity
-msgpack==1.1.1
+msgpack==1.1.2
     # via oslo-serialization
 netaddr==1.3.0
     # via
@@ -123,7 +123,7 @@ opencensus-ext-postgresql==0.1.3
     # via -r requirements.in
 opencensus-ext-requests==0.8.0
     # via -r requirements.in
-os-service-types==1.8.0
+os-service-types==1.8.1
     # via keystoneauth1
 oslo-config==10.0.0
     # via python-keystoneclient
@@ -142,7 +142,7 @@ packaging==25.0
     # via
     #   oslo-utils
     #   python-keystoneclient
-pbr==7.0.1
+pbr==7.0.2
     # via
     #   keystoneauth1
     #   os-service-types
@@ -153,16 +153,16 @@ pillow-simd==9.5.0.post2
     # via -r requirements.in
 proto-plus==1.26.1
     # via google-api-core
-protobuf==6.32.1
+protobuf==6.33.0
     # via
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
-psutil==7.1.0
+psutil==7.1.2
     # via
     #   opencensus-ext-azure
     #   oslo-utils
-psycopg2-binary==2.9.10
+psycopg2-binary==2.9.11
     # via
     #   -r requirements.in
     #   opencensus-ext-postgresql
@@ -207,7 +207,6 @@ rsa==4.9.1
 six==1.17.0
     # via
     #   -r requirements.in
-    #   azure-core
     #   opencensus
 sqlparse==0.5.3
     # via django
@@ -218,7 +217,7 @@ stevedore==5.5.0
     #   python-keystoneclient
 timeout-decorator==0.5.0
     # via -r requirements.in
-toolz==1.0.0
+toolz==1.1.0
     # via -r requirements.in
 typing-extensions==4.15.0
     # via
@@ -230,13 +229,14 @@ typing-extensions==4.15.0
     #   azure-storage-queue
     #   jwcrypto
     #   keystoneauth1
+    #   os-service-types
 tzdata==2025.2
     # via
     #   oslo-serialization
     #   oslo-utils
 urllib3==2.5.0
     # via requests
-uwsgi==2.0.30
+uwsgi==2.0.31
     # via -r requirements.in
 wrapt==1.17.3
     # via
