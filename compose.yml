@@ -1,24 +1,34 @@
+x-common-depends-on: &common-depends-on
+  migrate:
+    condition: service_completed_successfully
+  azurite:
+    condition: service_healthy
+
+x-common-env: &common-env
+  LOG_LEVEL: "WARNING"
+  DJANGO_LOG_LEVEL: "WARNING"
+  SECRET_KEY: "insecure"
+  JWT_SECRET_KEY: "insecure"
+  DATABASE_HOST: "database"
+  AZURITE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
+  AZURITE_QUEUE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;"
+
 x-app: &base-app
   build:
     context: .
     target: app
   depends_on:
-    - database
-    - azurite
+    <<: *common-depends-on
   volumes:
     - .:/app/
   networks:
     - amsterdam-bouwdossiers
     - default
-  environment: &base-app-env
-    LOG_LEVEL: "WARNING"
-    DJANGO_LOG_LEVEL: "WARNING"
-    SECRET_KEY: "insecure"
-    JWT_SECRET_KEY: "insecure"
-    DATABASE_HOST: "database"
-    AZURITE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
-    AZURITE_QUEUE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;"
-   
+
+volumes:
+  azurite_data:
+  db_data:
+
 services:
   database:
     image: postgres:15
@@ -26,22 +36,68 @@ services:
       POSTGRES_DB: dev
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: dev
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U statistiek_hub -d statistiek_hub
+      interval: 10s
+      timeout: 1s
+      retries: 5
+
+  migrate:
+    build:
+      context: .
+      target: app
+    environment:
+      SECRET_KEY: "insecure"
+      DJANGO_SETTINGS_MODULE: main.settings
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    user: 1000:1000
+    command: python manage.py migrate --noinput
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512mb
+        reservations:
+          cpus: "0.25"
+          memory: 256M
   
   azurite:
-    image: mcr.microsoft.com/azure-storage/azurite
+    image: mcr.microsoft.com/azure-storage/azurite:latest
     ports:
       - "10000:10000"  # Blob service
       - "10001:10001"  # Queue service
+    volumes:
+      - azurite_data:/data
+    command: >
+      azurite
+      -l /data
+      --blobHost 0.0.0.0
+      --queueHost 0.0.0.0
+      --loose
+    healthcheck:
+      test: nc 127.0.0.1 10000 -z
+      interval: 1s
+      retries: 30
 
   app:
     <<: *base-app
     build:
       context: .
       target: app
+    image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-opdrachten/iiif-auth-proxy}:${VERSION:-latest}
     ports:
       - "8000:8000"
-    image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-opdrachten/iiif-auth-proxy}:${VERSION:-latest}
+    environment:
+      <<: *common-env
     command: /app/deploy/docker-run.sh
+    user: 1000:1000
 
   dev:
     <<: *base-app
@@ -51,7 +107,7 @@ services:
     ports:
       - "8001:8000"
     environment:
-      <<: *base-app-env
+      <<: *common-env
       LOG_LEVEL: "DEBUG"
       DJANGO_LOG_LEVEL: "DEBUG"
       DEBUG: "true"
@@ -59,6 +115,7 @@ services:
       MOCK_GET_IMAGE_FROM_SERVER: "true"
       METADATA_SERVER_BASE_URL: "http://metadata-server:8000"
     command: python manage.py runserver 0.0.0.0:8000
+    user: 1000:1000
 
   test:
     <<: *base-app
@@ -66,7 +123,7 @@ services:
       context: .
       target: tests
     environment:
-      <<: *base-app-env
+      <<: *common-env
       LOG_LEVEL: "DEBUG"
       DJANGO_LOG_LEVEL: "DEBUG"      
       DJANGO_SETTINGS_MODULE: "main.settings"
@@ -78,6 +135,7 @@ services:
       target: linting
     volumes:
       - .:/app/
+    user: 1000:1000
 
 networks:
   amsterdam-bouwdossiers:
