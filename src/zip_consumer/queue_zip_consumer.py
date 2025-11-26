@@ -11,10 +11,10 @@ from auth_mail import authentication, mailing
 from iiif import image_server
 from iiif.metadata import get_metadata
 from main import utils
-from main.utils_azure_storage import (
+from utils.queue import get_queue_client
+from utils.storage import (
     create_storage_account_temp_url,
     get_blob_from_storage_account,
-    get_queue_client,
     remove_blob_from_storage_account,
     store_file_on_storage_account,
 )

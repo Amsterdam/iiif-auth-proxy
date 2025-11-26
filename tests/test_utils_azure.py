@@ -1,11 +1,7 @@
-from pathlib import Path
-from uuid import uuid4
-
-import requests
 from azure.core.exceptions import ResourceExistsError
-from django.conf import settings
 
-from main.utils_azure_storage import get_blob_service_client, get_queue_client
+from utils.queue import get_queue_client
+from utils.storage import get_blob_service_client
 
 
 def create_blob_container(container_name):
