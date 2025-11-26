@@ -5,7 +5,7 @@ from pathlib import Path
 from uuid import uuid4
 from zipfile import ZipFile
 
-from main.utils_azure_storage import get_queue_client
+from utils.queue import get_queue_client
 
 TMP_BOUWDOSSIER_ZIP_FOLDER = "/tmp/bouwdossier-zips/"
 ZIP_MESSAGE_VERSION_NAME = "zip_job_v1"

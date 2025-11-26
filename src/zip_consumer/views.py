@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from auth_mail import authentication
 from iiif import parsing
 from main import utils
-from main.utils_azure_storage import store_blob_on_storage_account
+from utils.storage import store_blob_on_storage_account
 from zip_consumer import zip_tools
 
 log = logging.getLogger(__name__)

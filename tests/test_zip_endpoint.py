@@ -15,7 +15,6 @@ from auth_mail.authentication import (
     create_mail_login_token,
 )
 from auth_mail.generate_token import create_authz_token
-from main.utils_azure_storage import get_blob_from_storage_account, get_queue_client
 from tests.test_settings import (
     IMAGE_BINARY_DATA,
     PRE_WABO_IMG_URL_BASE,
@@ -25,6 +24,8 @@ from tests.test_settings import (
 )
 from tests.test_utils_azure import create_blob_container, create_queue
 from tests.tools import MockResponse
+from utils.queue import get_queue_client
+from utils.storage import get_blob_from_storage_account
 from zip_consumer.queue_zip_consumer import AzureZipQueueConsumer
 from zip_consumer.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER
 
