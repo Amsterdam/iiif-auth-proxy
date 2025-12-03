@@ -113,6 +113,7 @@ def get_upper_lower_filename_in_file_url(file_url, mode):
 
 def get_file(url_info, metadata):
     file_url, headers = create_file_url_and_headers(url_info, metadata)
+    file_response = None
     try:
         for i in ["_", "LO", "UP"]:
             file_url = get_upper_lower_filename_in_file_url(file_url, i)
@@ -127,6 +128,7 @@ def get_file(url_info, metadata):
         raise ImmediateHttpResponse(response=file_response) from e
 
     finally:
+        log.info(f"Reached finally, file_response={file_response}")
         return file_response, file_url
 
 
