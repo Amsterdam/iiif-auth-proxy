@@ -134,6 +134,11 @@ def get_file(url_info, metadata):
 
 def handle_file_response_codes(file_response, file_url):
 
+    if file_response is None:
+        raise ImmediateHttpResponse(
+            response=HttpResponse(f"No source file could be found", status=404)
+        )
+
     match file_response.status_code:
         case 404:
             raise ImmediateHttpResponse(
