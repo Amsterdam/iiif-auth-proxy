@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import json
 import os
+import sys
 
 from corsheaders.defaults import default_headers
 from opencensus.trace import config_integration
@@ -258,6 +259,7 @@ base_log_fmt = {"time": "%(asctime)s", "name": "%(name)s", "level": "%(levelname
 log_fmt = base_log_fmt.copy()
 log_fmt["message"] = "%(message)s"
 
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -273,9 +275,33 @@ LOGGING = {
             "level": LOG_LEVEL,
             "class": "logging.StreamHandler",
             "formatter": "json",
+            "stream": sys.stdout,
+        },
+        "error_console": {
+            "level": "ERROR",
+            "class": "logging.StreamHandler",
+            "formatter": "json",
+            "stream": sys.stderr,
         },
     },
     "loggers": {
+        # Django loggers
+        "django": {
+            "handlers": ["console"],
+            "level": DJANGO_LOG_LEVEL,
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["error_console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        # Application-specific loggers
         "iiif": {
             "level": LOG_LEVEL,
             "handlers": ["console"],
@@ -286,18 +312,12 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
-        "django": {
+        # Third-party library loggers
+        "opencensus": {
             "handlers": ["console"],
-            "level": DJANGO_LOG_LEVEL,
-            "propagate": False,
-        },
-        # Log all unhandled exceptions
-        "django.request": {
             "level": LOG_LEVEL,
-            "handlers": ["console"],
-            "propagate": False,
+            "propagate": False
         },
-        "opencensus": {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False},
         "azure.core.pipeline.policies.http_logging_policy": {
             "handlers": ["console"],
             "level": LOG_LEVEL,
@@ -305,7 +325,6 @@ LOGGING = {
         },
     },
 }
-
 APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv(
     "APPLICATIONINSIGHTS_CONNECTION_STRING"
 )
