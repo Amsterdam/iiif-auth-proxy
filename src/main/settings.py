@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
-import json
 import os
 import sys
 
@@ -250,11 +249,6 @@ STATIC_IMAGE = os.path.join(STATIC_URL, "example.jpg")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "WARNING").upper()
 DJANGO_LOG_LEVEL = os.getenv("DJANGO_LOG_LEVEL", "WARNING").upper()
 
-base_log_fmt = {"time": "%(asctime)s", "name": "%(name)s", "level": "%(levelname)s"}
-log_fmt = base_log_fmt.copy()
-log_fmt["message"] = "%(message)s"
-
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -263,20 +257,20 @@ LOGGING = {
         "handlers": ["console"],
     },
     "formatters": {
-        "json": {"format": json.dumps(log_fmt)},
+        "json": {
+            "()": "main.logging.formatters.OTelJSONFormatter",
+        },
+        "human": {
+            "()": "main.logging.formatters.OTelHumanFormatter",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
     },
     "handlers": {
         "console": {
             "level": LOG_LEVEL,
             "class": "logging.StreamHandler",
-            "formatter": "json",
+            "formatter": "human" if IN_DEBUG_MODE else "json",
             "stream": sys.stdout,
-        },
-        "error_console": {
-            "level": "ERROR",
-            "class": "logging.StreamHandler",
-            "formatter": "json",
-            "stream": sys.stderr,
         },
     },
     "loggers": {
@@ -287,7 +281,7 @@ LOGGING = {
             "propagate": False,
         },
         "django.request": {
-            "handlers": ["error_console"],
+            "handlers": ["console"],
             "level": "ERROR",
             "propagate": False,
         },
@@ -315,6 +309,44 @@ LOGGING = {
         },
     },
 }
+
+# OTEL
 APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv(
     "APPLICATIONINSIGHTS_CONNECTION_STRING"
 )
+
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.django import DjangoInstrumentor
+from opentelemetry.instrumentation.logging import LoggingInstrumentor
+from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.instrumentation.urllib import URLLibInstrumentor
+from opentelemetry.instrumentation.urllib3 import URLLib3Instrumentor
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+
+resource = Resource(attributes={"service.name": "iiif-auth-proxy"})
+
+trace.set_tracer_provider(TracerProvider(resource=resource))
+tracer = trace.get_tracer(__name__)
+
+exporter_name = os.environ.get("OTEL_EXPORTER", "otlp")
+if exporter_name == "otlp":
+    otlp_exporter = OTLPSpanExporter()
+    span_processor = BatchSpanProcessor(otlp_exporter)
+    trace.get_tracer_provider().add_span_processor(span_processor)
+elif exporter_name == "console":
+    console_exporter = ConsoleSpanExporter()
+    console_processor = BatchSpanProcessor(console_exporter)
+    trace.get_tracer_provider().add_span_processor(console_processor)
+else:
+    pass
+
+DjangoInstrumentor().instrument()
+Psycopg2Instrumentor().instrument()
+RequestsInstrumentor().instrument()
+URLLibInstrumentor().instrument()
+URLLib3Instrumentor().instrument()
+LoggingInstrumentor().instrument(set_logging_format=True)
