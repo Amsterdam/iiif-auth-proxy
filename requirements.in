@@ -24,8 +24,13 @@ azure-storage-blob
 azure-keyvault
 azure-keyvault-secrets
 azure-storage-queue
-opencensus-ext-django
-opencensus-ext-azure
-opencensus-ext-postgresql
-opencensus-ext-logging
-opencensus-ext-requests
+
+# OTEL
+opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-instrumentation-celery
+opentelemetry-instrumentation-django
+opentelemetry-instrumentation-logging
+opentelemetry-instrumentation-psycopg2
+opentelemetry-instrumentation-requests
+opentelemetry-instrumentation-urllib
+opentelemetry-instrumentation-urllib3

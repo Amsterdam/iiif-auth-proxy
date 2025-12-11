@@ -9,9 +9,15 @@ x-common-env: &common-env
   DJANGO_LOG_LEVEL: "WARNING"
   SECRET_KEY: "insecure"
   JWT_SECRET_KEY: "insecure"
-  DATABASE_HOST: "database"
-  AZURITE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
-  AZURITE_QUEUE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://azurite:10001/devstoreaccount1;"
+  DATABASE_HOST: "iiif-auth-proxy-database"
+  AZURITE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://iiif-auth-proxy-azurite:10000/devstoreaccount1;"
+  AZURITE_QUEUE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://iiif-auth-proxy-azurite:10001/devstoreaccount1;"
+  OTEL_SERVICE_NAME: "iiif-auth-proxy"
+  OTEL_TRACES_SAMPLER: "always_on"
+  OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+  OTEL_INSTRUMENTATION_HTTP_CAPTURE_HEADERS_SERVER_REQUEST: ".*"
+  OTEL_INSTRUMENTATION_HTTP_CAPTURE_HEADERS_SERVER_RESPONSE: ".*"
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://iiif-auth-proxy-otel-collector:4317
 
 x-app: &base-app
   build:
@@ -31,6 +37,7 @@ volumes:
 
 services:
   database:
+    container_name: iiif-auth-proxy-database
     image: postgres:15
     environment:
       POSTGRES_DB: dev
@@ -45,12 +52,14 @@ services:
       retries: 5
 
   migrate:
+    container_name: iiif-auth-proxy-migrate
     build:
       context: .
       target: app
     environment:
       SECRET_KEY: "insecure"
       DJANGO_SETTINGS_MODULE: main.settings
+      OTEL_SDK_DISABLED: true
     depends_on:
       database:
         condition: service_healthy
@@ -69,6 +78,7 @@ services:
           memory: 256M
   
   azurite:
+    container_name: iiif-auth-proxy-azurite
     image: mcr.microsoft.com/azure-storage/azurite:latest
     ports:
       - "10000:10000"  # Blob service
@@ -87,6 +97,7 @@ services:
       retries: 30
 
   app:
+    container_name: iiif-auth-proxy-app
     <<: *base-app
     build:
       context: .
@@ -96,10 +107,15 @@ services:
       - "8000:8000"
     environment:
       <<: *common-env
+    depends_on:
+      <<: *common-depends-on
+      otel-collector:
+        condition: service_started
     command: /app/deploy/docker-run.sh
     user: 1000:1000
 
   dev:
+    container_name: iiif-auth-proxy-dev
     <<: *base-app
     build:
       context: .
@@ -114,10 +130,15 @@ services:
       USE_JWKS_TEST_KEY: "true"
       MOCK_GET_IMAGE_FROM_SERVER: "true"
       METADATA_SERVER_BASE_URL: "http://metadata-server:8000"
+    depends_on:
+      <<: *common-depends-on
+      otel-collector:
+        condition: service_started
     command: python manage.py runserver 0.0.0.0:8000
     user: 1000:1000
 
   test:
+    container_name: iiif-auth-proxy-test
     <<: *base-app
     build:
       context: .
@@ -128,14 +149,46 @@ services:
       DJANGO_LOG_LEVEL: "DEBUG"      
       DJANGO_SETTINGS_MODULE: "main.settings"
       USE_JWKS_TEST_KEY: "true"
+      OTEL_SDK_DISABLED: true
 
   linting:
+    container_name: iiif-auth-proxy-linting
     build:
       context: .
       target: linting
     volumes:
       - .:/app/
     user: 1000:1000
+
+  otel-collector:
+    container_name: iiif-auth-proxy-otel-collector
+    build:
+      context: otel-collector
+    volumes:
+      - ./otel-collector/config.local.yaml:/etc/otelcol-contrib/config.yaml
+    depends_on:
+      - jaeger
+    ports:
+      - "4317:4317"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
+        reservations:
+          cpus: "0.05"
+          memory: 128M
+
+  jaeger:
+    container_name: iiif-auth-proxy-jaeger
+    image: jaegertracing/jaeger:2.8.0
+    ports:
+      # ui
+      - "16686:16686"
+      # grpc
+      - "14317:4317"
+    environment:
+      LOG_LEVEL: debug
 
 networks:
   amsterdam-bouwdossiers:
