@@ -8,7 +8,7 @@ asgiref==3.11.0
     # via
     #   django
     #   django-cors-headers
-azure-core==1.37.0
+azure-core==1.38.0
     # via
     #   -r requirements.in
     #   azure-identity
