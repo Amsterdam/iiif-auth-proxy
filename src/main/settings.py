@@ -43,6 +43,9 @@ if CORS_DOMAINS := os.getenv("CORS_DOMAINS", ""):
         *default_headers,
     ]
 
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 METADATA_SERVER_BASE_URL = os.getenv(
     "METADATA_SERVER_BASE_URL",
     "http://app-iiif-metadata-server",
