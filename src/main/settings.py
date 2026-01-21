@@ -96,11 +96,6 @@ EMAIL_FROM_EMAIL_ADDRESS = os.getenv(
 EMAIL_USE_TLS = str_to_bool(os.getenv("EMAIL_USE_TLS", "true"))
 EMAIL_TIMEOUT = 5
 
-# Development
-MOCK_GET_IMAGE_FROM_SERVER = str_to_bool(
-    os.getenv("MOCK_GET_IMAGE_FROM_SERVER", "false")
-)
-
 # The following JWKS data was obtained in the authz project :  jwkgen -create -alg ES256
 # This is a test public/private key def and added for testing .
 JWKS_TEST_KEY = """
