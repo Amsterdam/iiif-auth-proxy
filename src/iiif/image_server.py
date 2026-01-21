@@ -1,6 +1,7 @@
 import logging
 from functools import partial
 from io import BytesIO
+from math import floor
 
 import requests
 from django.conf import settings
@@ -61,6 +62,24 @@ def create_file_url_and_headers(url_info, metadata):
     raise FileSourceNotValidError(f'File source: {url_info["source"]} invalid')
 
 
+def _get_filename_variants(file_url):
+    """
+    Generates a list of unique filename variants (original, lowercase, uppercase).
+
+    Removes duplicates when the filename is already all uppercase or lowercase.
+    """
+    base_url, full_filename = file_url.rsplit("/", maxsplit=1)
+    filename, extension = full_filename.rsplit(".", maxsplit=1)
+
+    variants = [
+        file_url,
+        f"{base_url}/{filename.lower()}.{extension}",
+        f"{base_url}/{filename.upper()}.{extension}",
+    ]
+
+    return list(dict.fromkeys(variants))
+
+
 def _create_image(
     file_format: str | None = None,
     size: tuple[int, int] | None = None,
@@ -80,42 +99,40 @@ def _create_image(
 create_non_image_file_thumbnail = partial(_create_image, size=(180, 180), color="green")
 
 
-def get_image_from_server(file_url, headers):
-    return requests.get(file_url, headers=headers, verify=False, timeout=(15, 25))
-
-
-def get_upper_lower_filename_in_file_url(file_url, mode):
-    file_url_array = file_url.rsplit(sep="/", maxsplit=1)
-    base_file_url = file_url_array[0] + "/"
-    filename, extensie = file_url_array[1].rsplit(sep=".", maxsplit=1)
-    match mode:
-        case "UP":
-            return base_file_url + filename.upper() + "." + extensie
-        case "LO":
-            return base_file_url + filename.lower() + "." + extensie
-        case _:
-            return file_url
-
-
 def get_file(url_info, metadata):
     file_url, headers = create_file_url_and_headers(url_info, metadata)
     file_response = None
-    try:
-        for i in ["_", "LO", "UP"]:
-            file_url = get_upper_lower_filename_in_file_url(file_url, i)
-            file_response = get_image_from_server(file_url, headers)
-            if file_response.status_code != 404:
-                break
+    successful_url = None
+    last_error = None
 
-    except RequestException as e:
-        message = f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {e.__class__.__name__}"
+    file_url_variants = _get_filename_variants(file_url)
+    max_timeout = floor(25 / len(file_url_variants))  # Calculate the correct max_timeout
+    for file_url_variant in file_url_variants:
+        try:
+            file_response = requests.get(
+                file_url_variant, headers=headers, verify=False, timeout=(5, max_timeout)
+            )
+            if file_response.status_code != 404:
+                successful_url = file_url_variant
+                break
+        except RequestException as e:
+            log.warning(
+                f"Request failed for {file_url_variant}: {e.__class__.__name__}"
+            )
+            last_error = e
+
+            # Try the next variant
+            continue
+
+    # If all variants failed, raise error
+    if file_response is None and last_error:
+        message = f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER} {last_error.__class__.__name__}"
         log.error(message)
         file_response = HttpResponse(message, status=502)
-        raise ImmediateHttpResponse(response=file_response) from e
+        raise ImmediateHttpResponse(response=file_response) from last_error
 
-    finally:
-        log.info(f"Reached finally, file_response={file_response}")
-        return file_response, file_url
+    log.info(f"Reached finally, {file_response=}")
+    return file_response, successful_url or file_url
 
 
 def handle_file_response_codes(file_response, file_url):
