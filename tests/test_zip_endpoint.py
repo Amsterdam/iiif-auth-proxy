@@ -385,7 +385,7 @@ class TestZipEndpoint:
         assert len(self.get_all_queue_messages()) == 1
 
     @patch("zip_consumer.queue_zip_consumer.create_storage_account_temp_url")
-    @patch("iiif.image_server.get_image_from_server")
+    @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     @patch("auth_mail.mailing.send_email")
     @patch("zip_consumer.zip_tools.cleanup_local_files")
@@ -417,7 +417,7 @@ class TestZipEndpoint:
         mock_cleanup_local_files,
         mock_send_email,
         mock_do_metadata_request,
-        mock_get_image_from_server,
+        mock_requests_get,
         mock_create_storage_account_temp_url,
         scope,
         second_image_access,
@@ -469,7 +469,7 @@ class TestZipEndpoint:
                 ],
             },
         )
-        mock_get_image_from_server.return_value = MockResponse(
+        mock_requests_get.return_value = MockResponse(
             200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/png"}
         )
         mock_create_storage_account_temp_url.return_value = "https://azure.com/tempurl"

@@ -1,7 +1,8 @@
 import os
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import pytest
+import requests
 from django.conf import settings
 
 from iiif import image_server
@@ -34,11 +35,15 @@ with open(
     IMAGE_BINARY_DATA = file.read()
 
 
-@pytest.mark.parametrize("error_mock", [404, 880])
-@patch("iiif.image_server.get_image_from_server")
-def test_get_image_fails(mock_get_image_from_server, error_mock):
+@pytest.mark.parametrize("http_status_code", [404, 880])
+@patch("requests.get")
+def test_get_image_fails(mock_requests_get, http_status_code):
+    mock_response = Mock()
+    mock_response.status_code = http_status_code
+    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError()
 
-    mock_get_image_from_server.return_value = MockResponse(error_mock)
+    mock_requests_get.return_value = mock_response
+
     tmp_folder_path = "/tmp/bouwdossier-zips/"
     info_txt_contents = ""
 
@@ -72,10 +77,9 @@ def test_get_image_fails(mock_get_image_from_server, error_mock):
     assert info_txt_contents[:30] == "SJ10027690_00001.jpg: Not incl"
 
 
-@patch("iiif.image_server.get_image_from_server")
-def test_get_image_200(mock_get_image_from_server):
-
-    mock_get_image_from_server.return_value = MockResponse(
+@patch("requests.get")
+def test_get_image_200(mock_requests_get):
+    mock_requests_get.return_value = MockResponse(
         200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/png"}
     )
     tmp_folder_path = "/tmp/bouwdossier-zips/"
