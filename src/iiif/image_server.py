@@ -106,11 +106,16 @@ def get_file(url_info, metadata):
     last_error = None
 
     file_url_variants = _get_filename_variants(file_url)
-    max_timeout = floor(25 / len(file_url_variants))  # Calculate the correct max_timeout
+    max_timeout = floor(
+        25 / len(file_url_variants)
+    )  # Calculate the correct max_timeout
     for file_url_variant in file_url_variants:
         try:
             file_response = requests.get(
-                file_url_variant, headers=headers, verify=False, timeout=(5, max_timeout)
+                file_url_variant,
+                headers=headers,
+                verify=False,
+                timeout=(5, max_timeout),
             )
             if file_response.status_code != 404:
                 successful_url = file_url_variant
