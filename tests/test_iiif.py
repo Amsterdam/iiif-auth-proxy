@@ -70,9 +70,7 @@ class TestFileRetrievalWithAuthz:
                 "documenten": [],  # This is empty on purpose to test non-existing documents in metadata
             },
         )
-        mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA
-        )
+        mock_requests_get.return_value = MockResponse(200, content=IMAGE_BINARY_DATA)
 
         header = {
             "HTTP_AUTHORIZATION": "Bearer "
@@ -164,9 +162,7 @@ class TestFileRetrievalWithAuthz:
 
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
-    def test_get_info_json(
-        self, mock_do_metadata_request, mock_requests_get, client
-    ):
+    def test_get_info_json(self, mock_do_metadata_request, mock_requests_get, client):
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content=PRE_WABO_METADATA_CONTENT,
@@ -208,9 +204,7 @@ class TestFileRetrievalWithAuthz:
                 ],
             },
         )
-        mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA
-        )
+        mock_requests_get.return_value = MockResponse(200, content=IMAGE_BINARY_DATA)
 
         response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING)
         assert response.status_code == 401
@@ -234,9 +228,7 @@ class TestFileRetrievalWithAuthz:
                 ],
             },
         )
-        mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA
-        )
+        mock_requests_get.return_value = MockResponse(200, content=IMAGE_BINARY_DATA)
 
         response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING)
         assert response.status_code == 401
@@ -260,9 +252,7 @@ class TestFileRetrievalWithAuthz:
                 ],
             },
         )
-        mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA
-        )
+        mock_requests_get.return_value = MockResponse(200, content=IMAGE_BINARY_DATA)
 
         response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING)
         assert response.status_code == 401
@@ -286,9 +276,7 @@ class TestFileRetrievalWithAuthz:
                 ],
             },
         )
-        mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA
-        )
+        mock_requests_get.return_value = MockResponse(200, content=IMAGE_BINARY_DATA)
 
         response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING)
         assert response.status_code == 401
