@@ -76,25 +76,11 @@ def _create_image(
     return buf.getvalue()
 
 
-# Used for testing and development
-create_mock_image = partial(_create_image, size=(32, 32), color="green")
-
 # Used to create a "default thumbnail" for files that are requested and are not an image itself
 create_non_image_file_thumbnail = partial(_create_image, size=(180, 180), color="green")
 
 
-# For develop/test environments where we don't have access to the upstream server
-def get_image_from_mock_server():
-    response = requests.Response()
-    response.status_code = 200
-    response.headers["Content-Type"] = "image/jpeg"
-    response._content = create_mock_image("JPEG")
-    return response
-
-
 def get_image_from_server(file_url, headers):
-    if settings.MOCK_GET_IMAGE_FROM_SERVER:
-        return get_image_from_mock_server()
     return requests.get(file_url, headers=headers, verify=False, timeout=(15, 25))
 
 
