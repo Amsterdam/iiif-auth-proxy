@@ -27,23 +27,23 @@ ONE_PRE_WABO_METADATA_CONTENT = {
 }
 
 
-@patch("iiif.image_server.get_image_from_server")
-def test_get_file_404retry(mock_get_image_from_server):
+@patch("requests.get")
+def test_get_file_404retry(mock_requests_get):
 
     iiif_url = PRE_WABO_IMG_URL_BASE
     url_info = parsing.get_url_info(iiif_url, source_file=True)
 
     metadata = ONE_PRE_WABO_METADATA_CONTENT
 
-    mock_get_image_from_server.side_effect = [
+    mock_requests_get.side_effect = [
         MockResponse(404),
         MockResponse(404),
         MockResponse(200),
     ]
 
-    fileresponse, file_url = image_server.get_file(url_info, metadata)
+    file_response, file_url = image_server.get_file(url_info, metadata)
 
-    assert fileresponse.status_code == 200
+    assert file_response.status_code == 200
     assert file_url[-17:] == "ST/15/ST_TEST.doc"
 
-    assert mock_get_image_from_server.call_count == 3
+    assert mock_requests_get.call_count == 3
