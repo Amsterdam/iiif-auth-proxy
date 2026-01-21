@@ -32,7 +32,7 @@ ONE_PRE_WABO_METADATA_CONTENT = {
 @pytest.mark.parametrize("variant_index", [0, 1, 2])
 @patch("requests.get")
 def test_timeout_on_specific_variant_then_success(mock_requests_get, variant_index):
-    """Test that timeout on one variant continues to try others"""
+    """Test that timeout on one variant continues to try the others"""
 
     def side_effect(url, *args, **kwargs):
         variants = _get_filename_variants("https://example.com/ImAgE.jpg")
@@ -54,7 +54,7 @@ def test_timeout_on_specific_variant_then_success(mock_requests_get, variant_ind
 
 @patch("requests.get")
 def test_all_variants_timeout(mock_requests_get):
-    """Test that all variants timing out raises error"""
+    """Test that all variants timing out raises an error"""
     mock_requests_get.side_effect = Timeout("Connection timeout")
 
     url_info = PRE_WABO_IMG_URL_BASE
@@ -72,7 +72,7 @@ def test_all_variants_timeout(mock_requests_get):
 
 @patch("requests.get")
 def test_all_variants_return_404(mock_requests_get):
-    """Test that all variants returning 404 raises error"""
+    """Test all variants returning 404"""
     mock_requests_get.return_value = MockResponse(status_code=404)
 
     url_info = PRE_WABO_IMG_URL_BASE
