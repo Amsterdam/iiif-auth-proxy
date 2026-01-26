@@ -16,6 +16,7 @@ packaging==25.0
     # via
     #   build
     #   pytest
+    #   wheel
 pip-tools==7.5.2
     # via -r requirements_dev.in
 pluggy==1.6.0
@@ -41,7 +42,7 @@ pytz==2025.2
     # via -r requirements_dev.in
 time-machine==3.2.0
     # via -r requirements_dev.in
-wheel==0.45.1
+wheel==0.46.2
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
