@@ -1,5 +1,3 @@
-import os
-
 from django.conf import settings
 
 EDEPOT_PREFIX = "2/edepot:"
@@ -36,22 +34,6 @@ PRE_WABO_IMG_URL_WITH_LOWERCASE_IN_DOSSIER = (
 
 WABO_IMG_URL = WABO_PREFIX + "SDZ_TA-38657~628547_0/full/1000,900/0/default.jpg"
 WABO_IMG_URL2 = WABO_PREFIX + "SDZ_TA-38657~628547_1/full/1000,900/0/default.jpg"
-
-CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-
-with open(
-    os.path.join(CURRENT_DIRECTORY, "test-images/test-image-96x85.jpg"), "rb"
-) as file:
-    IMAGE_BINARY_DATA = file.read()
-with open(
-    os.path.join(CURRENT_DIRECTORY, "test-images/test-image-50x44.jpg"), "rb"
-) as file:
-    IMAGE_BINARY_DATA_50x44 = file.read()
-with open(
-    os.path.join(CURRENT_DIRECTORY, "test-images/test-image-cropped-24x24x72x72.jpg"),
-    "rb",
-) as file:
-    IMAGE_BINARY_DATA_24x24x72x72 = file.read()
 
 DEFAULT_META_BESTAND = {
     "filename": "ST00000126.jpg",

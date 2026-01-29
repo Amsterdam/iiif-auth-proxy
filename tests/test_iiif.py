@@ -3,7 +3,6 @@ import logging
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
-import pytest
 import pytz
 import time_machine
 from django.conf import settings
@@ -23,7 +22,6 @@ from iiif.image_server import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER
 from iiif.metadata import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
 from tests.test_settings import (
     DEFAULT_META_BESTAND,
-    IMAGE_BINARY_DATA,
     PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
     PRE_WABO_IMG_URL_NO_SCALING,
     PRE_WABO_IMG_URL_SOURCE_FILE,
@@ -34,8 +32,6 @@ from tests.test_settings import (
     PRE_WABO_INFO_JSON_URL,
     PRE_WABO_METADATA_CONTENT,
     WABO_IMG_URL,
-    IMAGE_BINARY_DATA_24x24x72x72,
-    IMAGE_BINARY_DATA_50x44,
 )
 from tests.tools import MockResponse
 
@@ -61,8 +57,14 @@ class TestFileRetrievalWithAuthz:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_image_which_does_not_exist_in_metadata(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -70,7 +72,9 @@ class TestFileRetrievalWithAuthz:
                 "documenten": [],  # This is empty on purpose to test non-existing documents in metadata
             },
         )
-        mock_requests_get.return_value = MockResponse(200, content=IMAGE_BINARY_DATA)
+        mock_requests_get.return_value = MockResponse(
+            200, content=test_image_96x85_data
+        )
 
         header = {
             "HTTP_AUTHORIZATION": "Bearer "
@@ -162,13 +166,21 @@ class TestFileRetrievalWithAuthz:
 
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
-    def test_get_info_json(self, mock_do_metadata_request, mock_requests_get, client):
+    def test_get_info_json(
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
+    ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -189,8 +201,14 @@ class TestFileRetrievalWithAuthz:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_without_token(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -204,7 +222,9 @@ class TestFileRetrievalWithAuthz:
                 ],
             },
         )
-        mock_requests_get.return_value = MockResponse(200, content=IMAGE_BINARY_DATA)
+        mock_requests_get.return_value = MockResponse(
+            200, content=test_image_96x85_data
+        )
 
         response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING)
         assert response.status_code == 401
@@ -213,8 +233,14 @@ class TestFileRetrievalWithAuthz:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_without_token(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -228,7 +254,9 @@ class TestFileRetrievalWithAuthz:
                 ],
             },
         )
-        mock_requests_get.return_value = MockResponse(200, content=IMAGE_BINARY_DATA)
+        mock_requests_get.return_value = MockResponse(
+            200, content=test_image_96x85_data
+        )
 
         response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING)
         assert response.status_code == 401
@@ -237,8 +265,14 @@ class TestFileRetrievalWithAuthz:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_in_public_dossier_without_token(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -252,7 +286,9 @@ class TestFileRetrievalWithAuthz:
                 ],
             },
         )
-        mock_requests_get.return_value = MockResponse(200, content=IMAGE_BINARY_DATA)
+        mock_requests_get.return_value = MockResponse(
+            200, content=test_image_96x85_data
+        )
 
         response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING)
         assert response.status_code == 401
@@ -261,8 +297,14 @@ class TestFileRetrievalWithAuthz:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_in_restricted_dossier_without_token(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -276,7 +318,9 @@ class TestFileRetrievalWithAuthz:
                 ],
             },
         )
-        mock_requests_get.return_value = MockResponse(200, content=IMAGE_BINARY_DATA)
+        mock_requests_get.return_value = MockResponse(
+            200, content=test_image_96x85_data
+        )
 
         response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING)
         assert response.status_code == 401
@@ -285,14 +329,20 @@ class TestFileRetrievalWithAuthz:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_read_scope(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -301,20 +351,24 @@ class TestFileRetrievalWithAuthz:
         }
 
         response = client.get(self.url + PRE_WABO_IMG_URL_NO_SCALING, **header)
-        print(response)
         assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA
+        assert response.content == test_image_96x85_data
 
         response = client.get(self.url + PRE_WABO_IMG_URL_DOUBLE_DOSSIER, **header)
-        print(response)
         assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA
+        assert response.content == test_image_96x85_data
 
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_with_read_scope(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -329,7 +383,7 @@ class TestFileRetrievalWithAuthz:
             },
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -343,8 +397,14 @@ class TestFileRetrievalWithAuthz:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_extended_scope(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -359,7 +419,7 @@ class TestFileRetrievalWithAuthz:
             },
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -370,13 +430,19 @@ class TestFileRetrievalWithAuthz:
         }
         response = client.get(self.url + PRE_WABO_IMG_URL_NO_SCALING, **header)
         assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA
+        assert response.content == test_image_96x85_data
 
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_with_extended_scope(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -391,7 +457,7 @@ class TestFileRetrievalWithAuthz:
             },
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -402,13 +468,19 @@ class TestFileRetrievalWithAuthz:
         }
         response = client.get(self.url + PRE_WABO_IMG_URL_NO_SCALING, **header)
         assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA
+        assert response.content == test_image_96x85_data
 
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_dossier_and_restricted_image_with_extended_scope(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -423,7 +495,7 @@ class TestFileRetrievalWithAuthz:
             },
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -434,13 +506,19 @@ class TestFileRetrievalWithAuthz:
         }
         response = client.get(self.url + PRE_WABO_IMG_URL_NO_SCALING, **header)
         assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA
+        assert response.content == test_image_96x85_data
 
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_only_extended_scope_and_no_read_scope(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -455,7 +533,7 @@ class TestFileRetrievalWithAuthz:
             },
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -464,13 +542,19 @@ class TestFileRetrievalWithAuthz:
         }
         response = client.get(self.url + PRE_WABO_IMG_URL_NO_SCALING, **header)
         assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA
+        assert response.content == test_image_96x85_data
 
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_with_only_extended_scope_and_no_read_scope(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -485,7 +569,7 @@ class TestFileRetrievalWithAuthz:
             },
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -494,19 +578,25 @@ class TestFileRetrievalWithAuthz:
         }
         response = client.get(self.url + PRE_WABO_IMG_URL_NO_SCALING, **header)
         assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA
+        assert response.content == test_image_96x85_data
 
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_source_image(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -516,19 +606,26 @@ class TestFileRetrievalWithAuthz:
 
         response = client.get(self.url + PRE_WABO_IMG_URL_SOURCE_FILE, **header)
         assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA
+        assert response.content == test_image_96x85_data
 
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_resized_image(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+        test_image_50x44_data = test_image_data_factory("test-image-50x44.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -538,19 +635,25 @@ class TestFileRetrievalWithAuthz:
 
         response = client.get(self.url + PRE_WABO_IMG_URL_WITH_SCALING, **header)
         assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA_50x44
+        assert response.content == test_image_50x44_data
 
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_resized_image_without_scaling_param_raises(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -564,14 +667,23 @@ class TestFileRetrievalWithAuthz:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_cropped_image(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+        test_image_cropped_24x24x72x72_data = test_image_data_factory(
+            "test-image-cropped-24x24x72x72.jpg"
+        )
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -581,19 +693,25 @@ class TestFileRetrievalWithAuthz:
 
         response = client.get(self.url + PRE_WABO_IMG_URL_WITH_REGION, **header)
         assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA_24x24x72x72
+        assert response.content == test_image_cropped_24x24x72x72_data
 
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_cropped_image_outside_image_region_returns_400(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content=PRE_WABO_METADATA_CONTENT,
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         header = {
@@ -609,8 +727,14 @@ class TestFileRetrievalWithAuthz:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_file_not_on_server(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content=PRE_WABO_METADATA_CONTENT,
@@ -721,8 +845,14 @@ class TestFileRetrievalWithMailJWT:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_read_scope(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -766,7 +896,7 @@ class TestFileRetrievalWithMailJWT:
             },
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         response = client.get(
@@ -776,7 +906,7 @@ class TestFileRetrievalWithMailJWT:
             + self.mail_login_token
         )
         assert response.status_code == 200
-        assert response.content == IMAGE_BINARY_DATA
+        assert response.content == test_image_96x85_data
 
         response = client.get(
             self.file_url
@@ -790,8 +920,14 @@ class TestFileRetrievalWithMailJWT:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_with_read_scope(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -802,7 +938,7 @@ class TestFileRetrievalWithMailJWT:
             },
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         response = client.get(
@@ -817,8 +953,14 @@ class TestFileRetrievalWithMailJWT:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_expired_token(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -831,7 +973,7 @@ class TestFileRetrievalWithMailJWT:
             },
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         # Time travel to two days ago so that the jwt token will be invalid
@@ -848,8 +990,14 @@ class TestFileRetrievalWithMailJWT:
     @patch("requests.get")
     @patch("iiif.metadata.do_metadata_request")
     def test_get_public_image_with_invalid_token_signature(
-        self, mock_do_metadata_request, mock_requests_get, client
+        self,
+        mock_do_metadata_request,
+        mock_requests_get,
+        client,
+        test_image_data_factory,
     ):
+        test_image_96x85_data = test_image_data_factory("test-image-96x85.jpg")
+
         mock_do_metadata_request.return_value = MockResponse(
             200,
             json_content={
@@ -862,7 +1010,7 @@ class TestFileRetrievalWithMailJWT:
             },
         )
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/jpeg"}
+            200, content=test_image_96x85_data, headers={"Content-Type": "image/jpeg"}
         )
 
         mail_login_token = create_mail_login_token(

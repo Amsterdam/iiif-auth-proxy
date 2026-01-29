@@ -118,7 +118,6 @@ class TestUtils:
 
     def test_get_info_from_pre_wabo_url_with_no_scaling(self):
         url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_NO_SCALING, True)
-        print(PRE_WABO_IMG_URL_NO_SCALING)
         assert url_info["source"] == "edepot"
         assert url_info["stadsdeel"] == "ST"
         assert url_info["dossier"] == "00015"

@@ -1,10 +1,8 @@
 import json
-import logging
 import os
 from unittest.mock import ANY, patch
 
 import pytest
-import pytz
 from azure.core.exceptions import ResourceNotFoundError
 from django.conf import settings
 
@@ -16,21 +14,15 @@ from auth_mail.authentication import (
 )
 from auth_mail.generate_token import create_authz_token
 from tests.test_settings import (
-    IMAGE_BINARY_DATA,
     PRE_WABO_IMG_URL_BASE,
     PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
     PRE_WABO_IMG_URL_WITH_SCALING,
     WABO_IMG_URL,
 )
-from tests.test_utils_azure import create_blob_container, create_queue
 from tests.tools import MockResponse
-from utils.queue import get_queue_client
 from utils.storage import get_blob_from_storage_account
 from zip_consumer.queue_zip_consumer import AzureZipQueueConsumer
 from zip_consumer.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER
-
-log = logging.getLogger(__name__)
-timezone = pytz.timezone("UTC")
 
 
 @pytest.mark.django_db
@@ -47,16 +39,8 @@ class TestZipEndpoint:
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE]
         )
 
-        create_blob_container(settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME)
-        create_blob_container(settings.STORAGE_ACCOUNT_CONTAINER_NAME)
-        create_queue()
-        self.queue_client = get_queue_client()
-        # Clear the queue to start with a clean slate
-        for message in self.queue_client.receive_messages(max_messages=100):
-            self.queue_client.delete_message(message)
-
-    def get_all_queue_messages(self):
-        return [m for m in self.queue_client.receive_messages(max_messages=10000)]
+    def get_all_queue_messages(self, queue_client):
+        return [m for m in queue_client.receive_messages(max_messages=10000)]
 
     def get_zip_job(self, blob_name):
         _, blob = get_blob_from_storage_account(
@@ -65,7 +49,9 @@ class TestZipEndpoint:
         return json.loads(blob)
 
     @patch("iiif.metadata.do_metadata_request")
-    def test_get_public_image_with_jwt_token(self, mock_do_metadata_request, client):
+    def test_get_public_image_with_jwt_token(
+        self, mock_do_metadata_request, client, test_queue_client
+    ):
         # Set up mock metadata response
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -124,7 +110,7 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 200
-        messages = self.get_all_queue_messages()
+        messages = self.get_all_queue_messages(test_queue_client)
         assert len(messages) == 1
 
         job_name = json.loads(messages[0].content)["data"]
@@ -133,7 +119,9 @@ class TestZipEndpoint:
         assert len(data["urls"]) == 3
 
     @patch("iiif.metadata.do_metadata_request")
-    def test_get_many_public_images(self, mock_do_metadata_request, client):
+    def test_get_many_public_images(
+        self, mock_do_metadata_request, client, test_queue_client
+    ):
         num_dossiers = 1000
         # Set up mock metadata response
         mock_do_metadata_request.return_value = MockResponse(
@@ -162,7 +150,7 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 200
-        messages = self.get_all_queue_messages()
+        messages = self.get_all_queue_messages(test_queue_client)
         assert len(messages) == 1
 
         job_name = json.loads(messages[0].content)["data"]
@@ -171,7 +159,9 @@ class TestZipEndpoint:
         assert len(data["urls"]) == num_dossiers
 
     @patch("iiif.metadata.do_metadata_request")
-    def test_get_public_image_with_authz_token(self, mock_do_metadata_request, client):
+    def test_get_public_image_with_authz_token(
+        self, mock_do_metadata_request, client, test_queue_client
+    ):
         # Set up mock metadata response
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -206,7 +196,7 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 200
-        messages = self.get_all_queue_messages()
+        messages = self.get_all_queue_messages(test_queue_client)
         assert len(messages) == 1
 
         job_name = json.loads(messages[0].content)["data"]
@@ -272,7 +262,7 @@ class TestZipEndpoint:
 
         assert response.status_code == 400
 
-    def test_get_wabo_image_with_mail_login_fails(self, client):
+    def test_get_wabo_image_with_mail_login_fails(self, client, test_queue_client):
         # Request two images of which one is a WABO image
         response = client.post(
             self.url + "?auth=" + self.mail_login_token,
@@ -291,11 +281,11 @@ class TestZipEndpoint:
         assert (
             response.content.decode("utf-8") == RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN
         )
-        assert len(self.get_all_queue_messages()) == 0
+        assert len(self.get_all_queue_messages(test_queue_client)) == 0
 
     @patch("iiif.metadata.do_metadata_request")
     def test_request_restricted_image_with_read_scope_succeeds(
-        self, mock_do_metadata_request, client
+        self, mock_do_metadata_request, client, test_queue_client
     ):
         """
         It is possible to request a restricted image with a read scope, but it should fail
@@ -330,11 +320,11 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 200
-        assert len(self.get_all_queue_messages()) == 1
+        assert len(self.get_all_queue_messages(test_queue_client)) == 1
 
     @patch("iiif.metadata.do_metadata_request")
     def test_get_restricted_image_with_restricted_scope_succeeds(
-        self, mock_do_metadata_request, client
+        self, mock_do_metadata_request, client, test_queue_client
     ):
         """
         Because we send the link to the zip file with sendgrid, we cannot send links to
@@ -382,7 +372,7 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 200
-        assert len(self.get_all_queue_messages()) == 1
+        assert len(self.get_all_queue_messages(test_queue_client)) == 1
 
     @patch("zip_consumer.queue_zip_consumer.create_storage_account_temp_url")
     @patch("requests.get")
@@ -424,6 +414,8 @@ class TestZipEndpoint:
         expected_line_end,
         expected_files,
         client,
+        test_image_data_factory,
+        test_queue_client,
     ):
         # Setting up mocks
         mock_cleanup_local_files.return_value = None
@@ -469,8 +461,10 @@ class TestZipEndpoint:
                 ],
             },
         )
+
+        test_image_data = test_image_data_factory("test-image-96x85.jpg")
         mock_requests_get.return_value = MockResponse(
-            200, content=IMAGE_BINARY_DATA, headers={"Content-Type": "image/png"}
+            200, content=test_image_data, headers={"Content-Type": "image/png"}
         )
         mock_create_storage_account_temp_url.return_value = "https://azure.com/tempurl"
 
@@ -492,7 +486,7 @@ class TestZipEndpoint:
 
         assert response.status_code == 200
 
-        messages = [m for m in self.queue_client.peek_messages()]
+        messages = [m for m in test_queue_client.peek_messages()]
         assert len(messages) == 1
         job_name = json.loads(messages[0].content)["data"]
 
@@ -501,7 +495,7 @@ class TestZipEndpoint:
         consumer.run()
 
         # Test whether the records that were in the queue are correctly removed
-        assert len(self.get_all_queue_messages()) == 0
+        assert len(self.get_all_queue_messages(test_queue_client)) == 0
 
         # Check whether the newly created zip file exists
         tmp_contents = sorted(
@@ -522,7 +516,7 @@ class TestZipEndpoint:
         ) as f:
             assert f.readlines()[-1].endswith(expected_line_end + "\n")
 
-        # Check whether an email was send
+        # Check whether an email was sent
         mock_send_email.method_called_with("zip@amsterdam.nl", ANY, ANY)
 
         # Check whether the zip job blob was removed
