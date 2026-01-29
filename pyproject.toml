@@ -16,6 +16,13 @@ omit = [
     "*/apps.py",
     "/app/src/manage.py",
     "/app/src/main/wsgi.py",
+    "/app/src/main/*settings.py",
     "*/migrations/*",
     "*/factories.py"
 ]
+
+[tool.coverage.report]
+fail_under = 84
+skip_covered = true
+show_missing = true
+sort = "Cover"
