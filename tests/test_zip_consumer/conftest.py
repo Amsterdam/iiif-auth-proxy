@@ -1,7 +1,10 @@
 from contextlib import contextmanager
+from datetime import datetime, timezone
+from unittest.mock import patch
 
 import pytest
 from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError
+from azure.storage.queue import QueueMessage
 from django.conf import settings
 
 from utils.queue import get_queue_client
@@ -58,3 +61,39 @@ def test_queue_client():
         queue_client.delete_queue()
     except ResourceNotFoundError:
         pass
+
+
+@pytest.fixture
+def azure_queue_message_factory():
+    def _create_message(
+        content: str = "test message content",
+        dequeue_count: int = 1,
+        message_id: str = "test-message-id",
+        pop_receipt: str = "test-pop-receipt",
+        inserted_on: datetime = None,
+        expires_on: datetime = None,
+        next_visible_on: datetime = None,
+    ):
+        message = QueueMessage(
+            content=content,
+            id=message_id,
+            dequeue_count=dequeue_count,
+            pop_receipt=pop_receipt,
+            inserted_on=inserted_on or datetime.now(timezone.utc),
+            expires_on=expires_on,
+            next_visible_on=next_visible_on,
+        )
+        return message
+
+    return _create_message
+
+
+@pytest.fixture(autouse=True)
+def mocked_create_storage_account_temp_url():
+    with patch(
+        "zip_consumer.queue_zip_consumer.create_storage_account_temp_url"
+    ) as mock:
+        mock.return_value = (
+            "http://localhost:10000/devstoreaccount1/container/blob?mock_sas_token"
+        )
+        yield mock
