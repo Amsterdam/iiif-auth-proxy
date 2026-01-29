@@ -149,6 +149,9 @@ services:
       DJANGO_SETTINGS_MODULE: "main.settings"
       USE_JWKS_TEST_KEY: "true"
       OTEL_SDK_DISABLED: true
+      EMAIL_HOST_USER: "test"
+      EMAIL_HOST_PASSWORD: "insecure"
+      EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
 
   linting:
     container_name: iiif-auth-proxy-linting

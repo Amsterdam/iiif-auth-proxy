@@ -86,6 +86,9 @@ if str_to_bool(os.getenv("ALLOW_LOCALHOST_LOGIN_URL", "false")):
     LOGIN_ORIGIN_URL_TLD_WHITELIST += ["localhost", "127.0.0.1"]
 
 # SMTP email settings using Secure Mail Relay
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
+)
 EMAIL_HOST = os.getenv("EMAIL_HOST", "localhost")
 EMAIL_PORT = os.getenv("EMAIL_PORT", "587")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
