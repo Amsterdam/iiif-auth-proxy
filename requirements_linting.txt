@@ -6,7 +6,7 @@
 #
 autoflake==2.3.1
     # via -r requirements_linting.in
-black==25.12.0
+black==26.1.0
     # via -r requirements_linting.in
 click==8.3.1
     # via black
@@ -14,13 +14,13 @@ isort==7.0.0
     # via -r requirements_linting.in
 mypy-extensions==1.1.0
     # via black
-packaging==25.0
+packaging==26.0
     # via black
-pathspec==0.12.1
+pathspec==1.0.4
     # via black
 platformdirs==4.5.1
     # via black
 pyflakes==3.4.0
     # via autoflake
-pytokens==0.3.0
+pytokens==0.4.1
     # via black
