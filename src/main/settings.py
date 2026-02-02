@@ -141,6 +141,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
 ]
 LOCAL_APPS = [
+    "core",
     "iiif",
     "health",
     "zip_consumer",

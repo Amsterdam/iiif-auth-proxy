@@ -11,7 +11,8 @@ import pytest
 import pytz
 from django.conf import settings
 
-from auth_mail.authentication import create_mail_login_token, img_is_public_copyright
+from core.auth.document_access import img_is_public_copyright
+from core.auth.jwt_tokens import create_mail_login_token
 from iiif.image_server import create_file_url_and_headers, create_url, get_filename
 from iiif.parsing import InvalidIIIFUrlError, get_email_address, get_info_from_iiif_url
 from main.utils import ImmediateHttpResponse

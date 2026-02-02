@@ -9,12 +9,11 @@ import pytest
 from django.conf import settings
 from django.core import mail
 
-from auth_mail.generate_token import create_authz_token
 from tests.test_settings import (
     PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
     PRE_WABO_IMG_URL_WITH_SCALING,
 )
-from tests.tools import MockResponse
+from tests.tools import MockResponse, create_authz_token
 from zip_consumer.queue_zip_consumer import AzureZipQueueConsumer
 
 

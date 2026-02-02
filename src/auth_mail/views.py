@@ -6,7 +6,8 @@ from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 from django_ratelimit.decorators import ratelimit
 
-from auth_mail import authentication, mailing
+from auth_mail import mailing
+from core.auth.jwt_tokens import create_mail_login_token
 from iiif import parsing
 from main import utils
 
@@ -27,7 +28,7 @@ def send_dataportaal_login_url_to_mail(request):
         parsing.check_email_validity(email)
 
         # Create the login url
-        token = authentication.create_mail_login_token(email, settings.JWT_SECRET_KEY)
+        token = create_mail_login_token(email, settings.JWT_SECRET_KEY)
         login_url = origin_url + "?auth=" + token
 
         # Send the email
