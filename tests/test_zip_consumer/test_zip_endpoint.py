@@ -366,8 +366,8 @@ class TestZipEndpoint:
             (
                 settings.BOUWDOSSIER_EXTENDED_SCOPE,
                 settings.ACCESS_RESTRICTED,
-                f"Not included in this zip because {RESPONSE_CONTENT_RESTRICTED_IN_ZIP}",
-                2,  # The first file and the report.txt
+                f"included",
+                3,  # Both files and the report.txt
             ),
             (
                 settings.BOUWDOSSIER_READ_SCOPE,
