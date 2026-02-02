@@ -7,7 +7,11 @@ import timeout_decorator
 from django.conf import settings
 from django.template.loader import render_to_string
 
-from auth_mail import authentication, mailing
+from auth_mail import mailing
+from core.auth.document_access import (
+    check_file_access_in_metadata,
+    check_restricted_file,
+)
 from iiif import image_server
 from iiif.metadata import get_metadata
 from main import utils
@@ -114,8 +118,10 @@ class AzureZipQueueConsumer:
                 metadata_cache,
             )
             try:
-                authentication.check_file_access_in_metadata(metadata, image_info["url_info"], record["scope"])
-                authentication.check_restricted_file(metadata, image_info["url_info"])
+                check_file_access_in_metadata(
+                    metadata, image_info["url_info"], record["scope"]
+                )
+                check_restricted_file(metadata, image_info["url_info"])
             except utils.ImmediateHttpResponse as e:
                 fail_reason = e.response.content.decode("utf-8")
 

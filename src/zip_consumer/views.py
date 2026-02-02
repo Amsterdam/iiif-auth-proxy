@@ -6,7 +6,11 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from auth_mail import authentication
+from core.auth.jwt_tokens import check_auth_availability, read_out_mail_jwt_token
+from core.auth.permissions import (
+    check_wabo_for_mail_login,
+    get_user_scope,
+)
 from iiif import parsing
 from main import utils
 from utils.storage import store_blob_on_storage_account
@@ -19,9 +23,9 @@ log = logging.getLogger(__name__)
 def request_multiple_files_in_zip(request):
     try:
         parsing.check_for_post(request)
-        authentication.check_auth_availability(request)
-        read_jwt_token, is_mail_login = authentication.read_out_mail_jwt_token(request)
-        scope = authentication.get_user_scope(request, read_jwt_token)
+        check_auth_availability(request)
+        read_jwt_token, is_mail_login = read_out_mail_jwt_token(request)
+        scope = get_user_scope(request, read_jwt_token)
         email_address = parsing.get_email_address(request, read_jwt_token)
         payload = parsing.parse_payload(request)
         parsing.check_zip_payload(payload)
@@ -40,7 +44,7 @@ def request_multiple_files_in_zip(request):
         try:
             iiif_url = parsing.strip_full_iiif_url(full_url)
             url_info = parsing.get_url_info(iiif_url, True)
-            authentication.check_wabo_for_mail_login(is_mail_login, url_info)
+            check_wabo_for_mail_login(is_mail_login, url_info)
 
             # We create a new dict with all the info so that we have it when we want to get and zip the files later
             zip_info["urls"][iiif_url] = {"url_info": url_info}
