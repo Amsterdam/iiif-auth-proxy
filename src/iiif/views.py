@@ -6,7 +6,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.vary import vary_on_headers
 from toolz import partial, pipe
 
-from auth_mail import authentication
+from core.auth.document_access import (
+    check_file_access_in_metadata,
+    is_caching_allowed,
+)
+from core.auth.jwt_tokens import check_auth_availability, read_out_mail_jwt_token
+from core.auth.permissions import (
+    check_wabo_for_mail_login,
+    get_user_scope,
+)
 from iiif import image_server, parsing
 from iiif.image_handling import (
     crop_image,
@@ -34,18 +42,18 @@ def add_caching_headers(is_cacheable, response):
 @vary_on_headers("Authorization")
 def index(request, iiif_url):
     try:
-        authentication.check_auth_availability(request)
-        mail_jwt_token, is_mail_login = authentication.read_out_mail_jwt_token(request)
-        user_scope = authentication.get_user_scope(request, mail_jwt_token)
+        check_auth_availability(request)
+        mail_jwt_token, is_mail_login = read_out_mail_jwt_token(request)
+        user_scope = get_user_scope(request, mail_jwt_token)
 
         is_source_file_requested = utils.str_to_bool(request.GET.get("source_file"))
         url_info = parsing.get_url_info(iiif_url, is_source_file_requested)
 
-        authentication.check_wabo_for_mail_login(is_mail_login, url_info)
+        check_wabo_for_mail_login(is_mail_login, url_info)
         metadata, _ = get_metadata(url_info, iiif_url, {})
 
-        authentication.check_file_access_in_metadata(metadata, url_info, user_scope)
-        is_cacheable = authentication.is_caching_allowed(metadata, url_info)
+        check_file_access_in_metadata(metadata, url_info, user_scope)
+        is_cacheable = is_caching_allowed(metadata, url_info)
 
         file_response, file_url = image_server.get_file(url_info, metadata)
         image_server.handle_file_response_codes(file_response, file_url)
