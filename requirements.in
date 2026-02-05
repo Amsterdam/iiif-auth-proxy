@@ -20,10 +20,10 @@ uwsgi
 # Azure
 azure-core
 azure-identity==1.16  # 1.15 leads to incompatible version dependencies right now
-azure-storage-blob
+azure-storage-blob==12.27.1
 azure-keyvault
 azure-keyvault-secrets
-azure-storage-queue
+azure-storage-queue==12.14.1
 
 # OTEL
 opentelemetry-exporter-otlp-proto-grpc
