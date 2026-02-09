@@ -6,7 +6,6 @@ from core.auth.constants import (
     RESPONSE_CONTENT_INVALID_SCOPE,
     RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
     RESPONSE_CONTENT_RESTRICTED,
-    RESPONSE_CONTENT_RESTRICTED_IN_ZIP,
 )
 from core.auth.exceptions import DocumentNotFoundInMetadataError
 from main.utils import ImmediateHttpResponse
