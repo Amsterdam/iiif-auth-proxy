@@ -5,6 +5,7 @@ import uuid
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 from core.auth.jwt_tokens import check_auth_availability, read_out_mail_jwt_token
 from core.auth.permissions import (
@@ -19,10 +20,10 @@ from zip_consumer import zip_tools
 log = logging.getLogger(__name__)
 
 
+@require_POST
 @csrf_exempt
 def request_multiple_files_in_zip(request):
     try:
-        parsing.check_for_post(request)
         check_auth_availability(request)
         read_jwt_token, is_mail_login = read_out_mail_jwt_token(request)
         scope = get_user_scope(request, read_jwt_token)
