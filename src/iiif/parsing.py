@@ -4,7 +4,7 @@ import re
 import urllib
 
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseNotAllowed
+from django.http import HttpResponse
 
 from main.utils import ImmediateHttpResponse
 
@@ -13,11 +13,6 @@ log = logging.getLogger(__name__)
 
 class InvalidIIIFUrlError(Exception):
     pass
-
-
-def check_for_post(request):
-    if request.method != "POST":
-        raise ImmediateHttpResponse(response=HttpResponseNotAllowed(["POST"]))
 
 
 def get_info_from_iiif_url(iiif_url, source_file):
