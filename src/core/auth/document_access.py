@@ -67,14 +67,6 @@ def is_caching_allowed(metadata, url_info):
     return is_public and not has_copyright
 
 
-def check_restricted_file(metadata, url_info):
-    is_public, _ = img_is_public_copyright(metadata, url_info["document_barcode"])
-    if not is_public:
-        raise ImmediateHttpResponse(
-            response=HttpResponse(RESPONSE_CONTENT_RESTRICTED_IN_ZIP, status=400)
-        )
-
-
 def img_is_public_copyright(metadata, document_barcode):
     """
     Return whether document is public and has copyright.
