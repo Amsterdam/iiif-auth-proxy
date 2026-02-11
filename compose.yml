@@ -152,6 +152,8 @@ services:
       EMAIL_HOST_USER: "test"
       EMAIL_HOST_PASSWORD: "insecure"
       EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
+      COVERAGE_FILE: /tmp/.coverage
+    user: 1000:1000
 
   linting:
     container_name: iiif-auth-proxy-linting
