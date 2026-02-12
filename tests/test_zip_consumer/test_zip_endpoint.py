@@ -9,7 +9,6 @@ from django.conf import settings
 from core.auth.constants import (
     RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN,
     RESPONSE_CONTENT_RESTRICTED,
-    RESPONSE_CONTENT_RESTRICTED_IN_ZIP,
 )
 from core.auth.jwt_tokens import create_mail_login_token
 from tests.test_settings import (
@@ -366,7 +365,7 @@ class TestZipEndpoint:
             (
                 settings.BOUWDOSSIER_EXTENDED_SCOPE,
                 settings.ACCESS_RESTRICTED,
-                f"included",
+                "included",
                 3,  # Both files and the report.txt
             ),
             (

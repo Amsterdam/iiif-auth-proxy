@@ -110,17 +110,13 @@ def test_request_restricted_aanvraag_in_zip(
         "data": "zip_job_blob_data",
     }
     message = azure_queue_message_factory(content=json.dumps(message_content))
-    zip_jobs_blob_container.upload_blob(
-        name="zip_job_blob_data", data=json.dumps(zip_job_blob_data)
-    )
+    zip_jobs_blob_container.upload_blob(name="zip_job_blob_data", data=json.dumps(zip_job_blob_data))
 
     mock_do_metadata_request.return_value = restricted_meta_data_mock_response
 
     image_url = "2/edepot:ST_00015~ST00000126_0"
     test_image_data = test_image_data_factory("test-image-96x85.jpg")
-    mocked_file_response = MockResponse(
-        status_code=200, content=test_image_data, headers={"Content-Type": "image/jpg"}
-    )
+    mocked_file_response = MockResponse(status_code=200, content=test_image_data, headers={"Content-Type": "image/jpg"})
     mocked_get_file.return_value = mocked_file_response, image_url
 
     zip_queue_consumer = AzureZipQueueConsumer()
@@ -132,14 +128,8 @@ def test_request_restricted_aanvraag_in_zip(
     assert email.subject == "Downloadlink Bouw- en omgevingdossiers"
     assert email.from_email == "bouwdossiers@amsterdam.nl"
     assert email.to == ["authztest@amsterdam.nl"]
-    assert (
-        "U kunt de aangevraagde documenten downloaden gedurende 7 dagen via deze link"
-        in email.body
-    )
-    assert (
-        "http://localhost:10000/devstoreaccount1/container/blob?mock_sas_token"
-        in email.body
-    )
+    assert "U kunt de aangevraagde documenten downloaden gedurende 7 dagen via deze link" in email.body
+    assert "http://localhost:10000/devstoreaccount1/container/blob?mock_sas_token" in email.body
 
     blob_data = download_blob_container.download_blob(f"{fixed_uuid}.zip")
     zip_bytes = blob_data.readall()
@@ -155,17 +145,14 @@ def test_request_restricted_aanvraag_in_zip(
 
     assert len(lines) == 3
     assert lines[0].strip() == "The following files were requested:"
-    assert (
-        lines[1].strip()
-        == f"test.jpg: Not included in this zip because {RESPONSE_CONTENT_RESTRICTED}"
-    )
+    assert lines[1].strip() == f"test.jpg: Not included in this zip because {RESPONSE_CONTENT_RESTRICTED}"
     assert lines[2].strip() == "test-public.jpg: included"
 
     extracted_files = list((tmp_path / f"{fixed_uuid}").iterdir())
     assert len(extracted_files) == 2
 
     image_file = tmp_path / f"{fixed_uuid}" / "test.jpg"
-    assert image_file.exists() == False
+    assert image_file.exists() is False
 
     image_file = tmp_path / f"{fixed_uuid}" / "test-public.jpg"
     assert image_file.exists()

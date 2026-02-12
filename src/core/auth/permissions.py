@@ -20,10 +20,7 @@ def get_user_scope(request, mail_jwt_token):
     mail_jwt_scopes = set(mail_jwt_token.get("scopes", []))
     user_scopes = request_token_scopes | mail_jwt_scopes
 
-    if (
-        settings.DATAPUNT_AUTHZ["ALWAYS_OK"]
-        or settings.BOUWDOSSIER_EXTENDED_SCOPE in user_scopes
-    ):
+    if settings.DATAPUNT_AUTHZ["ALWAYS_OK"] or settings.BOUWDOSSIER_EXTENDED_SCOPE in user_scopes:
         return settings.BOUWDOSSIER_EXTENDED_SCOPE
 
     if settings.BOUWDOSSIER_READ_SCOPE in user_scopes:
@@ -32,9 +29,7 @@ def get_user_scope(request, mail_jwt_token):
     if settings.BOUWDOSSIER_PUBLIC_SCOPE in mail_jwt_scopes:
         return settings.BOUWDOSSIER_PUBLIC_SCOPE
 
-    raise ImmediateHttpResponse(
-        response=HttpResponse(RESPONSE_CONTENT_INVALID_SCOPE, status=401)
-    )
+    raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_INVALID_SCOPE, status=401))
 
 
 def check_wabo_for_mail_login(is_mail_login, url_info):
@@ -43,6 +38,4 @@ def check_wabo_for_mail_login(is_mail_login, url_info):
     """
     # TODO: replace this with a more sane check in which people who request mail login get a different scope
     if is_mail_login and url_info["source"] == "wabo":
-        raise ImmediateHttpResponse(
-            response=HttpResponse(RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN, status=401)
-        )
+        raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN, status=401))

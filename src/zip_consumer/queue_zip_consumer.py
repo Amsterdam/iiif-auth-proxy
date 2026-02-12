@@ -115,9 +115,7 @@ class AzureZipQueueConsumer:
                 metadata_cache,
             )
 
-            can_be_zipped, fail_reason = file_can_be_zipped(
-                metadata, image_info["url_info"], record["scope"]
-            )
+            can_be_zipped, fail_reason = file_can_be_zipped(metadata, image_info["url_info"], record["scope"])
 
             info_txt_contents = image_server.download_file_for_zip(
                 iiif_url,

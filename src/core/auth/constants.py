@@ -1,8 +1,6 @@
 RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA = "Document not found in metadata"
 RESPONSE_CONTENT_INVALID_SCOPE = "Invalid scope"
-RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN = (
-    "WABO dossiers cannot be retrieved using the mail login access."
-)
+RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN = "WABO dossiers cannot be retrieved using the mail login access."
 RESPONSE_CONTENT_RESTRICTED = "Document access is restricted"
 RESPONSE_CONTENT_NO_TOKEN = "No token supplied"
 RESPONSE_CONTENT_COPYRIGHT = "Document has copyright restriction"
