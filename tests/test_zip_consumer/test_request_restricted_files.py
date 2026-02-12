@@ -135,9 +135,7 @@ def test_request_restricted_images(
     assert response.status_code == expected_status_code
 
     queue_messages = list(test_queue_client.receive_messages(max_messages=2))
-    assert (
-        len(queue_messages) == messages_on_queue
-    ), f"Expected {messages_on_queue} message(s) in the queue"
+    assert len(queue_messages) == messages_on_queue, f"Expected {messages_on_queue} message(s) in the queue"
 
 
 @patch("iiif.metadata.do_metadata_request")
@@ -163,17 +161,13 @@ def test_request_restricted_images_in_zip(
         "data": "zip_job_blob_data",
     }
     message = azure_queue_message_factory(content=json.dumps(message_content))
-    zip_jobs_blob_container.upload_blob(
-        name="zip_job_blob_data", data=json.dumps(zip_job_blob_data)
-    )
+    zip_jobs_blob_container.upload_blob(name="zip_job_blob_data", data=json.dumps(zip_job_blob_data))
 
     mock_do_metadata_request.return_value = restricted_meta_data_mock_response
 
     image_url = "2/edepot:ST_00015~ST00000126_0"
     test_image_data = test_image_data_factory("test-image-96x85.jpg")
-    mocked_file_response = MockResponse(
-        status_code=200, content=test_image_data, headers={"Content-Type": "image/jpg"}
-    )
+    mocked_file_response = MockResponse(status_code=200, content=test_image_data, headers={"Content-Type": "image/jpg"})
     mocked_get_file.return_value = mocked_file_response, image_url
 
     zip_queue_consumer = AzureZipQueueConsumer()
@@ -185,14 +179,8 @@ def test_request_restricted_images_in_zip(
     assert email.subject == "Downloadlink Bouw- en omgevingdossiers"
     assert email.from_email == "bouwdossiers@amsterdam.nl"
     assert email.to == ["authztest@amsterdam.nl"]
-    assert (
-        "U kunt de aangevraagde documenten downloaden gedurende 7 dagen via deze link"
-        in email.body
-    )
-    assert (
-        "http://localhost:10000/devstoreaccount1/container/blob?mock_sas_token"
-        in email.body
-    )
+    assert "U kunt de aangevraagde documenten downloaden gedurende 7 dagen via deze link" in email.body
+    assert "http://localhost:10000/devstoreaccount1/container/blob?mock_sas_token" in email.body
 
     blob_data = download_blob_container.download_blob(f"{fixed_uuid}.zip")
     zip_bytes = blob_data.readall()

@@ -18,9 +18,7 @@ def check_auth_availability(request):
         and not request.GET.get("auth")
         and not settings.DATAPUNT_AUTHZ["ALWAYS_OK"]
     ):
-        raise ImmediateHttpResponse(
-            response=HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
-        )
+        raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401))
 
 
 def read_out_mail_jwt_token(request):
@@ -30,9 +28,7 @@ def read_out_mail_jwt_token(request):
         if not request.GET.get("auth"):
             if settings.DATAPUNT_AUTHZ["ALWAYS_OK"]:
                 return jwt_token, is_mail_login
-            raise ImmediateHttpResponse(
-                response=HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401)
-            )
+            raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_NO_TOKEN, status=401))
         try:
             jwt_token = jwt.decode(
                 request.GET.get("auth"),
@@ -46,23 +42,13 @@ def read_out_mail_jwt_token(request):
                     settings.BOUWDOSSIER_READ_SCOPE,
                     settings.BOUWDOSSIER_EXTENDED_SCOPE,
                 ):
-                    raise ImmediateHttpResponse(
-                        response=HttpResponse(
-                            RESPONSE_CONTENT_INVALID_SCOPE, status=401
-                        )
-                    )
+                    raise ImmediateHttpResponse(response=HttpResponse(RESPONSE_CONTENT_INVALID_SCOPE, status=401))
         except ExpiredSignatureError as e:
-            raise ImmediateHttpResponse(
-                response=HttpResponse("Expired JWT token signature", status=401)
-            ) from e
+            raise ImmediateHttpResponse(response=HttpResponse("Expired JWT token signature", status=401)) from e
         except InvalidSignatureError as e:
-            raise ImmediateHttpResponse(
-                response=HttpResponse("Invalid JWT token signature", status=401)
-            ) from e
+            raise ImmediateHttpResponse(response=HttpResponse("Invalid JWT token signature", status=401)) from e
         except DecodeError as e:
-            raise ImmediateHttpResponse(
-                response=HttpResponse("Invalid JWT token", status=401)
-            ) from e
+            raise ImmediateHttpResponse(response=HttpResponse("Invalid JWT token", status=401)) from e
 
         is_mail_login = True
 
