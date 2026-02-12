@@ -74,9 +74,7 @@ def test_get_image_fails(mock_requests_get, http_status_code):
 def test_get_image_200(mock_requests_get, test_image_data_factory):
     test_image_data = test_image_data_factory("test-image-96x85.jpg")
 
-    mock_requests_get.return_value = MockResponse(
-        200, content=test_image_data, headers={"Content-Type": "image/png"}
-    )
+    mock_requests_get.return_value = MockResponse(200, content=test_image_data, headers={"Content-Type": "image/png"})
     tmp_folder_path = "/tmp/bouwdossier-zips/"
     info_txt_contents = ""
 

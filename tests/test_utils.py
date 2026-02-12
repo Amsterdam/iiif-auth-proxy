@@ -91,9 +91,7 @@ class TestUtils:
 
     def test_get_info_json_from_pre_wabo_url_with_lowercase_in_dossier(self):
         """ "SQ_26614abc~sq10241283_1/full/full/0/default.jpg"""
-        url_info = get_info_from_iiif_url(
-            PRE_WABO_IMG_URL_WITH_LOWERCASE_IN_DOSSIER, False
-        )
+        url_info = get_info_from_iiif_url(PRE_WABO_IMG_URL_WITH_LOWERCASE_IN_DOSSIER, False)
         assert url_info["source"] == "edepot"
         assert url_info["stadsdeel"] == "SQ"
         assert url_info["dossier"] == "26614abc"
@@ -156,13 +154,9 @@ class TestUtils:
         assert url_info["formatting"] == "full/1000,900/0/default.jpg"
         assert url_info["info_json"] is False
 
-    @pytest.mark.xfail(
-        reason="WABO dossiers barcodes don't have underscores see metadata-server batch.py"
-    )
+    @pytest.mark.xfail(reason="WABO dossiers barcodes don't have underscores see metadata-server batch.py")
     def test_get_info_from_wabo_url_with_underscores_in_barcode(self):
-        url_info = get_info_from_iiif_url(
-            "2/wabo:SDO_T-10316333~ECS0000004420_000_000/info.json", False
-        )
+        url_info = get_info_from_iiif_url("2/wabo:SDO_T-10316333~ECS0000004420_000_000/info.json", False)
         assert url_info["source"] == "wabo"
         assert url_info["stadsdeel"] == "SDO"
         assert url_info["dossier"] == "T-10316333"
@@ -173,9 +167,7 @@ class TestUtils:
         assert url_info["info_json"] is True
 
     def test_get_info_from_wabo_url_with_hyphens_in_barcode(self):
-        url_info = get_info_from_iiif_url(
-            "2/wabo:SDO_10316333~ECS0000004420-000-00-00_2/info.json", False
-        )
+        url_info = get_info_from_iiif_url("2/wabo:SDO_10316333~ECS0000004420-000-00-00_2/info.json", False)
         assert url_info["source"] == "wabo"
         assert url_info["stadsdeel"] == "SDO"
         assert url_info["dossier"] == "10316333"
@@ -345,9 +337,7 @@ class TestUtils:
 
     def test_get_authentication_jwt(self):
         token = create_mail_login_token("jwttest@amsterdam.nl", settings.SECRET_KEY)
-        decoded = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
+        decoded = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         assert len(decoded.keys()) == 3
         assert "exp" in decoded.keys()
         assert "scopes" in decoded.keys()
@@ -377,9 +367,7 @@ class TestUtils:
 
         metadata = {
             "access": settings.ACCESS_PUBLIC,
-            "documenten": [
-                {"barcode": "ST00000126", "access": settings.ACCESS_RESTRICTED}
-            ],
+            "documenten": [{"barcode": "ST00000126", "access": settings.ACCESS_RESTRICTED}],
         }
         public, has_copyright = img_is_public_copyright(metadata, "ST00000126")
         assert public is False
@@ -423,9 +411,7 @@ class TestUtils:
             zip_ref.extractall(unzip_folder)
 
         os.path.isdir(os.path.join(unzip_folder, uuid))
-        extracted_files = sorted(
-            [file.name for file in Path(os.path.join(unzip_folder, uuid)).glob("*")]
-        )
+        extracted_files = sorted([file.name for file in Path(os.path.join(unzip_folder, uuid)).glob("*")])
         assert extracted_files == filenames
 
         # Cleanup so that other tests are not influenced
@@ -437,25 +423,16 @@ class TestUtils:
         Request = namedtuple("Request", "get_token_subject, get_token_claims")
 
         # test getting the email address from the authz token
-        request = Request(
-            get_token_subject=self.test_email_address, get_token_claims={}
-        )
+        request = Request(get_token_subject=self.test_email_address, get_token_claims={})
         assert get_email_address(request, {"sub": "a@a.a"}) == self.test_email_address
 
         # test getting the email address from the email login link jwt token
         request = Request(get_token_subject=None, get_token_claims={})
-        assert (
-            get_email_address(request, {"sub": self.test_email_address})
-            == self.test_email_address
-        )
+        assert get_email_address(request, {"sub": self.test_email_address}) == self.test_email_address
 
         # test getting the email address from the keycloak token
-        request = Request(
-            get_token_subject=None, get_token_claims={"email": self.test_email_address}
-        )
-        assert (
-            get_email_address(request, {"sub": "other str"}) == self.test_email_address
-        )
+        request = Request(get_token_subject=None, get_token_claims={"email": self.test_email_address})
+        assert get_email_address(request, {"sub": "other str"}) == self.test_email_address
 
         # test getting no email address from any token
         request = Request(get_token_subject=None, get_token_claims={})

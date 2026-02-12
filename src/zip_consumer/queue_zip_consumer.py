@@ -48,12 +48,9 @@ class AzureZipQueueConsumer:
             message_iterator = None
 
             if self.end_at_empty_queue:
-                # This part is only for testing purposes. To be able to exit the running process when the queue is empty.
-                message_iterator = list(
-                    self.queue_client.receive_messages(
-                        messages_per_page=10, visibility_timeout=5
-                    )
-                )
+                # This part is only for testing purposes.
+                # To be able to exit the running process when the queue is empty.
+                message_iterator = list(self.queue_client.receive_messages(messages_per_page=10, visibility_timeout=5))
                 if count == 0 or len(message_iterator) == 0:
                     break
 
@@ -72,15 +69,11 @@ class AzureZipQueueConsumer:
                 except Exception as e:
                     _job_content = json.loads(message.content)
                     logger.error(
-                        f"An exception occurred during processing of message data uuid {_job_content["data"]}: {e}"
+                        f"An exception occurred during processing of message data uuid {_job_content['data']}: {e}"
                     )
                     if message.dequeue_count > 5:
-                        logger.info(
-                            f"Deleting the message, dequeue count is too high. {message.dequeue_count=}"
-                        )
-                        self.queue_client.delete_message(
-                            message.id, message.pop_receipt
-                        )
+                        logger.info(f"Deleting the message, dequeue count is too high. {message.dequeue_count=}")
+                        self.queue_client.delete_message(message.id, message.pop_receipt)
                 else:
                     self.queue_client.delete_message(message.id, message.pop_receipt)
 
@@ -90,9 +83,7 @@ class AzureZipQueueConsumer:
         logger.info("Started process_message")
 
         if message.dequeue_count > 5:
-            logger.info(
-                f"Skipping the message, dequeue count is too high. {message.dequeue_count=}"
-            )
+            logger.info(f"Skipping the message, dequeue count is too high. {message.dequeue_count=}")
             return
 
         job = json.loads(message.content)
@@ -123,9 +114,7 @@ class AzureZipQueueConsumer:
                 metadata_cache,
             )
             try:
-                authentication.check_file_access_in_metadata(
-                    metadata, image_info["url_info"], record["scope"]
-                )
+                authentication.check_file_access_in_metadata(metadata, image_info["url_info"], record["scope"])
                 authentication.check_restricted_file(metadata, image_info["url_info"])
             except utils.ImmediateHttpResponse as e:
                 fail_reason = e.response.content.decode("utf-8")
@@ -149,18 +138,12 @@ class AzureZipQueueConsumer:
             settings.STORAGE_ACCOUNT_CONTAINER_NAME, zip_file_path, zip_file_name
         )
 
-        temp_zip_download_url = create_storage_account_temp_url(
-            blob_client, blob_service_client
-        )
+        temp_zip_download_url = create_storage_account_temp_url(blob_client, blob_service_client)
 
         email_subject = "Downloadlink Bouw- en omgevingdossiers"
-        email_body = render_to_string(
-            "download_zip.html", {"temp_zip_download_url": temp_zip_download_url}
-        )
+        email_body = render_to_string("download_zip.html", {"temp_zip_download_url": temp_zip_download_url})
 
         mailing.send_email(record["email_address"], email_subject, email_body)
 
-        remove_blob_from_storage_account(
-            settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME, job_blob_name
-        )
+        remove_blob_from_storage_account(settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME, job_blob_name)
         zip_tools.cleanup_local_files(zip_file_path, tmp_folder_path)

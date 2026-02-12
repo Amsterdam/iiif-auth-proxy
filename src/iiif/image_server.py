@@ -33,9 +33,7 @@ def get_filename(url_info, metadata):
         if document["barcode"] == url_info["document_barcode"]:
             position = int(url_info["filenr"])
             return document["bestanden"][position]["filename"]
-    raise FilenameNotFoundInDocumentInMetadataError(
-        f'Filename for document {url_info["document_barcode"]} not found'
-    )
+    raise FilenameNotFoundInDocumentInMetadataError(f"Filename for document {url_info['document_barcode']} not found")
 
 
 def create_url(url_info, metadata):
@@ -43,9 +41,7 @@ def create_url(url_info, metadata):
         if document["barcode"] == url_info["document_barcode"]:
             position = int(url_info["filenr"])
             return document["bestanden"][position]["file_pad"]
-    raise FilenameNotFoundInDocumentInMetadataError(
-        f'File_pad for document {url_info["document_barcode"]} not found'
-    )
+    raise FilenameNotFoundInDocumentInMetadataError(f"File_pad for document {url_info['document_barcode']} not found")
 
 
 def create_file_url_and_headers(url_info, metadata):
@@ -59,7 +55,7 @@ def create_file_url_and_headers(url_info, metadata):
         iiif_image_url = f"{settings.WABO_BASE_URL}{wabo_url}"
         return iiif_image_url, {"Authorization": settings.WABO_AUTHORIZATION}
 
-    raise FileSourceNotValidError(f'File source: {url_info["source"]} invalid')
+    raise FileSourceNotValidError(f"File source: {url_info['source']} invalid")
 
 
 def _get_filename_variants(file_url):
@@ -106,9 +102,7 @@ def get_file(url_info, metadata):
     last_error = None
 
     file_url_variants = _get_filename_variants(file_url)
-    max_timeout = floor(
-        25 / len(file_url_variants)
-    )  # Calculate the correct max_timeout
+    max_timeout = floor(25 / len(file_url_variants))  # Calculate the correct max_timeout
     for file_url_variant in file_url_variants:
         try:
             file_response = requests.get(
@@ -121,9 +115,7 @@ def get_file(url_info, metadata):
                 successful_url = file_url_variant
                 break
         except RequestException as e:
-            log.warning(
-                f"Request failed for {file_url_variant}: {e.__class__.__name__}"
-            )
+            log.warning(f"Request failed for {file_url_variant}: {e.__class__.__name__}")
             last_error = e
 
             # Try the next variant
@@ -143,15 +135,11 @@ def get_file(url_info, metadata):
 def handle_file_response_codes(file_response, file_url):
 
     if file_response is None:
-        raise ImmediateHttpResponse(
-            response=HttpResponse(f"No source file could be found", status=404)
-        )
+        raise ImmediateHttpResponse(response=HttpResponse("No source file could be found", status=404))
 
     match file_response.status_code:
         case 404:
-            raise ImmediateHttpResponse(
-                response=HttpResponse(f"No source file could be found", status=404)
-            )
+            raise ImmediateHttpResponse(response=HttpResponse("No source file could be found", status=404))
         case 502:
             raise ImmediateHttpResponse(response=file_response)
         case _ if file_response.status_code != 200:
@@ -161,8 +149,7 @@ def handle_file_response_codes(file_response, file_url):
             )
             raise ImmediateHttpResponse(
                 response=HttpResponse(
-                    f"We had a problem retrieving the image. We got status "
-                    f"code {file_response.status_code}",
+                    f"We had a problem retrieving the image. We got status code {file_response.status_code}",
                     status=502,
                 )
             )
@@ -197,21 +184,15 @@ def download_file_for_zip(
         file_response, file_url = get_file(url_info, metadata)
         handle_file_response_codes(file_response, file_url)
     except ImmediateHttpResponse as e:
-        log.exception(
-            f"HTTP Exception while retrieving {iiif_url} from the source system: ({e.response.content})"
-        )
+        log.exception(f"HTTP Exception while retrieving {iiif_url} from the source system: ({e.response.content})")
         info_txt_contents += (
-            f"Not included in this zip because an error occurred "
-            f"while getting it from the source system\n"
+            "Not included in this zip because an error occurred while getting it from the source system\n"
         )
         return info_txt_contents
     except Exception as e:
-        log.exception(
-            f"Exception while retrieving {iiif_url} from the source system: ({e})."
-        )
+        log.exception(f"Exception while retrieving {iiif_url} from the source system: ({e}).")
         info_txt_contents += (
-            f"Not included in this zip because an error occurred "
-            f"while getting it from the source system\n"
+            "Not included in this zip because an error occurred while getting it from the source system\n"
         )
         return info_txt_contents
 

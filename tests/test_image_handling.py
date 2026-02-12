@@ -3,7 +3,6 @@ import os
 import pytest
 
 from iiif.image_handling import (
-    NON_OVERLAPPING_REGION_PARAMETER,
     crop_image,
     parse_region_string,
     parse_scaling_string,
@@ -16,43 +15,29 @@ CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 class TestImageFormatting:
     def setup_method(self):
-        with open(
-            os.path.join(CURRENT_DIRECTORY, "test-images/test-image-96x85.jpg"), "rb"
-        ) as f:
+        with open(os.path.join(CURRENT_DIRECTORY, "test-images/test-image-96x85.jpg"), "rb") as f:
             self.img_96x85 = f.read()
-        with open(
-            os.path.join(CURRENT_DIRECTORY, "test-images/test-image-50x44.jpg"), "rb"
-        ) as f:
+        with open(os.path.join(CURRENT_DIRECTORY, "test-images/test-image-50x44.jpg"), "rb") as f:
             self.img_50x44 = f.read()
-        with open(
-            os.path.join(CURRENT_DIRECTORY, "test-images/test-image-49x44.jpg"), "rb"
-        ) as f:
+        with open(os.path.join(CURRENT_DIRECTORY, "test-images/test-image-49x44.jpg"), "rb") as f:
             self.img_49x44 = f.read()
         with open(
-            os.path.join(
-                CURRENT_DIRECTORY, "test-images/test-image-cropped-0x0x50x44.jpg"
-            ),
+            os.path.join(CURRENT_DIRECTORY, "test-images/test-image-cropped-0x0x50x44.jpg"),
             "rb",
         ) as f:
             self.img_0x0x50x44 = f.read()
         with open(
-            os.path.join(
-                CURRENT_DIRECTORY, "test-images/test-image-cropped-0x41x96x44.jpg"
-            ),
+            os.path.join(CURRENT_DIRECTORY, "test-images/test-image-cropped-0x41x96x44.jpg"),
             "rb",
         ) as f:
             self.img_0x41x96x44 = f.read()
         with open(
-            os.path.join(
-                CURRENT_DIRECTORY, "test-images/test-image-cropped-24x24x72x72.jpg"
-            ),
+            os.path.join(CURRENT_DIRECTORY, "test-images/test-image-cropped-24x24x72x72.jpg"),
             "rb",
         ) as f:
             self.img_24x24x72x72 = f.read()
         with open(
-            os.path.join(
-                CURRENT_DIRECTORY, "test-images/test-image-cropped-48x0x48x85.jpg"
-            ),
+            os.path.join(CURRENT_DIRECTORY, "test-images/test-image-cropped-48x0x48x85.jpg"),
             "rb",
         ) as f:
             self.img_48x0x48x85 = f.read()
@@ -95,25 +80,11 @@ class TestImageFormatting:
         assert crop_image("image/jpeg", "full", self.img_96x85) == self.img_96x85
         assert crop_image("image/jpeg", "square", self.img_96x85) == self.img_85x85
         assert crop_image("image/jpeg", "0,0,100,100", self.img_96x85) == self.img_96x85
-        assert (
-            crop_image("image/jpeg", "0,0,50,44", self.img_96x85) == self.img_0x0x50x44
-        )
-        assert (
-            crop_image("image/jpeg", "24,24,48,48", self.img_96x85)
-            == self.img_24x24x72x72
-        )
-        assert (
-            crop_image("image/jpeg", "0,41,96,85", self.img_96x85)
-            == self.img_0x41x96x44
-        )
-        assert (
-            crop_image("image/jpeg", "48,0,96,85", self.img_96x85)
-            == self.img_48x0x48x85
-        )
-        assert (
-            crop_image("image/jpeg", "-50,-56,100,100", self.img_96x85)
-            == self.img_0x0x50x44
-        )
+        assert crop_image("image/jpeg", "0,0,50,44", self.img_96x85) == self.img_0x0x50x44
+        assert crop_image("image/jpeg", "24,24,48,48", self.img_96x85) == self.img_24x24x72x72
+        assert crop_image("image/jpeg", "0,41,96,85", self.img_96x85) == self.img_0x41x96x44
+        assert crop_image("image/jpeg", "48,0,96,85", self.img_96x85) == self.img_48x0x48x85
+        assert crop_image("image/jpeg", "-50,-56,100,100", self.img_96x85) == self.img_0x0x50x44
 
     def test_crop_image_no_size(self):
         with pytest.raises(ImmediateHttpResponse):

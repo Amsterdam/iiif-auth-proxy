@@ -54,18 +54,14 @@ ACCESS_PUBLIC = "PUBLIC"
 ACCESS_RESTRICTED = "RESTRICTED"
 COPYRIGHT_YES = "J"
 COPYRIGHT_NO = "N"
-BOUWDOSSIER_PUBLIC_SCOPE = (
-    "BD/P"  # BouwDossiers_Public_Read. Access to anybody with e-mail link
+BOUWDOSSIER_PUBLIC_SCOPE = "BD/P"  # BouwDossiers_Public_Read. Access to anybody with e-mail link
+BOUWDOSSIER_READ_SCOPE = "BD/R"  # BouwDossiers_Read. Access to civil servants of Amsterdam Municipality
+BOUWDOSSIER_EXTENDED_SCOPE = (
+    "BD/X"  # BouwDossiers_eXtended. Access civil servants of Amsterdam Municipality with special rights.
 )
-BOUWDOSSIER_READ_SCOPE = (
-    "BD/R"  # BouwDossiers_Read. Access to civil servants of Amsterdam Municipality
-)
-BOUWDOSSIER_EXTENDED_SCOPE = "BD/X"  # BouwDossiers_eXtended. Access civil servants of Amsterdam Municipality with special rights.
 # IIIF_BASE_URL = os.getenv("IIIF_BASE_URL", "http://iiif.service.consul")
 # IIIF_PORT = os.getenv("IIIF_PORT", "8149")  # This port is static within the network
-EDEPOT_BASE_URL = os.getenv(
-    "EDEPOT_BASE_URL", "https://bwt.uitplaatsing.shcp03.archivingondemand.nl/rest/"
-)
+EDEPOT_BASE_URL = os.getenv("EDEPOT_BASE_URL", "https://bwt.uitplaatsing.shcp03.archivingondemand.nl/rest/")
 WABO_BASE_URL = os.getenv(
     "WABO_BASE_URL",
     "https://bwt.hs3-saa-bwt.shcp04.archivingondemand.nl/rest/",
@@ -86,16 +82,12 @@ if str_to_bool(os.getenv("ALLOW_LOCALHOST_LOGIN_URL", "false")):
     LOGIN_ORIGIN_URL_TLD_WHITELIST += ["localhost", "127.0.0.1"]
 
 # SMTP email settings using Secure Mail Relay
-EMAIL_BACKEND = os.getenv(
-    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
-)
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = os.getenv("EMAIL_HOST", "localhost")
 EMAIL_PORT = os.getenv("EMAIL_PORT", "587")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-EMAIL_FROM_EMAIL_ADDRESS = os.getenv(
-    "EMAIL_FROM_EMAIL_ADDRESS", "bouwdossiers@amsterdam.nl"
-)
+EMAIL_FROM_EMAIL_ADDRESS = os.getenv("EMAIL_FROM_EMAIL_ADDRESS", "bouwdossiers@amsterdam.nl")
 EMAIL_USE_TLS = str_to_bool(os.getenv("EMAIL_USE_TLS", "true"))
 EMAIL_TIMEOUT = 5
 
@@ -220,9 +212,7 @@ DATABASES = {
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -312,9 +302,7 @@ LOGGING = {
 }
 
 # OTEL
-APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv(
-    "APPLICATIONINSIGHTS_CONNECTION_STRING"
-)
+APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
 
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter

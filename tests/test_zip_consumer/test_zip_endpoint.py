@@ -32,9 +32,7 @@ class TestZipEndpoint:
         self.url = "/iiif/zip/"
         self.BASE_URL = "https://bouwdossiers.amsterdam.nl/iiif/"
         self.test_email_address = "zip@amsterdam.nl"
-        self.mail_login_token = create_mail_login_token(
-            self.test_email_address, settings.SECRET_KEY
-        )
+        self.mail_login_token = create_mail_login_token(self.test_email_address, settings.SECRET_KEY)
         self.extended_scope_token = create_authz_token(
             [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE]
         )
@@ -43,15 +41,11 @@ class TestZipEndpoint:
         return [m for m in queue_client.receive_messages(max_messages=10000)]
 
     def get_zip_job(self, blob_name):
-        _, blob = get_blob_from_storage_account(
-            settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME, blob_name
-        )
+        _, blob = get_blob_from_storage_account(settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME, blob_name)
         return json.loads(blob)
 
     @patch("iiif.metadata.do_metadata_request")
-    def test_get_public_image_with_jwt_token(
-        self, mock_do_metadata_request, client, test_queue_client
-    ):
+    def test_get_public_image_with_jwt_token(self, mock_do_metadata_request, client, test_queue_client):
         # Set up mock metadata response
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -119,9 +113,7 @@ class TestZipEndpoint:
         assert len(data["urls"]) == 3
 
     @patch("iiif.metadata.do_metadata_request")
-    def test_get_many_public_images(
-        self, mock_do_metadata_request, client, test_queue_client
-    ):
+    def test_get_many_public_images(self, mock_do_metadata_request, client, test_queue_client):
         num_dossiers = 1000
         # Set up mock metadata response
         mock_do_metadata_request.return_value = MockResponse(
@@ -138,14 +130,7 @@ class TestZipEndpoint:
         # Request two images
         response = client.post(
             self.url + "?auth=" + self.mail_login_token,
-            json.dumps(
-                {
-                    "urls": [
-                        self.BASE_URL + PRE_WABO_IMG_URL_BASE + f"?q={i}"
-                        for i in range(0, num_dossiers)
-                    ]
-                }
-            ),
+            json.dumps({"urls": [self.BASE_URL + PRE_WABO_IMG_URL_BASE + f"?q={i}" for i in range(0, num_dossiers)]}),
             content_type="application/json",
         )
 
@@ -159,9 +144,7 @@ class TestZipEndpoint:
         assert len(data["urls"]) == num_dossiers
 
     @patch("iiif.metadata.do_metadata_request")
-    def test_get_public_image_with_authz_token(
-        self, mock_do_metadata_request, client, test_queue_client
-    ):
+    def test_get_public_image_with_authz_token(self, mock_do_metadata_request, client, test_queue_client):
         # Set up mock metadata response
         mock_do_metadata_request.return_value = MockResponse(
             200,
@@ -176,10 +159,7 @@ class TestZipEndpoint:
         )
 
         # Request two images
-        header = {
-            "HTTP_AUTHORIZATION": "Bearer "
-            + create_authz_token([settings.BOUWDOSSIER_READ_SCOPE])
-        }
+        header = {"HTTP_AUTHORIZATION": "Bearer " + create_authz_token([settings.BOUWDOSSIER_READ_SCOPE])}
         response = client.post(
             self.url + "?auth=" + self.mail_login_token,
             json.dumps(
@@ -278,9 +258,7 @@ class TestZipEndpoint:
         )
 
         assert response.status_code == 401
-        assert (
-            response.content.decode("utf-8") == RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN
-        )
+        assert response.content.decode("utf-8") == RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN
         assert len(self.get_all_queue_messages(test_queue_client)) == 0
 
     @patch("iiif.metadata.do_metadata_request")
@@ -353,9 +331,7 @@ class TestZipEndpoint:
         # Request two images with extended scope
         header = {
             "HTTP_AUTHORIZATION": "Bearer "
-            + create_authz_token(
-                [settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE]
-            )
+            + create_authz_token([settings.BOUWDOSSIER_READ_SCOPE, settings.BOUWDOSSIER_EXTENDED_SCOPE])
         }
         response = client.post(
             self.url,
@@ -511,9 +487,7 @@ class TestZipEndpoint:
         assert len(files) == expected_files
 
         # Check whether the report.txt contains info about the missing restrictions
-        with open(
-            f"{TMP_BOUWDOSSIER_ZIP_FOLDER}{tmp_contents[0]}/report.txt", "r"
-        ) as f:
+        with open(f"{TMP_BOUWDOSSIER_ZIP_FOLDER}{tmp_contents[0]}/report.txt", "r") as f:
             assert f.readlines()[-1].endswith(expected_line_end + "\n")
 
         # Check whether an email was sent

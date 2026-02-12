@@ -14,14 +14,18 @@ Image.MAX_IMAGE_PIXELS = None
 
 log = logging.getLogger(__name__)
 
-MALFORMED_SCALING_PARAMETER = "The scaling parameter is malformed. It should either be 'full' or in the form of '100,50'."
-MISSING_SCALING_PARAMETER = "The scaling parameter is missing. It should either be 'full' or in the form of '100,50'."
-MALFORMED_REGION_PARAMETER = "The region parameter is malformed. It should either be 'full' or in the form of '50,50,100,100' (x,y,w,h)."
-MISSING_REGION_PARAMETER = "The region parameter is missing. It should either be 'full' or in the form of '50,50,100,100' (x,y,w,h)."
-NON_OVERLAPPING_REGION_PARAMETER = "The region parameter should overlap with the image."
-NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER = (
-    "The region parameter should have a positive width and height value"
+MALFORMED_SCALING_PARAMETER = (
+    "The scaling parameter is malformed. It should either be 'full' or in the form of '100,50'."  # noqa: E501
 )
+MISSING_SCALING_PARAMETER = "The scaling parameter is missing. It should either be 'full' or in the form of '100,50'."
+MALFORMED_REGION_PARAMETER = (
+    "The region parameter is malformed. It should either be 'full' or in the form of '50,50,100,100' (x,y,w,h)."  # noqa: E501
+)
+MISSING_REGION_PARAMETER = (
+    "The region parameter is missing. It should either be 'full' or in the form of '50,50,100,100' (x,y,w,h)."  # noqa: E501
+)
+NON_OVERLAPPING_REGION_PARAMETER = "The region parameter should overlap with the image."
+NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER = "The region parameter should have a positive width and height value"
 
 BASE_INFO_JSON = {
     "@context": "http://iiif.io/api/image/2/context.json",
@@ -57,9 +61,7 @@ def generate_info_json(image_base_url, content, content_type):
     info_json["width"] = img.width
     info_json["height"] = img.height
     info_json["sizes"] = [{"width": img.width, "height": img.height}]
-    info_json["profile"][1]["formats"] = [
-        content_type_to_format(content_type).replace("jpeg", "jpg")
-    ]
+    info_json["profile"][1]["formats"] = [content_type_to_format(content_type).replace("jpeg", "jpg")]
 
     return json.dumps(info_json)
 
@@ -78,20 +80,14 @@ def parse_scaling_string(scaling):
             raise ValueError("Invalid format for scaling")
 
         if not (parts[0] or parts[1]):
-            raise ValueError(
-                "Invalid format for scaling. Width or height value required."
-            )
+            raise ValueError("Invalid format for scaling. Width or height value required.")
 
         requested_width = int(parts[0]) if parts[0] else None
         requested_height = int(parts[1]) if parts[1] else None
     except ValueError as e:
-        raise utils.ImmediateHttpResponse(
-            response=HttpResponse(MALFORMED_SCALING_PARAMETER, status=400)
-        ) from e
+        raise utils.ImmediateHttpResponse(response=HttpResponse(MALFORMED_SCALING_PARAMETER, status=400)) from e
     except AttributeError as e:
-        raise utils.ImmediateHttpResponse(
-            response=HttpResponse(MISSING_SCALING_PARAMETER, status=400)
-        ) from e
+        raise utils.ImmediateHttpResponse(response=HttpResponse(MISSING_SCALING_PARAMETER, status=400)) from e
 
     return requested_width, requested_height
 
@@ -142,9 +138,7 @@ def scale_image(content_type, scaling, content):
 
     img = Image.open(BytesIO(content))
     requested_width, requested_height = parse_scaling_string(scaling)
-    target_width, target_height = calculate_scaled_dimensions(
-        img, requested_width, requested_height
-    )
+    target_width, target_height = calculate_scaled_dimensions(img, requested_width, requested_height)
 
     # Ensure we don't scale up
     if target_width > img.width or target_height > img.height:
@@ -173,37 +167,25 @@ def parse_region_string(region):
             raise ValueError("Invalid format for region")
 
         if not (parts[0] and parts[1] and parts[2] and parts[3]):
-            raise ValueError(
-                "Invalid format for region. x, y, width and height values required."
-            )
+            raise ValueError("Invalid format for region. x, y, width and height values required.")
 
         requested_x = int(parts[0])
         requested_y = int(parts[1])
         requested_width = int(parts[2])
         requested_height = int(parts[3])
     except ValueError as e:
-        raise utils.ImmediateHttpResponse(
-            response=HttpResponse(MALFORMED_REGION_PARAMETER, status=400)
-        ) from e
+        raise utils.ImmediateHttpResponse(response=HttpResponse(MALFORMED_REGION_PARAMETER, status=400)) from e
     except AttributeError as e:
-        raise utils.ImmediateHttpResponse(
-            response=HttpResponse(MISSING_REGION_PARAMETER, status=400)
-        ) from e
+        raise utils.ImmediateHttpResponse(response=HttpResponse(MISSING_REGION_PARAMETER, status=400)) from e
 
     return requested_x, requested_y, requested_width, requested_height
 
 
-def assert_valid_region(
-    img, requested_x, requested_y, requested_width, requested_height
-):
+def assert_valid_region(img, requested_x, requested_y, requested_width, requested_height):
     region_has_no_width = requested_width <= 0 or requested_width is None
     region_has_no_height = requested_height <= 0 or requested_height is None
     if region_has_no_width or region_has_no_height:
-        raise utils.ImmediateHttpResponse(
-            response=HttpResponse(
-                NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER, status=400
-            )
-        )
+        raise utils.ImmediateHttpResponse(response=HttpResponse(NON_POSITIVE_WIDTH_HEIGHT_REGION_PARAMETER, status=400))
 
     region_has_no_overlap_with_img = (
         requested_x + requested_width <= 0
@@ -212,9 +194,7 @@ def assert_valid_region(
         or requested_y >= img.height
     )
     if region_has_no_overlap_with_img:
-        raise utils.ImmediateHttpResponse(
-            response=HttpResponse(NON_OVERLAPPING_REGION_PARAMETER, status=400)
-        )
+        raise utils.ImmediateHttpResponse(response=HttpResponse(NON_OVERLAPPING_REGION_PARAMETER, status=400))
 
 
 # TODO: Extract sub functions to own functions for:
@@ -241,22 +221,16 @@ def crop_image(content_type, region, content):
             requested_x = (img.width - requested_width) / 2
             requested_y = (img.height - requested_height) / 2
         case _:
-            requested_x, requested_y, requested_width, requested_height = (
-                parse_region_string(region)
-            )
+            requested_x, requested_y, requested_width, requested_height = parse_region_string(region)
 
-    assert_valid_region(
-        img, requested_x, requested_y, requested_width, requested_height
-    )
+    assert_valid_region(img, requested_x, requested_y, requested_width, requested_height)
 
     left = clamp(requested_x, 0, img.width)
     top = clamp(requested_y, 0, img.height)
     right = clamp(requested_x + requested_width, left, img.width)
     bottom = clamp(requested_y + requested_height, top, img.height)
 
-    crop_contains_complete_img = (
-        left <= 0 and top <= 0 and right >= img.width and bottom >= img.height
-    )
+    crop_contains_complete_img = left <= 0 and top <= 0 and right >= img.width and bottom >= img.height
     if crop_contains_complete_img:
         return content
 

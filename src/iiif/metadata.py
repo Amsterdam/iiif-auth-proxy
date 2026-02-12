@@ -9,15 +9,15 @@ from main.utils import ImmediateHttpResponse
 
 log = logging.getLogger(__name__)
 
-RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER = (
-    "The iiif-metadata-server cannot be reached"
-)
+RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER = "The iiif-metadata-server cannot be reached"
 
 
 def get_metadata_url(url_info):
     # Test with:
     # curl -i -H "Accept: application/json" http://app-iiif-metadata-server/iiif-metadata/bouwdossier/SA85385/
-    return f"{settings.METADATA_SERVER_BASE_URL}/iiif-metadata/bouwdossier/{url_info['stadsdeel']}_{url_info['dossier']}/"
+    return (
+        f"{settings.METADATA_SERVER_BASE_URL}/iiif-metadata/bouwdossier/{url_info['stadsdeel']}_{url_info['dossier']}/"  # noqa: E501
+    )
 
 
 def do_metadata_request(metadata_url):
@@ -36,22 +36,13 @@ def get_metadata(url_info, iiif_url, metadata_cache):
         metadata_url = get_metadata_url(url_info)
         meta_response = do_metadata_request(metadata_url)
     except RequestException as e:
-        log.error(
-            f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER} "
-            f"because of this error {e}"
-        )
+        log.error(f"{RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER} because of this error {e}")
         raise ImmediateHttpResponse(
-            response=HttpResponse(
-                RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER, status=502
-            )
+            response=HttpResponse(RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER, status=502)
         ) from e
 
     if meta_response.status_code == 404:
-        raise ImmediateHttpResponse(
-            response=HttpResponse(
-                "No metadata could be found for this dossier", status=404
-            )
-        )
+        raise ImmediateHttpResponse(response=HttpResponse("No metadata could be found for this dossier", status=404))
     if meta_response.status_code != 200:
         log.info(
             f"Got response code {meta_response.status_code} while retrieving "
