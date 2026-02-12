@@ -24,11 +24,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements_linting.txt
 
-      - name: Run autoflake check
-        run: autoflake ./src/ --check --recursive --quiet
+      - name: Run ruff check
+        run: ruff check .
 
-      - name: Run isort check
-        run: isort --diff --check ./src/ ./tests/
-
-      - name: Run black check
-        run: black --diff --check ./src/ ./tests/
+      - name: Run ruff format check
+        run: ruff format --diff .
