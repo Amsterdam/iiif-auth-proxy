@@ -55,17 +55,11 @@ def request_multiple_files_in_zip(request):
     # can pick it up.
 
     # Zip_info is too large for the request body (hard limit by Azure). So we use the claim check pattern.
-    # First, the jobs/zip_info is stored as a blob in the storage_account. Then we send a reference to the blob to the queue
+    # First, the jobs/zip_info is stored as a blob in the storage_account.
+    # Then we send a reference to the blob to the queue
     blob_name = str(uuid.uuid4())
-    zip_job = json.dumps(
-        {
-            key: zip_info[key]
-            for key in ["email_address", "scope", "is_mail_login", "urls"]
-        }
-    )
-    store_blob_on_storage_account(
-        settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME, blob_name, zip_job
-    )
+    zip_job = json.dumps({key: zip_info[key] for key in ["email_address", "scope", "is_mail_login", "urls"]})
+    store_blob_on_storage_account(settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME, blob_name, zip_job)
     zip_tools.store_zip_job(blob_name)
 
     # Respond with a 200 to signal success.

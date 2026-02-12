@@ -1,7 +1,5 @@
-import os
 from unittest.mock import patch
 
-import pytest
 from django.conf import settings
 
 from iiif import image_server, parsing

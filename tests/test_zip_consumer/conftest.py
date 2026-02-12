@@ -36,9 +36,7 @@ def download_blob_container():
 
 @pytest.fixture(scope="session", autouse=True)
 def zip_jobs_blob_container():
-    with blob_container(
-        settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME
-    ) as container:
+    with blob_container(settings.STORAGE_ACCOUNT_CONTAINER_ZIP_QUEUE_JOBS_NAME) as container:
         yield container
 
 

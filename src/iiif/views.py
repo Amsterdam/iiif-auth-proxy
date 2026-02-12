@@ -54,9 +54,7 @@ def index(request, iiif_url):
         file_type = file_response.headers.get("Content-Type")
 
         if is_source_file_requested:
-            return add_caching_headers(
-                is_cacheable, HttpResponse(file_content, file_type)
-            )
+            return add_caching_headers(is_cacheable, HttpResponse(file_content, file_type))
 
         if not is_image_content_type(file_type):
             # The requested file is NOT an image itself, but we can create a thumbnail for it so let's create it.
