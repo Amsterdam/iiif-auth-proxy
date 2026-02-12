@@ -90,10 +90,6 @@ def azure_queue_message_factory():
 
 @pytest.fixture(autouse=True)
 def mocked_create_storage_account_temp_url():
-    with patch(
-        "zip_consumer.queue_zip_consumer.create_storage_account_temp_url"
-    ) as mock:
-        mock.return_value = (
-            "http://localhost:10000/devstoreaccount1/container/blob?mock_sas_token"
-        )
+    with patch("zip_consumer.queue_zip_consumer.create_storage_account_temp_url") as mock:
+        mock.return_value = "http://localhost:10000/devstoreaccount1/container/blob?mock_sas_token"
         yield mock
