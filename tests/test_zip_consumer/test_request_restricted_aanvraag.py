@@ -9,7 +9,7 @@ import pytest
 from django.conf import settings
 from django.core import mail
 
-from core.auth.constants import RESPONSE_CONTENT_RESTRICTED
+from core.auth.constants import RESPONSE_CONTENT_AANVRAAG_RESTRICTED
 from tests.tools import MockResponse
 from zip_consumer.queue_zip_consumer import AzureZipQueueConsumer
 
@@ -145,7 +145,7 @@ def test_request_restricted_aanvraag_in_zip(
 
     assert len(lines) == 3
     assert lines[0].strip() == "The following files were requested:"
-    assert lines[1].strip() == f"test.jpg: Not included in this zip because {RESPONSE_CONTENT_RESTRICTED}"
+    assert lines[1].strip() == f"test.jpg: Not included in this zip because {RESPONSE_CONTENT_AANVRAAG_RESTRICTED}"
     assert lines[2].strip() == "test-public.jpg: included"
 
     extracted_files = list((tmp_path / f"{fixed_uuid}").iterdir())
