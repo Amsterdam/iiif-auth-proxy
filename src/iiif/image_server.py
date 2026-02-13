@@ -177,7 +177,7 @@ def download_file_for_zip(
     info_txt_contents += f"{filename}: "
 
     if fail_reason:
-        info_txt_contents += f"Not included in this zip because {fail_reason}\n"
+        info_txt_contents += f"excluded, {fail_reason}\n"
         return info_txt_contents
 
     try:
@@ -185,15 +185,11 @@ def download_file_for_zip(
         handle_file_response_codes(file_response, file_url)
     except ImmediateHttpResponse as e:
         log.exception(f"HTTP Exception while retrieving {iiif_url} from the source system: ({e.response.content})")
-        info_txt_contents += (
-            "Not included in this zip because an error occurred while getting it from the source system\n"
-        )
+        info_txt_contents += "excluded, Error occurred while getting file from the source system\n"
         return info_txt_contents
     except Exception as e:
         log.exception(f"Exception while retrieving {iiif_url} from the source system: ({e}).")
-        info_txt_contents += (
-            "Not included in this zip because an error occurred while getting it from the source system\n"
-        )
+        info_txt_contents += "excluded, Error occurred while getting file from the source system\n"
         return info_txt_contents
 
     # Save image file to tmp folder
