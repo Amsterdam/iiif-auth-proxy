@@ -145,7 +145,7 @@ def test_request_restricted_aanvraag_in_zip(
 
     assert len(lines) == 3
     assert lines[0].strip() == "The following files were requested:"
-    assert lines[1].strip() == f"test.jpg: Not included in this zip because {RESPONSE_CONTENT_AANVRAAG_RESTRICTED}"
+    assert lines[1].strip() == f"test.jpg: excluded, {RESPONSE_CONTENT_AANVRAAG_RESTRICTED}"
     assert lines[2].strip() == "test-public.jpg: included"
 
     extracted_files = list((tmp_path / f"{fixed_uuid}").iterdir())
