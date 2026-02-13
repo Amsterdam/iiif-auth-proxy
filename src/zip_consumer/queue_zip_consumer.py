@@ -7,10 +7,12 @@ import timeout_decorator
 from django.conf import settings
 from django.template.loader import render_to_string
 
-from auth_mail import authentication, mailing
+from auth_mail import mailing
+from core.auth.document_access import (
+    file_can_be_zipped,
+)
 from iiif import image_server
 from iiif.metadata import get_metadata
-from main import utils
 from utils.queue import get_queue_client
 from utils.storage import (
     create_storage_account_temp_url,
@@ -27,7 +29,7 @@ class AzureZipQueueConsumer:
     # Be careful with the visibility timeout! If the message is still processing when the visibility timeout
     # expires, the message will be put back on the queue and will be processed again. This can lead to duplicate
     # messages!!! Always use a timeout decorator to prevent this.
-    # We set it to an hour, because some zips can simply be very very large
+    # We set it to an hour, because some zips can simply be very, very large
     MESSAGE_VISIBILITY_TIMEOUT = 3600
 
     # This consumer accepts messages with this name
@@ -107,17 +109,13 @@ class AzureZipQueueConsumer:
         # Get metadata and files from image servers
         metadata_cache = {}
         for iiif_url, image_info in record["urls"].items():
-            fail_reason = None
             metadata, metadata_cache = get_metadata(
                 image_info["url_info"],
                 iiif_url,
                 metadata_cache,
             )
-            try:
-                authentication.check_file_access_in_metadata(metadata, image_info["url_info"], record["scope"])
-                authentication.check_restricted_file(metadata, image_info["url_info"])
-            except utils.ImmediateHttpResponse as e:
-                fail_reason = e.response.content.decode("utf-8")
+
+            can_be_zipped, fail_reason = file_can_be_zipped(metadata, image_info["url_info"], record["scope"])
 
             info_txt_contents = image_server.download_file_for_zip(
                 iiif_url,

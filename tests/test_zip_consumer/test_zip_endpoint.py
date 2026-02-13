@@ -6,20 +6,18 @@ import pytest
 from azure.core.exceptions import ResourceNotFoundError
 from django.conf import settings
 
-from auth_mail.authentication import (
+from core.auth.constants import (
     RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN,
     RESPONSE_CONTENT_RESTRICTED,
-    RESPONSE_CONTENT_RESTRICTED_IN_ZIP,
-    create_mail_login_token,
 )
-from auth_mail.generate_token import create_authz_token
+from core.auth.jwt_tokens import create_mail_login_token
 from tests.test_settings import (
     PRE_WABO_IMG_URL_BASE,
     PRE_WABO_IMG_URL_DOUBLE_DOSSIER,
     PRE_WABO_IMG_URL_WITH_SCALING,
     WABO_IMG_URL,
 )
-from tests.tools import MockResponse
+from tests.tools import MockResponse, create_authz_token
 from utils.storage import get_blob_from_storage_account
 from zip_consumer.queue_zip_consumer import AzureZipQueueConsumer
 from zip_consumer.zip_tools import TMP_BOUWDOSSIER_ZIP_FOLDER
@@ -361,14 +359,14 @@ class TestZipEndpoint:
             (
                 settings.BOUWDOSSIER_READ_SCOPE,
                 settings.ACCESS_RESTRICTED,
-                f"Not included in this zip because {RESPONSE_CONTENT_RESTRICTED}",
+                f"excluded, {RESPONSE_CONTENT_RESTRICTED}",
                 2,  # The first file and the report.txt
             ),
             (
                 settings.BOUWDOSSIER_EXTENDED_SCOPE,
                 settings.ACCESS_RESTRICTED,
-                f"Not included in this zip because {RESPONSE_CONTENT_RESTRICTED_IN_ZIP}",
-                2,  # The first file and the report.txt
+                "included",
+                3,  # Both files and the report.txt
             ),
             (
                 settings.BOUWDOSSIER_READ_SCOPE,
