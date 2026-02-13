@@ -2,6 +2,7 @@ from django.conf import settings
 from django.http import HttpResponse
 
 from core.auth.constants import (
+    RESPONSE_CONTENT_AANVRAAG_RESTRICTED,
     RESPONSE_CONTENT_COPYRIGHT,
     RESPONSE_CONTENT_INVALID_SCOPE,
     RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
@@ -88,7 +89,7 @@ def file_can_be_zipped(metadata: dict, url_info: dict, scope: str) -> tuple[bool
     is_restricted = access == settings.ACCESS_RESTRICTED
 
     if is_aanvraag and is_restricted:
-        return False, RESPONSE_CONTENT_RESTRICTED
+        return False, RESPONSE_CONTENT_AANVRAAG_RESTRICTED
 
     # All good, the file can be included in the zip
     return True, None
