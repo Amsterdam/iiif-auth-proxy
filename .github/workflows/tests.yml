@@ -2,7 +2,10 @@ name: Tests
 
 on:
   pull_request:
-    branches: [main]
+    paths-ignore:
+      - ".github/**"
+    branches:
+      - main
 
 permissions:
   contents: read

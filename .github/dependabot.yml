@@ -1,0 +1,54 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      time: "07:30"
+      timezone: "Europe/Amsterdam"
+    groups:
+      maintenance:
+        applies-to: "version-updates"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "chore(deps)"
+    allow:
+      - dependency-type: "all"
+    open-pull-requests-limit: 1
+    ignore:
+      - dependency-name: "azure-identity"
+        versions:
+          - "> 1.16"
+      - dependency-name: "azure-storage-blob"
+        versions:
+          - "> 12.27.1"
+      - dependency-name: "azure-storage-queue"
+        versions:
+          - "> 12.14.1"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "07:30"
+      timezone: "Europe/Amsterdam"
+    groups:
+      maintenance:
+        applies-to: "version-updates"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci(deps)"
+    open-pull-requests-limit: 1
