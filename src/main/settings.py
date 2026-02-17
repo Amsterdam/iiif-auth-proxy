@@ -339,3 +339,11 @@ RequestsInstrumentor().instrument()
 URLLibInstrumentor().instrument()
 URLLib3Instrumentor().instrument()
 LoggingInstrumentor().instrument(set_logging_format=True)
+
+
+# Suppress InsecureRequestWarning for unverified HTTPS requests to 'bwt.uitplaatsing.shcp03.archivingondemand.nl'.
+# This is a trusted source, and we have verified it is valid, but it does not provide a certificate that urllib3
+# can verify. Until this is resolved on their end, we suppress the warning to avoid log noise.
+import urllib3  # noqa: I001
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
