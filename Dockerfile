@@ -53,7 +53,6 @@ COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/pyth
 COPY --from=builder /usr/local/bin/ /usr/local/bin
 
 WORKDIR /app
-COPY deploy deploy
 COPY src src
 
 WORKDIR /app/src
@@ -62,7 +61,7 @@ RUN python manage.py collectstatic --no-input
 
 USER datapunt
 
-CMD ["/app/deploy/docker-run.sh"]
+CMD ["uwsgi", "--ini", "/app/src/main/uwsgi.ini"]
 
 
 # stage 2, dev
