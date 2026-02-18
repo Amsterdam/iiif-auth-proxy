@@ -67,7 +67,7 @@ def test_get_image_fails(mock_requests_get, http_status_code):
         tmp_folder_path,
     )
 
-    assert info_txt_contents[:30] == "SJ10027690_00001.jpg: Not incl"
+    assert info_txt_contents[:30] == "SJ10027690_00001.jpg: excluded"
 
 
 @patch("requests.get")

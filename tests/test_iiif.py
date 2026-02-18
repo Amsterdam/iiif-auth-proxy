@@ -9,15 +9,14 @@ from django.conf import settings
 from django.test import override_settings
 from requests.exceptions import ConnectTimeout, RequestException
 
-from auth_mail.authentication import (
+from core.auth.constants import (
     RESPONSE_CONTENT_COPYRIGHT,
     RESPONSE_CONTENT_NO_DOCUMENT_IN_METADATA,
     RESPONSE_CONTENT_NO_TOKEN,
     RESPONSE_CONTENT_NO_WABO_WITH_MAIL_LOGIN,
     RESPONSE_CONTENT_RESTRICTED,
-    create_mail_login_token,
 )
-from auth_mail.generate_token import create_authz_token
+from core.auth.jwt_tokens import create_mail_login_token
 from iiif.image_server import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_IMAGE_SERVER
 from iiif.metadata import RESPONSE_CONTENT_ERROR_RESPONSE_FROM_METADATA_SERVER
 from tests.test_settings import (
@@ -33,7 +32,7 @@ from tests.test_settings import (
     PRE_WABO_METADATA_CONTENT,
     WABO_IMG_URL,
 )
-from tests.tools import MockResponse
+from tests.tools import MockResponse, create_authz_token
 
 log = logging.getLogger(__name__)
 timezone = pytz.timezone("UTC")
