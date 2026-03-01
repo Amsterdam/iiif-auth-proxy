@@ -4,5 +4,5 @@
 #
 #    pip-compile --allow-unsafe --output-file=requirements_linting.txt requirements_linting.in
 #
-ruff==0.15.1
+ruff==0.15.4
     # via -r requirements_linting.in
