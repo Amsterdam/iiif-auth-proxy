@@ -8,7 +8,7 @@ asgiref==3.11.1
     # via
     #   django
     #   django-cors-headers
-azure-core==1.38.2
+azure-core==1.39.0
     # via
     #   -r requirements.in
     #   azure-identity
@@ -37,7 +37,7 @@ certifi==2026.2.25
     # via requests
 cffi==2.0.0
     # via cryptography
-charset-normalizer==3.4.4
+charset-normalizer==3.4.6
     # via requests
 cryptography==46.0.6
     # via
@@ -48,7 +48,7 @@ cryptography==46.0.6
     #   jwcrypto
     #   msal
     #   pyjwt
-datapunt-authorization-django==2.0.1
+datapunt-authorization-django==2.0.3
     # via -r requirements.in
 debtcollector==3.0.0
     # via
@@ -63,9 +63,9 @@ django-cors-headers==4.9.0
     # via -r requirements.in
 django-ratelimit==4.1.0
     # via -r requirements.in
-googleapis-common-protos==1.72.0
+googleapis-common-protos==1.73.1
     # via opentelemetry-exporter-otlp-proto-grpc
-grpcio==1.78.0
+grpcio==1.80.0
     # via opentelemetry-exporter-otlp-proto-grpc
 idna==3.11
     # via requests
@@ -86,7 +86,7 @@ jwcrypto==1.5.6
     # via datapunt-authorization-django
 keystoneauth1==5.13.1
     # via python-keystoneclient
-msal==1.35.0
+msal==1.35.1
     # via
     #   azure-identity
     #   msal-extensions
@@ -199,7 +199,7 @@ pbr==7.0.3
     #   python-keystoneclient
 pillow-simd==9.5.0.post2
     # via -r requirements.in
-protobuf==6.33.5
+protobuf==6.33.6
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
@@ -209,7 +209,7 @@ psycopg2-binary==2.9.11
     # via -r requirements.in
 pycparser==3.0
     # via cffi
-pyjwt[crypto]==2.12.0
+pyjwt[crypto]==2.12.1
     # via
     #   -r requirements.in
     #   msal
@@ -223,7 +223,7 @@ pyyaml==6.0.3
     # via
     #   oslo-config
     #   oslo-utils
-requests==2.33.0
+requests==2.33.1
     # via
     #   azure-core
     #   datapunt-authorization-django
@@ -277,5 +277,5 @@ zipp==3.23.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==82.0.0
+setuptools==82.0.1
     # via pbr
