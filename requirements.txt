@@ -33,13 +33,13 @@ azure-storage-blob==12.27.1
     # via -r requirements.in
 azure-storage-queue==12.14.1
     # via -r requirements.in
-certifi==2026.5.20
+certifi==2026.6.17
     # via requests
 cffi==2.0.0
     # via cryptography
 charset-normalizer==3.4.7
     # via requests
-cryptography==48.0.1
+cryptography==49.0.0
     # via
     #   azure-identity
     #   azure-keyvault-keys
@@ -52,7 +52,7 @@ datapunt-authorization-django==2.1.0
     # via -r requirements.in
 debtcollector==3.0.0
     # via python-keystoneclient
-django==6.0.5
+django==6.0.6
     # via
     #   -r requirements.in
     #   datapunt-authorization-django
@@ -63,9 +63,9 @@ django-ratelimit==4.1.0
     # via -r requirements.in
 googleapis-common-protos==1.75.0
     # via opentelemetry-exporter-otlp-proto-grpc
-grpcio==1.81.0
+grpcio==1.81.1
     # via opentelemetry-exporter-otlp-proto-grpc
-idna==3.17
+idna==3.18
     # via requests
 importlib-metadata==8.7.1
     # via opentelemetry-api
@@ -80,7 +80,7 @@ isodate==0.7.2
     #   azure-keyvault-secrets
     #   azure-storage-blob
     #   azure-storage-queue
-jwcrypto==1.5.7
+jwcrypto==1.5.8
     # via datapunt-authorization-django
 keystoneauth1==5.14.0
     # via python-keystoneclient
@@ -170,7 +170,7 @@ opentelemetry-util-http==0.60b1
     #   opentelemetry-instrumentation-wsgi
 os-service-types==1.8.2
     # via keystoneauth1
-oslo-config==10.4.0
+oslo-config==10.5.0
     # via python-keystoneclient
 oslo-i18n==6.8.0
     # via
@@ -179,7 +179,7 @@ oslo-i18n==6.8.0
     #   python-keystoneclient
 oslo-serialization==5.10.0
     # via python-keystoneclient
-oslo-utils==10.1.0
+oslo-utils==10.1.1
     # via
     #   oslo-serialization
     #   python-keystoneclient
