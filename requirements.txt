@@ -4,7 +4,7 @@
 #
 #    pip-compile --allow-unsafe --output-file=requirements.txt requirements.in
 #
-asgiref==3.11.1
+asgiref==3.12.1
     # via
     #   django
     #   django-cors-headers
@@ -33,11 +33,11 @@ azure-storage-blob==12.27.1
     # via -r requirements.in
 azure-storage-queue==12.14.1
     # via -r requirements.in
-certifi==2026.6.17
+certifi==2026.7.22
     # via requests
-cffi==2.0.0
+cffi==2.1.0
     # via cryptography
-charset-normalizer==3.4.7
+charset-normalizer==3.4.9
     # via requests
 cryptography==49.0.0
     # via
@@ -52,7 +52,7 @@ datapunt-authorization-django==2.1.0
     # via -r requirements.in
 debtcollector==3.0.0
     # via python-keystoneclient
-django==6.0.6
+django==6.0.7
     # via
     #   -r requirements.in
     #   datapunt-authorization-django
@@ -63,7 +63,7 @@ django-ratelimit==4.1.0
     # via -r requirements.in
 googleapis-common-protos==1.75.0
     # via opentelemetry-exporter-otlp-proto-grpc
-grpcio==1.81.1
+grpcio==1.83.0
     # via opentelemetry-exporter-otlp-proto-grpc
 idna==3.18
     # via requests
@@ -82,7 +82,7 @@ isodate==0.7.2
     #   azure-storage-queue
 jwcrypto==1.5.8
     # via datapunt-authorization-django
-keystoneauth1==5.14.0
+keystoneauth1==5.15.0
     # via python-keystoneclient
 msal==1.37.0
     # via
@@ -170,14 +170,14 @@ opentelemetry-util-http==0.60b1
     #   opentelemetry-instrumentation-wsgi
 os-service-types==1.8.2
     # via keystoneauth1
-oslo-config==10.5.0
+oslo-config==10.6.0
     # via python-keystoneclient
-oslo-i18n==6.8.0
+oslo-i18n==6.9.0
     # via
     #   oslo-config
     #   oslo-utils
     #   python-keystoneclient
-oslo-serialization==5.10.0
+oslo-serialization==5.11.0
     # via python-keystoneclient
 oslo-utils==10.1.1
     # via
@@ -190,7 +190,6 @@ packaging==26.2
     #   python-keystoneclient
 pbr==7.0.3
     # via
-    #   keystoneauth1
     #   os-service-types
     #   oslo-i18n
     #   oslo-utils
@@ -236,7 +235,7 @@ six==1.17.0
     # via -r requirements.in
 sqlparse==0.5.5
     # via django
-stevedore==5.8.0
+stevedore==5.9.0
     # via
     #   keystoneauth1
     #   oslo-config
@@ -245,7 +244,7 @@ timeout-decorator==0.5.0
     # via -r requirements.in
 toolz==1.1.0
     # via -r requirements.in
-typing-extensions==4.15.0
+typing-extensions==4.16.0
     # via
     #   azure-core
     #   azure-keyvault-certificates
@@ -275,5 +274,5 @@ zipp==4.1.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==82.0.1
+setuptools==83.0.0
     # via pbr
