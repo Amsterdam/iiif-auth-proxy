@@ -233,7 +233,7 @@ rfc3986==2.0.0
     # via oslo-config
 six==1.17.0
     # via -r requirements.in
-sqlparse==0.5.5
+sqlparse==0.6.0
     # via django
 stevedore==5.9.0
     # via
