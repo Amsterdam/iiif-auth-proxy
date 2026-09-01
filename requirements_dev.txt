@@ -4,26 +4,26 @@
 #
 #    pip-compile --allow-unsafe --output-file=requirements_dev.txt requirements_dev.in
 #
-build==1.5.0
+build==1.6.0
     # via pip-tools
-click==8.4.2
+click==8.5.0
     # via pip-tools
-coverage[toml]==7.15.2
+coverage[toml]==7.16.0
     # via pytest-cov
 iniconfig==2.3.0
     # via pytest
-packaging==26.2
+packaging==26.3
     # via
     #   build
     #   pytest
     #   wheel
-pip-tools==7.6.0
+pip-tools==7.6.1
     # via -r requirements_dev.in
 pluggy==1.6.0
     # via
     #   pytest
     #   pytest-cov
-pygments==2.20.0
+pygments==2.21.0
     # via pytest
 pyproject-hooks==1.2.0
     # via
@@ -36,17 +36,17 @@ pytest==9.1.1
     #   pytest-django
 pytest-cov==7.1.0
     # via -r requirements_dev.in
-pytest-django==4.12.0
+pytest-django==4.14.0
     # via -r requirements_dev.in
 pytz==2026.3.post1
     # via -r requirements_dev.in
-time-machine==3.2.0
+time-machine==3.5.0
     # via -r requirements_dev.in
-wheel==0.47.0
+wheel==0.48.0
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
-pip==26.1.2
+pip==26.2.1
     # via pip-tools
-setuptools==83.0.0
+setuptools==84.0.0
     # via pip-tools
