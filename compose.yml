@@ -102,7 +102,7 @@ services:
     build:
       context: .
       target: app
-    image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-opdrachten/iiif-auth-proxy}:${VERSION:-latest}
+    image: ${REGISTRY:-localhost:5000}/${REPOSITORY:-ams-opdr/iiif-auth-proxy}:${VERSION:-latest}
     ports:
       - "8000:8000"
     environment:
