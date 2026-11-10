@@ -260,7 +260,7 @@ typing-extensions==4.16.0
     #   opentelemetry-sdk
     #   opentelemetry-semantic-conventions
     #   os-service-types
-urllib3==2.7.0
+urllib3==2.8.0
     # via requests
 uwsgi==2.0.31
     # via -r requirements.in
