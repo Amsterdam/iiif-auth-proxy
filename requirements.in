@@ -1,7 +1,7 @@
 # Define all requirements, only pin when necessary (and if so, add a comment explaining why).
 # See # https://git.datapunt.amsterdam.nl/Datapunt/python-best-practices/blob/master/dependency_management/
 
-datapunt-authorization-django
+datapunt-authorization-django<=2.2.0
 pyjwt
 pillow-simd  # Pillow with SIMD support
 six # Needed by jwcrypto, which mistakenly doesn't include it. PR with fix here: https://github.com/latchset/jwcrypto/pull/202
