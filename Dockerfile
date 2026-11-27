@@ -33,10 +33,12 @@ ENV CONSUL_PORT=${CONSUL_PORT:-8500}
 
 ARG USE_JWKS_TEST_KEY=true
 
+# Temporary: telnet for acc/dev troubleshooting; remove after deployment checks.
 RUN set -eux && \
     python -m ensurepip --upgrade && \
     apt-get update && apt-get install -y \
         libgeos3.11.1 \
+        telnet \
         gdal-bin && \
     useradd --user-group --system datapunt && \
     apt-get clean && \
